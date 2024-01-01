@@ -3,3 +3,9 @@
 
 # Ignore fvcode file
 fvcode
+
+# Ignore .DS file
+.DS_Store
+
+# Ignore obj folder
+obj/
