@@ -1,0 +1,2 @@
+# FVCode - Fast and easy code editor
+**Fast View Code** is a brand new editor code created on 31st December of 2023. It started as a little idea in my head and evolved into a big project that i love to work on.
