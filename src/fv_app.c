@@ -45,7 +45,6 @@ void
 FV_DestroyApp(fv_app_t* app)
 {
     /* Unallocate everything by using FV_UnallocAll */
-    FV_Free(app);
     FV_UnallocAll();
 }
 

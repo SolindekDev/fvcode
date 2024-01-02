@@ -21,13 +21,22 @@
 
 #include <fv/fv.h>
 
+typedef struct __fv_alloc_pointer_t {
+    void* ptr;
+    u8    free;
+} fv_alloc_pointer_t;
+
 void FV_AllocInit ();
 void FV_UnallocAll();
 
-void* FV_Calloc (size_t count, size_t size);
-void* FV_Malloc (size_t size);
-void* FV_Realloc(void *ptr, size_t size);
+void*  FV_Calloc (size_t count, size_t size);
+void*  FV_Malloc (size_t size);
+void*  FV_Realloc(void *ptr, size_t size);
 
-void  FV_Free(void *ptr);
+void   FV_Free(void *ptr);
+size_t FV_GetAllocatedPointersLength();
+
+fv_alloc_pointer_t* FV_FindAllocatedPointerByAddress(void* address);
+fv_alloc_pointer_t* FV_CreateAllocatedPointer(void* ptr, u8 free);
 
 #endif /* __FV_ALLOC_H */

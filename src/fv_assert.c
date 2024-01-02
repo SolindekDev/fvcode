@@ -20,8 +20,8 @@
 
 #include <fv/fv_assert.h>
 
-#define FV_ASSERT_MESSAGE                                                            \
-     "FVCode AssertFailed: %s:%d in %s because \'%s\' failed.\nExiting with 1 code." \
+#define FV_ASSERT_MESSAGE                                                              \
+     "FVCode AssertFailed: %s:%d in %s because \'%s\' failed.\nExiting with 1 code.\n" \
 
 __FV_NO_RETURN__ void 
 FV_Assert(const char* file, i32 line, 
