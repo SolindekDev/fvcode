@@ -16,5 +16,5 @@
 - FreeType documentation https://freetype.org/freetype2/docs/documentation.html
 - Curl API documentation https://curl.se/libcurl/c/
 - GLFW documentation https://www.glfw.org/documentation.html
-- Multiply github repositories
+- Github repositories
 - And other resources like StackOverflow, ChatGPT and just google 
