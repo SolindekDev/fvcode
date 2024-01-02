@@ -17,7 +17,7 @@
 #
 
 CC = gcc
-CFLAGS = -Wall -I./include
+CFLAGS = -O3 -std=c2x -I./include
 
 SRC_DIR = ./src
 OBJ_DIR = ./obj

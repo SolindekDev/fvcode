@@ -16,25 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __FV_FV_H
-#define __FV_FV_H
+#include <fv/fv.h>
 
-/* C Headers */
-#include <stdbool.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <assert.h>
-#include <stdarg.h>
-#include <string.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <math.h>
-#include <time.h>
-
-/* FV Headers */
-#include <fv/fv_types.h>
 #include <fv/fv_assert.h>
 
-#define __FV_NO_RETURN__ __attribute__((noreturn))
+#define FV_ASSERT_MESSAGE                                                            \
+     "FVCode AssertFailed: %s:%d in %s because \'%s\' failed.\nExiting with 1 code." \
 
-#endif /* __FV_FV_H */
+__FV_NO_RETURN__ void 
+FV_Assert(const char* file, i32 line, 
+          const char* func, const char* e)
+{
+    printf(FV_ASSERT_MESSAGE, file, line, func, e);
+    exit(1);
+}

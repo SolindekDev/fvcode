@@ -18,9 +18,16 @@
 
 #include <fv/fv.h>
 
-int 
-main(int argc, char** argv)
+#include <fv/fv_main.h>
+#include <fv/fv_app.h>
+
+/* Main entry of FVCode*/
+i32 
+main(i32 argc, char** argv)
 {
-    printf("Hello, World!\n");
-    return 0;
+    fv_app_t* fv = FV_CreateApp(argc, argv);
+
+    /* Initialize and run the app */ 
+              fv->Init(fv);
+    return    fv->Run(fv) ;
 }

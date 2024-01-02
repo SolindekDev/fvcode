@@ -16,25 +16,51 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __FV_FV_H
-#define __FV_FV_H
+#include <fv/fv.h>
 
-/* C Headers */
-#include <stdbool.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <assert.h>
-#include <stdarg.h>
-#include <string.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <math.h>
-#include <time.h>
-
-/* FV Headers */
-#include <fv/fv_types.h>
+#include <fv/fv_alloc.h>
 #include <fv/fv_assert.h>
 
-#define __FV_NO_RETURN__ __attribute__((noreturn))
+/* Global array that consists of every allocated 
+ * pointer by calloc, malloc etc. in this app.
+ * This helps track memory allocation. */
+void** fv_allocated_pointers;
 
-#endif /* __FV_FV_H */
+void 
+FV_AllocInit()
+{
+    if (fv_allocated_pointers != NULL)
+        return;
+    fv_allocated_pointers = calloc(1, sizeof(void*));
+    return;
+}
+
+void 
+FV_UnallocAll()
+{
+
+}
+
+void* 
+FV_Calloc(size_t count, size_t size)
+{
+
+}
+
+void* 
+FV_Malloc(size_t size)
+{
+
+}
+
+void* 
+FV_Realloc(void *ptr, size_t size)
+{
+
+}
+
+void  
+FV_Free(void *ptr)
+{
+
+}

@@ -16,25 +16,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __FV_FV_H
-#define __FV_FV_H
+#ifndef __FV_ASSERT_H
+#define __FV_ASSERT_H
 
-/* C Headers */
-#include <stdbool.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <assert.h>
-#include <stdarg.h>
-#include <string.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <math.h>
-#include <time.h>
+#include <fv/fv.h>
 
-/* FV Headers */
-#include <fv/fv_types.h>
-#include <fv/fv_assert.h>
-
+#ifndef __FV_NO_RETURN__
 #define __FV_NO_RETURN__ __attribute__((noreturn))
+#endif /* __FV_NO_RETURN__ */
 
-#endif /* __FV_FV_H */
+#define FV_ASSERT(e) {(e == true)                                            \
+                            ? (e)                                            \
+                            : FV_Assert(__FILE__, __LINE__, __func__, #e); } \
+
+__FV_NO_RETURN__ void FV_Assert(const char* file, i32 line, 
+                                const char* func, const char* e);
+
+#endif /* __FV_ASSERT_H */

@@ -16,25 +16,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __FV_FV_H
-#define __FV_FV_H
+#ifndef __FV_APP_H
+#define __FV_APP_H
 
-/* C Headers */
-#include <stdbool.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <assert.h>
-#include <stdarg.h>
-#include <string.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <math.h>
-#include <time.h>
+#include <fv/fv.h>
 
-/* FV Headers */
-#include <fv/fv_types.h>
-#include <fv/fv_assert.h>
+typedef int (*fv_app_init_func)(void* app);
+typedef int (*fv_app_run_func) (void* app);
 
-#define __FV_NO_RETURN__ __attribute__((noreturn))
+typedef struct __fv_app_t {
+    char** argv;
+    i32  argc;
 
-#endif /* __FV_FV_H */
+    fv_app_run_func  Run;
+    fv_app_init_func Init;
+} fv_app_t;
+
+fv_app_t* FV_CreateApp(i32 argc, char** argv);
+
+__FV_NO_RETURN__ void FV_DestroyAppAndExit(fv_app_t* app, i32 code);
+                 void FV_DestroyApp(fv_app_t* app);
+
+int FV_AppInitFunctionDefault(fv_app_t* app);
+int FV_AppRunFunctionDefault(fv_app_t* app);
+
+#endif /* __FV_APP_H */
