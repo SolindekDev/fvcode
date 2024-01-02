@@ -62,8 +62,7 @@ FV_DestroyAppAndExit(fv_app_t* app, i32 code)
 int 
 FV_AppInitFunctionDefault(fv_app_t* app)
 {
-    void* p = FV_Calloc(1, 1);
-    FV_Free(p);
+    
     return 0;
 }  
 
