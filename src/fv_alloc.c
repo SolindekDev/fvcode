@@ -53,11 +53,13 @@ FV_UnallocAll()
     while (*pointers != NULL)
     {
         fv_alloc_pointer_t* curr_pointer = *pointers;
-        free(curr_pointer->ptr); 
-        free(curr_pointer     );   
+        if (curr_pointer->free == 0)
+        {
+            free(curr_pointer->ptr); 
+            free(curr_pointer);   
+        }
         pointers++;
     }
-    free(fv_allocated_pointers); // Free the memory for the array of pointers
 }
 
 size_t
