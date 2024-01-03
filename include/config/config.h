@@ -19,7 +19,15 @@
 #ifndef __FV_CONFIG_H
 #define __FV_CONFIG_H
 
+#include <stdbool.h>
+
+/* Version */
 #define FV_VERSION     "0.1.0v BETA"
-#define FV_WINDOW_NAME "FVCode " FV_VERSION
+
+/* Window */
+#define FV_WINDOW_NAME   "FVCode " FV_VERSION
+
+#define FV_WINDOW_SIZE_X     1280
+#define FV_WINDOW_SIZE_Y     720
 
 #endif /* __FV_CONFIG_H */

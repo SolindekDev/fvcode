@@ -18,20 +18,29 @@
 
 #include <fv/fv.h>
 
-#include <fv/fv_assert.h>
+#include <fv/fv_error.h>
 #include <fv/fv_alloc.h>
+#include <fv/fv_app.h>
 
-#include <GLFW/glfw3.h>
+#define FV_ERROR_MESSAGE                                      \
+     "FVCode Error: %s:%d in %s: %s\nExiting with 1 code.\n"  \
 
-#define FV_ASSERT_MESSAGE                                                              \
-     "FVCode AssertFailed: %s:%d in %s because \'%s\' failed.\nExiting with 1 code.\n" \
+#define FV_ERROR_NO_EXIT_MESSAGE         \
+     "FVCode Error: %s:%d in %s: %s\n"   \
 
 __FV_NO_RETURN__ void 
-FV_Assert(const char* file, i32 line, 
-          const char* func, const char* e)
+FV_Error(const char* file, i32 line, 
+         const char* func, const char* error)
 {
-    printf(FV_ASSERT_MESSAGE, file, line, func, e);
+    printf(FV_ERROR_MESSAGE, file, line, func, error);
     FV_UnallocAll();
     glfwTerminate();
     exit(1);
+}
+
+
+void FV_ErrorNoExit(const char* file, i32 line, 
+                    const char* func, const char* error)
+{
+    printf(FV_ERROR_NO_EXIT_MESSAGE, file, line, func, error);
 }

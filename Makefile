@@ -17,7 +17,8 @@
 #
 
 CC = gcc
-CFLAGS = -O3 -std=c2x -I./include
+CFLAGS = -O3 -std=c2x -I./include $(shell pkg-config --cflags glfw3) -Wno-deprecated-declarations
+LIBFLAGS = $(shell pkg-config --libs glfw3) -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo
 
 SRC_DIR = ./src
 OBJ_DIR = ./obj
@@ -28,7 +29,7 @@ SRC_FILES = $(wildcard $(SRC_DIR)/*.c)
 OBJ_FILES = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC_FILES))
 
 $(EXECUTABLE): $(OBJ_FILES)
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(LIBFLAGS) $(CFLAGS) $^ -o $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@

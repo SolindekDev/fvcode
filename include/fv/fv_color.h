@@ -16,22 +16,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#ifndef __FV_COLOR_H
+#define __FV_COLOR_H
+
 #include <fv/fv.h>
 
-#include <fv/fv_assert.h>
-#include <fv/fv_alloc.h>
+#define FV_CONVERT_COLOR_TO_OPENGL(color)                 \
+    ((float)color.r / 255.0f), ((float)color.g / 255.0f), \
+    ((float)color.b / 255.0f), ((float)color.a / 255.0f)  \
 
-#include <GLFW/glfw3.h>
+typedef struct __fv_color_t {
+    float r, g, b, a;
+} fv_color_t;
 
-#define FV_ASSERT_MESSAGE                                                              \
-     "FVCode AssertFailed: %s:%d in %s because \'%s\' failed.\nExiting with 1 code.\n" \
+fv_color_t FV_NewColorRGB(float r, float g, float b, float a);
+fv_color_t FV_NewColorHSV(float h, float s, float v, float a);
+fv_color_t FV_NewColorHex(u64 hex);
 
-__FV_NO_RETURN__ void 
-FV_Assert(const char* file, i32 line, 
-          const char* func, const char* e)
-{
-    printf(FV_ASSERT_MESSAGE, file, line, func, e);
-    FV_UnallocAll();
-    glfwTerminate();
-    exit(1);
-}
+#endif /* __FV_COLOR_H */

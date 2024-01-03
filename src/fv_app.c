@@ -18,9 +18,12 @@
 
 #include <fv/fv.h>
 
-#include <fv/fv_app.h>
-#include <fv/fv_main.h>
+#include <fv/fv_render.h>
+#include <fv/fv_drawing.h>
+#include <fv/fv_color.h>
 #include <fv/fv_alloc.h>
+#include <fv/fv_main.h>
+#include <fv/fv_app.h>
 
 /* This function will initalize app structure 
  * that is used in main function for managing
@@ -46,6 +49,7 @@ FV_DestroyApp(fv_app_t* app)
 {
     /* Unallocate everything by using FV_UnallocAll */
     FV_UnallocAll();
+    glfwTerminate();
 }
 
 /* Wrapper for function FV_DestroyApp that will 
@@ -62,7 +66,12 @@ FV_DestroyAppAndExit(fv_app_t* app, i32 code)
 int 
 FV_AppInitFunctionDefault(fv_app_t* app)
 {
-    
+    app->render = FV_RenderInit(app);
+    FV_RenderCreateDefaultWindow(app->render);
+    FV_RenderInitHandleViewportChange(app->render);
+    FV_RenderInitGL(app->render);
+
+    app->background = FV_NewColorRGB(28, 29, 29, 255);
     return 0;
 }  
 
@@ -71,6 +80,18 @@ FV_AppInitFunctionDefault(fv_app_t* app)
 int 
 FV_AppRunFunctionDefault (fv_app_t* app)
 {
+    while (!FV_RenderShouldExit(app->render))
+    {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(FV_CONVERT_COLOR_TO_OPENGL(app->background));
+        FV_DrawRenderQuad(app, FV_NewVector(150, 150), FV_NewVector(500, 300),
+                          FV_NewColorRGB(123, 40, 150, 255), FV_NewColorRGB(255, 255, 150, 255), 5);
+        // FV_DrawRenderLine(app, FV_NewVector(100, 100), FV_NewVector(400, 200),
+        //                   FV_NewColorRGB(123, 40, 150, 255), 4);
+        glfwSwapBuffers(app->render->window);
+        glfwPollEvents();
+    }
+
     FV_DestroyApp(app);
     return 0;
 }

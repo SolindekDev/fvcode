@@ -19,6 +19,17 @@
 #ifndef __FV_FV_H
 #define __FV_FV_H
 
+/* For now we support only Windows, Unix and MacOS */
+#if !defined(_WIN32) || !defined(__unix__) || !defined(unix)|| !defined(__unix) || !defined(__linux__)
+# if !(defined(__MACH__) && defined(__APPLE__))
+#  error "Unknown environment that is not supported by Dozen Rivals Client."
+# endif /* __MACH__, __APPLE__ */
+#endif /* _WIN32, __unix__, unix, __unix, __linux__ */
+
+#if defined(__MACH__) || defined(__APPLE__)
+# define GL_SILENCE_DEPRECATION
+#endif /* __MACH__, __APPLE__ */
+
 /* C Headers */
 #include <stdbool.h>
 #include <stdlib.h>

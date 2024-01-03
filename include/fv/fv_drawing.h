@@ -16,34 +16,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __FV_APP_H
-#define __FV_APP_H
+#ifndef __FV_DRAWING_H
+#define __FV_DRAWING_H
 
 #include <fv/fv.h>
 
+#include <fv/fv_vector.h>
 #include <fv/fv_render.h>
 #include <fv/fv_color.h>
+#include <fv/fv_app.h>
 
-typedef int (*fv_app_init_func)(void* app);
-typedef int (*fv_app_run_func) (void* app);
+/* app - pointer to app strucutre
+ * start - start position of line
+ * end - end position of line
+ * line_color - line color 
+ * border_tickness - if 0 then function will fail*/
+void
+FV_DrawRenderLine(fv_app_t* app, fv_vector_t start, fv_vector_t end,
+                  fv_color_t line_color, i32 line_thickness);
 
-typedef struct __fv_render_t fv_render_t;
+/* app - pointer to app strucutre
+ * pos - position of quad
+ * size - size of quad 
+ * fill_color - fill color 
+ * border_color - border color
+ * border_tickness - if 0 then no border */
+void FV_DrawRenderQuad(fv_app_t* app, fv_vector_t pos, fv_vector_t size,
+                       fv_color_t fill_color, fv_color_t border_color, i32 border_thickness);
 
-typedef struct __fv_app_t {
-    char** argv;
-    i32  argc;
-    fv_app_run_func  Run;
-    fv_app_init_func Init;
-    fv_render_t* render;
-    fv_color_t   background;
-} fv_app_t;
-
-fv_app_t* FV_CreateApp(i32 argc, char** argv);
-
-__FV_NO_RETURN__ void FV_DestroyAppAndExit(fv_app_t* app, i32 code);
-                 void FV_DestroyApp(fv_app_t* app);
-
-int FV_AppInitFunctionDefault(fv_app_t* app);
-int FV_AppRunFunctionDefault(fv_app_t* app);
-
-#endif /* __FV_APP_H */
+#endif /* __FV_DRAWING_H */

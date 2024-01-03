@@ -3,9 +3,9 @@
 - `Done` ~ Simple App structure 
 - `Done` ~ Assert
 - `Done` ~ Memory manager
-- `TODO` ~ Initialize GLFW
-- `TODO` ~ Simple rendering loop
-- `TODO` ~ Render lines, triangles and cubes
+- `Done` ~ Initialize GLFW
+- `Done` ~ Simple rendering loop
+- `DONE` ~ Render lines and cubes
 - `TODO` ~ Font manager
     - `TODO` ~ Load fonts by FreeType library
     - `TODO` ~ Draw fonts by using OpenGL ([OpenGL Text rendering](https://en.wikibooks.org/wiki/OpenGL_Programming/Modern_OpenGL_Tutorial_Text_Rendering_01))
@@ -16,5 +16,6 @@
 - FreeType documentation https://freetype.org/freetype2/docs/documentation.html
 - Curl API documentation https://curl.se/libcurl/c/
 - GLFW documentation https://www.glfw.org/documentation.html
+- Great OpenGL documentation https://docs.gl
 - Github repositories
 - And other resources like StackOverflow, ChatGPT and just google 

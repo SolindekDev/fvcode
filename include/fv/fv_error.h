@@ -16,22 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#ifndef __FV_ERROR_H
+#define __FV_ERROR_H
+
 #include <fv/fv.h>
 
-#include <fv/fv_assert.h>
-#include <fv/fv_alloc.h>
+#define FV_ERROR_NO_EXIT(err) (FV_ErrorNoExit(__FILE__, __LINE__, __func__, err))
+#define FV_ERROR(err)         (FV_Error(__FILE__, __LINE__, __func__, err))
 
-#include <GLFW/glfw3.h>
+__FV_NO_RETURN__ void FV_Error(const char* file, i32 line, 
+                               const char* func, const char* error);
 
-#define FV_ASSERT_MESSAGE                                                              \
-     "FVCode AssertFailed: %s:%d in %s because \'%s\' failed.\nExiting with 1 code.\n" \
-
-__FV_NO_RETURN__ void 
-FV_Assert(const char* file, i32 line, 
-          const char* func, const char* e)
-{
-    printf(FV_ASSERT_MESSAGE, file, line, func, e);
-    FV_UnallocAll();
-    glfwTerminate();
-    exit(1);
-}
+void FV_ErrorNoExit(const char* file, i32 line, 
+                    const char* func, const char* error);
+                    
+#endif /* __FV_ERROR_H */

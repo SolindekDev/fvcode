@@ -16,22 +16,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <fv/fv.h>
+#ifndef __FV_RENDER_H
+#define __FV_RENDER_H
 
-#include <fv/fv_assert.h>
-#include <fv/fv_alloc.h>
+#include <fv/fv.h>
+#include <fv/fv_app.h>
 
 #include <GLFW/glfw3.h>
 
-#define FV_ASSERT_MESSAGE                                                              \
-     "FVCode AssertFailed: %s:%d in %s because \'%s\' failed.\nExiting with 1 code.\n" \
+typedef struct __fv_app_t fv_app_t;
 
-__FV_NO_RETURN__ void 
-FV_Assert(const char* file, i32 line, 
-          const char* func, const char* e)
-{
-    printf(FV_ASSERT_MESSAGE, file, line, func, e);
-    FV_UnallocAll();
-    glfwTerminate();
-    exit(1);
-}
+typedef struct __fv_render_t {
+    GLFWwindow* window;
+    fv_app_t*   app;
+} fv_render_t;
+
+fv_render_t* FV_RenderInit(fv_app_t* parent_app);
+
+void FV_RenderCreateDefaultWindow(fv_render_t* render);
+bool FV_RenderShouldExit(fv_render_t* render);
+
+void FV_RenderInitHandleViewportChange(fv_render_t* render);
+void FV_RenderInitGL(fv_render_t* render);
+
+#endif /* __FV_RENDER_H */

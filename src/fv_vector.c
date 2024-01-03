@@ -18,20 +18,10 @@
 
 #include <fv/fv.h>
 
-#include <fv/fv_assert.h>
-#include <fv/fv_alloc.h>
+#include <fv/fv_vector.h>
 
-#include <GLFW/glfw3.h>
-
-#define FV_ASSERT_MESSAGE                                                              \
-     "FVCode AssertFailed: %s:%d in %s because \'%s\' failed.\nExiting with 1 code.\n" \
-
-__FV_NO_RETURN__ void 
-FV_Assert(const char* file, i32 line, 
-          const char* func, const char* e)
+fv_vector_t 
+FV_NewVector(float x, float y)
 {
-    printf(FV_ASSERT_MESSAGE, file, line, func, e);
-    FV_UnallocAll();
-    glfwTerminate();
-    exit(1);
+    return ((fv_vector_t){x,y});
 }

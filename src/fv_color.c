@@ -18,20 +18,34 @@
 
 #include <fv/fv.h>
 
-#include <fv/fv_assert.h>
-#include <fv/fv_alloc.h>
+#include <fv/fv_color.h>
 
-#include <GLFW/glfw3.h>
-
-#define FV_ASSERT_MESSAGE                                                              \
-     "FVCode AssertFailed: %s:%d in %s because \'%s\' failed.\nExiting with 1 code.\n" \
-
-__FV_NO_RETURN__ void 
-FV_Assert(const char* file, i32 line, 
-          const char* func, const char* e)
+/* Create color in RGBA standard */
+fv_color_t 
+FV_NewColorRGB(float r, float g, float b, float a)
 {
-    printf(FV_ASSERT_MESSAGE, file, line, func, e);
-    FV_UnallocAll();
-    glfwTerminate();
-    exit(1);
+    return ((fv_color_t){ r, g, b, a });
+}
+
+/* Create color in HSV standard */
+fv_color_t 
+FV_NewColorHSV(float h, float s, float v, float a)
+{
+    /* TODO: Algorithm for converting HSV color to RGB */
+    
+    return FV_NewColorRGB(215, 105, 132, a);
+}
+
+/* Create color in RGBA by hexadecimal value*/
+fv_color_t 
+FV_NewColorHex(u64 hex)
+{
+    fv_color_t hex_color = FV_NewColorRGB(0, 0, 0, 255);
+
+    hex_color.r = (hex >> 24) & 0xFF;
+    hex_color.g = (hex >> 16) & 0xFF;
+    hex_color.b = (hex >>  8) & 0xFF;
+    hex_color.a = (   hex   ) & 0xFF;  
+
+    return hex_color;
 }
