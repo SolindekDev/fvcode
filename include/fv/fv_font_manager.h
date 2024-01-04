@@ -16,31 +16,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#ifndef __FV_FONT_MANAGER_H
+#define __FV_FONT_MANAGER_H
+
 #include <fv/fv.h>
+#include <fv/fv_array.h>
 
-#include <fv/fv_error.h>
-#include <fv/fv_alloc.h>
-#include <fv/fv_app.h>
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
-#define FV_ERROR_MESSAGE                                      \
-     "FVCode Error: %s:%d in %s: %s\nExiting with 1 code.\n"  \
+typedef struct __fv_font_t {
+    FT_Face font_face;
+} fv_font_t;
 
-#define FV_ERROR_NO_EXIT_MESSAGE         \
-     "FVCode Error: %s:%d in %s: %s\n"   \
+typedef struct __fv_font_manager_t {
+    fv_font_t*  default_font;
+    FT_Library  freetype;
+    fv_array_t* fonts /* fv_font_t* */; 
+} fv_font_manager_t;
 
-__FV_NO_RETURN__ void 
-FV_Error(const char* file, i32 line, 
-         const char* func, const char* error)
-{
-    printf(FV_ERROR_MESSAGE, file, line, func, error);
-    FV_UnallocAll();
-    glfwTerminate();
-    exit(1);
-}
+fv_font_manager_t* FV_FontManagerInit();
 
+fv_font_t* FV_CreateNewFontStructure();
 
-void FV_ErrorNoExit(const char* file, i32 line, 
-                    const char* func, const char* error)
-{
-    printf(FV_ERROR_NO_EXIT_MESSAGE, file, line, func, error);
-}
+fv_font_t* FV_CreateNewFontAsDefault(fv_font_manager_t* font_manager, char* font_path);
+fv_font_t* FV_CreateNewFont(fv_font_manager_t* font_manager, char* font_path);
+fv_font_t* FV_OpenNewFont(fv_font_manager_t* font_manager, char* font_path);
+
+#endif /* __FV_FONT_MANAGER_H */

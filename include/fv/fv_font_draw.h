@@ -16,18 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __FV_ERROR_H
-#define __FV_ERROR_H
+#ifndef __FV_FONT_DRAW_H
+#define __FV_FONT_DRAW_H
 
 #include <fv/fv.h>
 
-#define FV_ERROR_NO_EXIT(err) (FV_ErrorNoExit(__FILE__, __LINE__, __func__, err))
-#define FV_ERROR(err)         (FV_Error(__FILE__, __LINE__, __func__, err))
-
-__FV_NO_RETURN__ void FV_Error(const char* file, i32 line, 
-                               const char* func, const char* error);
-
-void FV_ErrorNoExit(const char* file, i32 line, 
-                    const char* func, const char* error);
-                    
-#endif /* __FV_ERROR_H */
+#endif /* __FV_FONT_DRAW_H */

@@ -17,21 +17,22 @@
 #
 
 CC = gcc
-CFLAGS = -O3 -std=c2x -I./include $(shell pkg-config --cflags glfw3) -Wno-deprecated-declarations
-LIBFLAGS = $(shell pkg-config --libs glfw3) -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo
+CFLAGS = -O3 -std=c2x -I./include $(shell pkg-config --cflags glfw3) -Wno-deprecated-declarations $(shell pkg-config --cflags freetype2)
+LIBFLAGS = $(shell pkg-config --libs glfw3) -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo $(shell pkg-config --libs freetype2)
 
 SRC_DIR = ./src
 OBJ_DIR = ./obj
 
 EXECUTABLE = fvcode
 
-SRC_FILES = $(wildcard $(SRC_DIR)/*.c)
+SRC_FILES = $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/**/*.c)
 OBJ_FILES = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC_FILES))
 
 $(EXECUTABLE): $(OBJ_FILES)
 	$(CC) $(LIBFLAGS) $(CFLAGS) $^ -o $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJ_DIR):

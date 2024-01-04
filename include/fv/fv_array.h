@@ -16,36 +16,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __FV_APP_H
-#define __FV_APP_H
+#ifndef __FV_ARRAY_H
+#define __FV_ARRAY_H
 
 #include <fv/fv.h>
 
-#include <fv/fv_font_manager.h>
-#include <fv/fv_render.h>
-#include <fv/fv_color.h>
+typedef struct __fv_array_t {
+    size_t size_of_element;
+    size_t length;
+    void** ptr;
+} fv_array_t;
 
-typedef int (*fv_app_init_func)(void* app);
-typedef int (*fv_app_run_func) (void* app);
+#define FV_ARRAY_FOR(arr) for (int i = 0; i < arr->length; i++)
+#define FV_ARRAY_IS_LAST_ELEMENT(arr, i) (arr->length == (i + 1))
 
-typedef struct __fv_render_t fv_render_t;
+fv_array_t* FV_CreateArray(size_t size_of_element);
+fv_array_t* FV_DestroyArray(fv_array_t* array);
 
-typedef struct __fv_app_t {
-    char** argv;
-    i32  argc;
-    fv_app_run_func  Run;
-    fv_app_init_func Init;
-    fv_render_t* render;
-    fv_color_t   background;
-    fv_font_manager_t* font_manager;
-} fv_app_t;
+void* FV_GetElementFromArray(fv_array_t* array, size_t index);
 
-fv_app_t* FV_CreateApp(i32 argc, char** argv);
+i32 FV_AppendElementToArray(fv_array_t* array, void* element);
+i32 FV_DeleteElementFromArray(fv_array_t* array, size_t index);
+i32 FV_InsertElementToArray(fv_array_t* array, size_t index, void* element);
+i32 FV_DeleteLastElementFromArray(fv_array_t* array);
+i32 FV_ResizeArray(fv_array_t* array, size_t n);
 
-__FV_NO_RETURN__ void FV_DestroyAppAndExit(fv_app_t* app, i32 code);
-                 void FV_DestroyApp(fv_app_t* app);
-
-int FV_AppInitFunctionDefault(fv_app_t* app);
-int FV_AppRunFunctionDefault(fv_app_t* app);
-
-#endif /* __FV_APP_H */
+#endif /* __FV_ARRAY_H */

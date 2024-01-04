@@ -16,36 +16,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __FV_APP_H
-#define __FV_APP_H
+#ifndef __FV_MSG_H
+#define __FV_MSG_H
 
 #include <fv/fv.h>
 
-#include <fv/fv_font_manager.h>
-#include <fv/fv_render.h>
-#include <fv/fv_color.h>
+#define FV_ERROR_NO_EXIT(err, ...) (FV_ErrorNoExit(__FILE__, __LINE__, __func__, err, __VA_ARGS__))
+#define FV_SUCCESS(msg, ...)       (FV_Success(__FILE__, __LINE__, __func__, msg, __VA_ARGS__))
+#define FV_ERROR(err, ...)         (FV_Error(__FILE__, __LINE__, __func__, err, __VA_ARGS__))
 
-typedef int (*fv_app_init_func)(void* app);
-typedef int (*fv_app_run_func) (void* app);
+__FV_NO_RETURN__ void FV_Error(const char* file, i32 line, 
+                               const char* func, const char* error, ...);
 
-typedef struct __fv_render_t fv_render_t;
+void FV_ErrorNoExit(const char* file, i32 line, 
+                    const char* func, const char* error, ...);
 
-typedef struct __fv_app_t {
-    char** argv;
-    i32  argc;
-    fv_app_run_func  Run;
-    fv_app_init_func Init;
-    fv_render_t* render;
-    fv_color_t   background;
-    fv_font_manager_t* font_manager;
-} fv_app_t;
+void FV_Success(const char* file, i32 line, const char* func, const char* msg, ...);
 
-fv_app_t* FV_CreateApp(i32 argc, char** argv);
-
-__FV_NO_RETURN__ void FV_DestroyAppAndExit(fv_app_t* app, i32 code);
-                 void FV_DestroyApp(fv_app_t* app);
-
-int FV_AppInitFunctionDefault(fv_app_t* app);
-int FV_AppRunFunctionDefault(fv_app_t* app);
-
-#endif /* __FV_APP_H */
+#endif /* __FV_MSG_H */

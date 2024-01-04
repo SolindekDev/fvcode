@@ -5,7 +5,7 @@
 - `Done` ~ Memory manager
 - `Done` ~ Initialize GLFW
 - `Done` ~ Simple rendering loop
-- `DONE` ~ Render lines and cubes
+- `DONE` ~ Render lines and rectangles
 - `TODO` ~ Font manager
     - `TODO` ~ Load fonts by FreeType library
     - `TODO` ~ Draw fonts by using OpenGL ([OpenGL Text rendering](https://en.wikibooks.org/wiki/OpenGL_Programming/Modern_OpenGL_Tutorial_Text_Rendering_01))

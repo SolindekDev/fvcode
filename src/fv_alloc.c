@@ -18,13 +18,14 @@
 
 #include <fv/fv.h>
 
-#include <fv/fv_alloc.h>
 #include <fv/fv_assert.h>
+#include <fv/fv_alloc.h>
+#include <fv/fv_array.h>
 
 /* Global array that consists of every allocated 
  * pointer by calloc, malloc etc. in this app.
  * This helps track memory allocation. */
-fv_alloc_pointer_t** fv_allocated_pointers;
+fv_array_t* fv_allocated_pointers;
 
 fv_alloc_pointer_t*
 FV_CreateAllocatedPointer(void* mem_ptr, u8 free)
@@ -42,44 +43,41 @@ FV_AllocInit()
 {
     if (fv_allocated_pointers != NULL)
         return;
-    fv_allocated_pointers  = calloc(1, sizeof(fv_alloc_pointer_t*));
-    *fv_allocated_pointers = NULL;
+    // fv_allocated_pointers  = calloc(1, sizeof(fv_alloc_pointer_t*));
+    // *fv_allocated_pointers = NULL;
+    fv_allocated_pointers = FV_CreateArray(sizeof(fv_alloc_pointer_t*));
 }
 
 void 
 FV_UnallocAll()
 {
-    fv_alloc_pointer_t** pointers = fv_allocated_pointers;
-    while (*pointers != NULL)
+    FV_ARRAY_FOR(fv_allocated_pointers)
     {
-        fv_alloc_pointer_t* curr_pointer = *pointers;
+        fv_alloc_pointer_t* curr_pointer = FV_GetElementFromArray(fv_allocated_pointers, i);
         if (curr_pointer->free == 0)
         {
             free(curr_pointer->ptr); 
             free(curr_pointer);   
         }
-        pointers++;
     }
 }
 
 size_t
 FV_GetAllocatedPointersLength()
 {
-    size_t ptrs_len = 0;
-    while (fv_allocated_pointers[ptrs_len] != NULL)
-        ptrs_len++;
-    return ptrs_len;
+    return fv_allocated_pointers->length;
 }
 
 void
 FV_AppendAllocatedPointer(fv_alloc_pointer_t* alloc_ptr)
 {
-    size_t pointers_len    = FV_GetAllocatedPointersLength();
-    fv_allocated_pointers = realloc(fv_allocated_pointers, 
-                                    (pointers_len + 2) * sizeof(fv_alloc_pointer_t*));
+    // size_t pointers_len    = FV_GetAllocatedPointersLength();
+    // fv_allocated_pointers = realloc(fv_allocated_pointers, 
+    //                                 (pointers_len + 2) * sizeof(fv_alloc_pointer_t*));
 
-    fv_allocated_pointers[pointers_len]    = alloc_ptr;
-    fv_allocated_pointers[pointers_len + 1] = NULL;
+    // fv_allocated_pointers[pointers_len]     = alloc_ptr;
+    // fv_allocated_pointers[pointers_len + 1] = NULL;
+    FV_TRY(FV_AppendElementToArray(fv_allocated_pointers, alloc_ptr));
 }
 
 void* 
@@ -111,11 +109,12 @@ FV_Malloc(size_t size)
 fv_alloc_pointer_t*
 FV_FindAllocatedPointerByAddress(void* address)
 {
-    while (*fv_allocated_pointers != NULL)
+    FV_ARRAY_FOR(fv_allocated_pointers)
     {
-        if ((*fv_allocated_pointers)->ptr == address)
-            return *fv_allocated_pointers;
-        fv_allocated_pointers++;
+        fv_alloc_pointer_t* curr_pointer = FV_GetElementFromArray(fv_allocated_pointers, i);
+
+        if (curr_pointer->ptr == address)
+            return curr_pointer;
     }
 
     return NULL;

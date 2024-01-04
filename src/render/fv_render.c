@@ -21,7 +21,7 @@
 #include <config/config.h>
 
 #include <fv/fv_render.h>
-#include <fv/fv_error.h>
+#include <fv/fv_msg.h>
 #include <fv/fv_alloc.h>
 #include <fv/fv_app.h>
 
@@ -31,7 +31,7 @@ fv_render_t*
 FV_RenderInit(fv_app_t* parent_app)
 {
     if (glfwInit() == false)
-        FV_ERROR("Couldn't initialize GLFW library.");
+        FV_ERROR("Couldn't initialize GLFW library.", 0);
 
     fv_render_t* render = FV_Calloc(1, sizeof(fv_render_t));
     return render;
@@ -47,7 +47,7 @@ FV_RenderCreateDefaultWindow(fv_render_t* render)
 
     if (render->window == NULL)
     {
-        FV_ERROR_NO_EXIT("\'glfwCreateWindow\' failed returning NULL.");
+        FV_ERROR_NO_EXIT("\'glfwCreateWindow\' failed returning NULL.", 0);
         FV_DestroyAppAndExit(render->app, 1);
     }
 

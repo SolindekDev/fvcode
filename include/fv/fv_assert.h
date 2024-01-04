@@ -20,6 +20,7 @@
 #define __FV_ASSERT_H
 
 #include <fv/fv.h>
+#include <fv/fv_types.h>
 
 #ifndef __FV_NO_RETURN__
 #define __FV_NO_RETURN__ __attribute__((noreturn))

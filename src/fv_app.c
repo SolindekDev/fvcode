@@ -18,6 +18,8 @@
 
 #include <fv/fv.h>
 
+#include <fv/fv_font_manager.h>
+
 #include <fv/fv_render.h>
 #include <fv/fv_drawing.h>
 #include <fv/fv_color.h>
@@ -70,6 +72,9 @@ FV_AppInitFunctionDefault(fv_app_t* app)
     FV_RenderCreateDefaultWindow(app->render);
     FV_RenderInitHandleViewportChange(app->render);
     FV_RenderInitGL(app->render);
+
+    app->font_manager = FV_FontManagerInit();
+    FV_CreateNewFontAsDefault("");
 
     app->background = FV_NewColorRGB(28, 29, 29, 255);
     return 0;

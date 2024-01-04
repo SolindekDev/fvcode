@@ -43,9 +43,17 @@
 #include <time.h>
 
 /* FV Headers */
-#include <fv/fv_types.h>
 #include <fv/fv_assert.h>
+#include <fv/fv_types.h>
+#include <fv/fv_msg.h>
 
 #define __FV_NO_RETURN__ __attribute__((noreturn))
+
+#define FV_NO_NULL(ptr) ({(ptr == NULL)                                                 \
+                            ? FV_Error(__FILE__, __LINE__, __func__, #ptr " is NULL.")  \
+                            : ((void*)0); })
+#define FV_TRY(i)       ({ (i == -1)                                                        \
+                            ? FV_Error(__FILE__, __LINE__, __func__, "\'" #i "\' failed.")  \
+                            : ((void*)0); })
 
 #endif /* __FV_FV_H */
