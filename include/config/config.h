@@ -30,4 +30,6 @@
 #define FV_WINDOW_SIZE_X     1280
 #define FV_WINDOW_SIZE_Y     720
 
+#define FV_MAX_FORMAT_BUFFER (int)(1024 * 3)
+
 #endif /* __FV_CONFIG_H */

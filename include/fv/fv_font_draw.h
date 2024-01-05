@@ -21,4 +21,14 @@
 
 #include <fv/fv.h>
 
-#endif /* __FV_FONT_DRAW_H */
+#include <fv/fv_font_manager.h>
+#include <fv/fv_vector.h>
+#include <fv/fv_render.h>
+#include <fv/fv_alloc.h>
+
+void FV_FontDrawFormat(fv_font_t* font, fv_render_t* render, fv_vector_t pos, i32 size, const char* text, ...);
+void FV_FontDraw(fv_font_t* font, fv_render_t* render, fv_vector_t pos, i32 size, const char* text);
+
+void FV_FontDrawSingleCharacter(fv_font_t* font, fv_render_t* render, fv_vector_t pos, i32 size, const char character);
+
+#endif /* __FV_FONT_DRAW_H */                           

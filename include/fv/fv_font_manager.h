@@ -27,6 +27,8 @@
 
 typedef struct __fv_font_t {
     FT_Face font_face;
+    char*   font_path;
+    char*   font_name;
 } fv_font_t;
 
 typedef struct __fv_font_manager_t {
@@ -42,5 +44,9 @@ fv_font_t* FV_CreateNewFontStructure();
 fv_font_t* FV_CreateNewFontAsDefault(fv_font_manager_t* font_manager, char* font_path);
 fv_font_t* FV_CreateNewFont(fv_font_manager_t* font_manager, char* font_path);
 fv_font_t* FV_OpenNewFont(fv_font_manager_t* font_manager, char* font_path);
+
+fv_font_t* FV_GetFontByName(fv_font_manager_t* font_manager, char* font_name);
+fv_font_t* FV_GetFontByPath(fv_font_manager_t* font_manager, char* font_path);
+fv_font_t* FV_GetDefaultFont(fv_font_manager_t* font_manager);
 
 #endif /* __FV_FONT_MANAGER_H */

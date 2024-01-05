@@ -32,6 +32,10 @@ FV_OpenNewFont(fv_font_manager_t* font_manager, char* font_path)
     fv_font_t* font = FV_Calloc(1, sizeof(fv_font_t));
     if ((FT_New_Face(font_manager->freetype, font_path, 0, &font->font_face)) != 0)
         FV_ERROR("Couldn't open font named \'%s\'", font_path);
+    font->font_name = font->font_face->family_name;
+    font->font_path = font_path;
+    FV_SUCCESS("Opening a new font at \'%s\' with family \'%s\'", 
+        font_path, font->font_name);
     return font;
 }
 
@@ -63,4 +67,34 @@ FV_FontManagerInit()
 
     font_manager->fonts = FV_CreateArray(sizeof(fv_font_t*));
     return font_manager;
+}
+
+fv_font_t* 
+FV_GetFontByName(fv_font_manager_t* font_manager, char* font_name)
+{
+    FV_ARRAY_FOR(font_manager->fonts)
+    {
+        fv_font_t* font = FV_GetElementFromArray(font_manager->fonts, i);
+        if (FV_STRCMP(font->font_name, font_name))  
+            return font;
+    }
+    return NULL;
+}
+
+fv_font_t* 
+FV_GetFontByPath(fv_font_manager_t* font_manager, char* font_path)
+{
+    FV_ARRAY_FOR(font_manager->fonts)
+    {
+        fv_font_t* font = FV_GetElementFromArray(font_manager->fonts, i);
+        if (FV_STRCMP(font->font_path, font_path))  
+            return font;
+    }
+    return NULL;
+}
+
+fv_font_t*
+FV_GetDefaultFont(fv_font_manager_t* font_manager)
+{
+    return font_manager->default_font;
 }

@@ -19,6 +19,7 @@
 #include <fv/fv.h>
 
 #include <fv/fv_font_manager.h>
+#include <fv/fv_font_draw.h>
 
 #include <fv/fv_render.h>
 #include <fv/fv_drawing.h>
@@ -41,6 +42,7 @@ FV_CreateApp(i32 argc, char** argv)
     fv->Init     = (fv_app_init_func)&FV_AppInitFunctionDefault;
     fv->Run      = (fv_app_run_func) &FV_AppRunFunctionDefault;
 
+    FV_SUCCESS("Created a app", 0);
     return fv;
 }
 
@@ -68,13 +70,15 @@ FV_DestroyAppAndExit(fv_app_t* app, i32 code)
 int 
 FV_AppInitFunctionDefault(fv_app_t* app)
 {
+    FV_SUCCESS("Executing \'FV_AppInitFunctionDefault\'. App is being initalized.", 0);
+
     app->render = FV_RenderInit(app);
     FV_RenderCreateDefaultWindow(app->render);
     FV_RenderInitHandleViewportChange(app->render);
     FV_RenderInitGL(app->render);
 
     app->font_manager = FV_FontManagerInit();
-    FV_CreateNewFontAsDefault("");
+    FV_CreateNewFontAsDefault(app->font_manager, "./fonts/inter/Inter-Regular.ttf");
 
     app->background = FV_NewColorRGB(28, 29, 29, 255);
     return 0;
@@ -85,18 +89,19 @@ FV_AppInitFunctionDefault(fv_app_t* app)
 int 
 FV_AppRunFunctionDefault (fv_app_t* app)
 {
+    FV_SUCCESS("Executing \'FV_AppRunFunctionDefault\'. App is running.", 0);
+
     while (!FV_RenderShouldExit(app->render))
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(FV_CONVERT_COLOR_TO_OPENGL(app->background));
-        FV_DrawRenderQuad(app, FV_NewVector(150, 150), FV_NewVector(500, 300),
-                          FV_NewColorRGB(123, 40, 150, 255), FV_NewColorRGB(255, 255, 150, 255), 5);
-        // FV_DrawRenderLine(app, FV_NewVector(100, 100), FV_NewVector(400, 200),
-        //                   FV_NewColorRGB(123, 40, 150, 255), 4);
+        FV_FontDrawSingleCharacter(FV_GetDefaultFont(app->font_manager), app->render, 
+                                   FV_NewVector(100, 100), 32, 'A');
         glfwSwapBuffers(app->render->window);
         glfwPollEvents();
     }
 
+    FV_SUCCESS("Destroying the app", 0);
     FV_DestroyApp(app);
     return 0;
 }

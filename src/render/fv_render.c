@@ -30,6 +30,8 @@
 fv_render_t*
 FV_RenderInit(fv_app_t* parent_app)
 {
+    FV_SUCCESS("Initalizing render", 0);
+
     if (glfwInit() == false)
         FV_ERROR("Couldn't initialize GLFW library.", 0);
 
@@ -40,6 +42,8 @@ FV_RenderInit(fv_app_t* parent_app)
 void
 FV_RenderCreateDefaultWindow(fv_render_t* render)
 {
+    FV_SUCCESS("Creating a window", 0);
+
     const int window_x = FV_WINDOW_SIZE_X;
     const int window_y = FV_WINDOW_SIZE_Y;
 
@@ -75,6 +79,8 @@ FV_RenderInitHandleViewportChange(fv_render_t* render)
 void
 FV_RenderInitGL(fv_render_t* render)
 {
+    FV_SUCCESS("Initializing OpenGL", 0);
+
     /* This code makes drawing lines more smooth */
     glEnable(GL_LINE_SMOOTH);
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);

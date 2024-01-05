@@ -49,4 +49,6 @@
                             ? FV_Error(__FILE__, __LINE__, __func__, "\'" #i "\' failed.")  \
                             : ((void*)0); })
 
+#define FV_STRCMP(s1, s2) (strcmp(s1, s2) == 0)
+
 #endif /* __FV_FV_H */
