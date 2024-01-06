@@ -17,9 +17,10 @@
  */
 
 #include <fv/fv.h>
+
 #include <fv/fv_app.h>
 #include <fv/fv_alloc.h>
-
+#include <fv/fv_io.h>
 #include <fv/fv_shaders.h>
 
 fv_shaders_t* 
@@ -83,9 +84,10 @@ FV_CheckShaderProgramLinkStatus(u32 program_id)
 u32
 FV_LoadShader(const char* file_path, GLenum shader_type)
 {
-    u32 shader_id = glCreateShader(shader_type);
+    u32 shader_id = glCreateShader(GL_VERTEX_SHADER);
+    printf("glCreateShader kurwo dzialaj\n");
 
-    const char* shader_content = FV_ReadWholeFileContent(file_path);
+    const char* shader_content = FV_ReadWholeFileContent((char*)file_path);
     if (shader_content == NULL)
         FV_ERROR("Couldn't load shader at \'%s\' properly", file_path);
 
@@ -123,7 +125,6 @@ FV_CreateShaderProgram(fv_shaders_t* shaders, const char* vertex_shader_path, co
     shader->fragment_shader_path = vertex_shader_path;
     shader->vertex_shader_path   = fragment_shader_path;
     shader->program_id           = program_id;
-
     FV_AppendElementToArray(shaders->loaded_shaders, shader);
     return shader;
 }

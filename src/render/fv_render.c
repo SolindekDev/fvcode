@@ -40,8 +40,18 @@ FV_RenderInit(fv_app_t* parent_app)
 }
 
 void
+FV_RenderSetOpenGLVersion()
+{
+    FV_SUCCESS("Setting OpenGL Version to 3.3V", 0);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+}
+
+void
 FV_RenderCreateDefaultWindow(fv_render_t* render)
 {
+    FV_RenderSetOpenGLVersion();
     FV_SUCCESS("Creating a window", 0);
 
     const int window_x = FV_WINDOW_SIZE_X;
@@ -88,10 +98,10 @@ FV_RenderInitGL(fv_render_t* render)
     /* Set the viewport */
     glViewport(0, 0, FV_WINDOW_SIZE_X, FV_WINDOW_SIZE_Y);
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0, FV_WINDOW_SIZE_X, FV_WINDOW_SIZE_Y, 0, -1, 1); // Adjust the parameters based on your needs
+    // glMatrixMode(GL_PROJECTION);
+    // glLoadIdentity();
+    // glOrtho(0, FV_WINDOW_SIZE_X, FV_WINDOW_SIZE_Y, 0, -1, 1); // Adjust the parameters based on your needs
 
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    // glMatrixMode(GL_MODELVIEW);
+    // glLoadIdentity();
 }
