@@ -21,8 +21,9 @@
 #include <fv/fv_font_manager.h>
 #include <fv/fv_font_draw.h>
 
-#include <fv/fv_render.h>
+#include <fv/fv_shaders.h>
 #include <fv/fv_drawing.h>
+#include <fv/fv_render.h>
 #include <fv/fv_color.h>
 #include <fv/fv_alloc.h>
 #include <fv/fv_main.h>
@@ -81,6 +82,10 @@ FV_AppInitFunctionDefault(fv_app_t* app)
     FV_CreateNewFontAsDefault(app->font_manager, "./fonts/inter/Inter-Regular.ttf");
 
     app->background = FV_NewColorRGB(28, 29, 29, 255);
+
+    app->render->shaders = FV_ShadersInit();
+    printf("%d == ", FV_CreateShaderProgram(app->render->shaders, "./shaders/text.vertex.glsl", "./shaders/text.frag.glsl")->program_id);
+    printf("%d\n",   FV_GetShaderProgram(app->render->shaders, "./shaders/text.vertex.glsl", "./shaders/text.frag.glsl")->program_id);
     return 0;
 }  
 

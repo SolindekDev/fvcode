@@ -16,29 +16,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __FV_RENDER_H
-#define __FV_RENDER_H
+#ifndef __FV_SHADERS_H
+#define __FV_SHADERS_H
 
 #include <fv/fv.h>
 #include <fv/fv_app.h>
-#include <fv/fv_shaders.h>
+#include <fv/fv_array.h>
 
-#include <GLFW/glfw3.h>
+typedef struct __fv_shader_t {
+    const char* fragment_shader_path;
+    const char* vertex_shader_path;
+    u32         program_id;
+} fv_shader_t;
 
-typedef struct __fv_app_t fv_app_t;
+typedef struct __fv_shaders_t {
+    fv_array_t* loaded_shaders;
+} fv_shaders_t;
+ 
+fv_shaders_t* FV_ShadersInit();
 
-typedef struct __fv_render_t {
-    GLFWwindow*   window;
-    fv_app_t*     app;
-    fv_shaders_t* shaders;
-} fv_render_t;
+fv_shader_t* FV_CreateShaderProgram(fv_shaders_t* shaders, const char* vertex_shader_path, const char* fragment_shader_path);
+fv_shader_t* FV_GetShaderProgram(fv_shaders_t* shaders, const char* vertex_shader_path, const char* fragment_shader_path);
 
-fv_render_t* FV_RenderInit(fv_app_t* parent_app);
+u32 FV_LoadShader(const char* file_path, GLenum shader_type);
 
-void FV_RenderCreateDefaultWindow(fv_render_t* render);
-bool FV_RenderShouldExit(fv_render_t* render);
-
-void FV_RenderInitHandleViewportChange(fv_render_t* render);
-void FV_RenderInitGL(fv_render_t* render);
-
-#endif /* __FV_RENDER_H */
+#endif /* __FV_SHADERS_H */

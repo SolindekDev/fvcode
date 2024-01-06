@@ -40,6 +40,10 @@
 #include <fv/fv_types.h>
 #include <fv/fv_msg.h>
 
+/* OpenGL */
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
 #define __FV_NO_RETURN__ __attribute__((noreturn))
 
 #define FV_NO_NULL(ptr) ({(ptr == NULL)                                                 \
