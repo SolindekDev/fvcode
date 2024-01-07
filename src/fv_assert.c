@@ -21,7 +21,7 @@
 #include <fv/fv_assert.h>
 #include <fv/fv_alloc.h>
 
-#include <GLFW/glfw3.h>
+#include <SDL2/SDL.h> 
 
 #define FV_ASSERT_MESSAGE                                                              \
      "FVCode AssertFailed: %s:%d in %s because \'%s\' failed.\nExiting with 1 code.\n" \
@@ -32,6 +32,6 @@ FV_Assert(const char* file, i32 line,
 {
     printf(FV_ASSERT_MESSAGE, file, line, func, e);
     FV_UnallocAll();
-    glfwTerminate();
+    SDL_Quit();
     exit(1);
 }

@@ -35,11 +35,11 @@ FV_ReadWholeFileContent(char* filename)
     FILE* f = fopen(filename, "rb");
 
     /* File doesn't exists */
-    if (f) 
+    if (f == NULL) 
         return NULL;
 
     size_t file_size = FV_GetFileSize(f);
-    char* buffer     = FV_Calloc(sizeof(char), file_size + 1);
+    char* buffer     = FV_Calloc(file_size + 1, sizeof(char));
     FV_NO_NULL(buffer);
 
     /* Return value of fread need to be equal to
@@ -49,4 +49,5 @@ FV_ReadWholeFileContent(char* filename)
 
     buffer[file_size] = '\0';
     fclose(f);
+    return buffer;
 }

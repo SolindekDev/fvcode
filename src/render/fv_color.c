@@ -22,14 +22,14 @@
 
 /* Create color in RGBA standard */
 fv_color_t 
-FV_NewColorRGB(float r, float g, float b, float a)
+FV_NewColorRGB(u8 r, u8 g, u8 b, u8 a)
 {
     return ((fv_color_t){ r, g, b, a });
 }
 
 /* Create color in HSV standard */
 fv_color_t 
-FV_NewColorHSV(float h, float s, float v, float a)
+FV_NewColorHSV(u8 h, u8 s, u8 v, u8 a)
 {
     /* TODO: Algorithm for converting HSV color to RGB */
     

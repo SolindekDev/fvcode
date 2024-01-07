@@ -55,7 +55,7 @@ FV_Error(const char* file, i32 line,
 
     printf(FV_ERROR_MESSAGE, file, line, func, buffer);
     FV_UnallocAll();
-    glfwTerminate();
+    SDL_Quit();
 
     va_end(ap);
     exit(1);

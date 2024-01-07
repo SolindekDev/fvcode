@@ -21,16 +21,12 @@
 
 #include <fv/fv.h>
 
-#define FV_CONVERT_COLOR_TO_OPENGL(color)                 \
-    ((float)color.r / 255.0f), ((float)color.g / 255.0f), \
-    ((float)color.b / 255.0f), ((float)color.a / 255.0f)  \
-
 typedef struct __fv_color_t {
-    float r, g, b, a;
+    u8 r, g, b, a;
 } fv_color_t;
 
-fv_color_t FV_NewColorRGB(float r, float g, float b, float a);
-fv_color_t FV_NewColorHSV(float h, float s, float v, float a);
+fv_color_t FV_NewColorRGB(u8 r, u8 g, u8 b, u8 a);
+fv_color_t FV_NewColorHSV(u8 h, u8 s, u8 v, u8 a);
 fv_color_t FV_NewColorHex(u64 hex);
 
 #endif /* __FV_COLOR_H */

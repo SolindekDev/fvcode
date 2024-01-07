@@ -18,10 +18,6 @@
 
 #include <fv/fv.h>
 
-#include <fv/fv_font_manager.h>
-#include <fv/fv_font_draw.h>
-
-#include <fv/fv_shaders.h>
 #include <fv/fv_drawing.h>
 #include <fv/fv_render.h>
 #include <fv/fv_color.h>
@@ -54,7 +50,7 @@ FV_DestroyApp(fv_app_t* app)
 {
     /* Unallocate everything by using FV_UnallocAll */
     FV_UnallocAll();
-    glfwTerminate();
+    SDL_Quit();
 }
 
 /* Wrapper for function FV_DestroyApp that will 
@@ -75,11 +71,6 @@ FV_AppInitFunctionDefault(fv_app_t* app)
 
     app->render = FV_RenderInit(app);
     FV_RenderCreateDefaultWindow(app->render);
-    FV_RenderInitHandleViewportChange(app->render);
-    FV_RenderInitGL(app->render);
-
-    app->font_manager = FV_FontManagerInit();
-    FV_CreateNewFontAsDefault(app->font_manager, "./fonts/inter/Inter-Regular.ttf");
 
     app->background = FV_NewColorRGB(28, 29, 29, 255);
     return 0;
@@ -91,18 +82,18 @@ int
 FV_AppRunFunctionDefault (fv_app_t* app)
 {
     FV_SUCCESS("Executing \'FV_AppRunFunctionDefault\'. App is running.", 0);
-    app->render->shaders = FV_ShadersInit();
-    printf("%d == ", FV_CreateShaderProgram(app->render->shaders, "./shaders/text.vertex.glsl", "./shaders/text.frag.glsl")->program_id);
-    printf("%d\n",   FV_GetShaderProgram(app->render->shaders, "./shaders/text.vertex.glsl", "./shaders/text.frag.glsl")->program_id);
 
-    while (!FV_RenderShouldExit(app->render))
+    while (!app->render->exit)
     {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(FV_CONVERT_COLOR_TO_OPENGL(app->background));
-        FV_FontDrawSingleCharacter(FV_GetDefaultFont(app->font_manager), app->render, 
-                                   FV_NewVector(100, 100), 32, 'A');
-        glfwSwapBuffers(app->render->window);
-        glfwPollEvents();
+        FV_RenderClearWindow(app->render);
+        FV_RenderCatchEvents(app->render);        
+        SDL_SetRenderDrawColor(app->render->sdl_renderer, 0, 255, 19, 255);
+        SDL_Rect rect = { .x = 100,    .y = 200, 
+                          .w = 350,    .h = 200 };
+        SDL_RenderFillRect(app->render->sdl_renderer, &rect);
+        FV_DrawRenderLine(app, FV_NewVector(100, 100), FV_NewVector(300, 300), FV_NewColorRGB(255, 255, 0, 255), 5);
+        FV_RenderSwapBuffer(app->render);
+        SDL_Delay(1000 / 60);
     }
 
     FV_SUCCESS("Destroying the app", 0);

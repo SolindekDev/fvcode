@@ -21,16 +21,20 @@
 
 #include <fv/fv.h>
 #include <fv/fv_app.h>
-#include <fv/fv_shaders.h>
 
-#include <GLFW/glfw3.h>
+#include <SDL2/SDL.h> 
 
 typedef struct __fv_app_t fv_app_t;
 
 typedef struct __fv_render_t {
-    GLFWwindow*   window;
+	SDL_Renderer* sdl_renderer;
+	SDL_Window*   sdl_window;
     fv_app_t*     app;
-    fv_shaders_t* shaders;
+    bool          exit;
+
+    u64     frames;
+    u64     fps;
+    clock_t last_tick; 
 } fv_render_t;
 
 fv_render_t* FV_RenderInit(fv_app_t* parent_app);
@@ -38,7 +42,8 @@ fv_render_t* FV_RenderInit(fv_app_t* parent_app);
 void FV_RenderCreateDefaultWindow(fv_render_t* render);
 bool FV_RenderShouldExit(fv_render_t* render);
 
-void FV_RenderInitHandleViewportChange(fv_render_t* render);
-void FV_RenderInitGL(fv_render_t* render);
+void FV_RenderCatchEvents(fv_render_t* render);
+void FV_RenderSwapBuffer (fv_render_t* render);
+void FV_RenderClearWindow(fv_render_t* render);
 
 #endif /* __FV_RENDER_H */

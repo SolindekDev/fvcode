@@ -41,8 +41,7 @@
 #include <fv/fv_msg.h>
 
 /* OpenGL */
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include <SDL2/SDL.h> 
 
 #define __FV_NO_RETURN__ __attribute__((noreturn))
 

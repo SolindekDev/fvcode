@@ -26,22 +26,15 @@
 #include <fv/fv_color.h>
 #include <fv/fv_app.h>
 
-/* app - pointer to app strucutre
- * start - start position of line
- * end - end position of line
- * line_color - line color 
- * border_tickness - if 0 then function will fail*/
-void
-FV_DrawRenderLine(fv_app_t* app, fv_vector_t start, fv_vector_t end,
-                  fv_color_t line_color, i32 line_thickness);
+void FV_DrawFillRect(fv_app_t* window, fv_vector_t pos, fv_vector_t size, fv_color_t color);
+void FV_DrawRect(fv_app_t* window, fv_vector_t pos, fv_vector_t size, fv_color_t color);
 
-/* app - pointer to app strucutre
- * pos - position of quad
- * size - size of quad 
- * fill_color - fill color 
- * border_color - border color
- * border_tickness - if 0 then no border */
-void FV_DrawRenderQuad(fv_app_t* app, fv_vector_t pos, fv_vector_t size,
-                       fv_color_t fill_color, fv_color_t border_color, i32 border_thickness);
+void FV_DrawFillCircle(fv_app_t* window, fv_vector_t pos, u32 radius, fv_color_t color);
+void FV_DrawCircle(fv_app_t* window, fv_vector_t pos, u32 radius, fv_color_t color);
+
+void FV_DrawFillTriangle(fv_app_t* window, fv_vector_t point1, fv_vector_t point2, fv_vector_t point3, fv_color_t color);
+void FV_DrawTriangle(fv_app_t* window, fv_vector_t point1, fv_vector_t point2, fv_vector_t point3, fv_color_t color);
+
+void FV_DrawLine(fv_app_t* window, fv_vector_t start, fv_vector_t end, fv_color_t color);
 
 #endif /* __FV_DRAWING_H */

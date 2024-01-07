@@ -20,6 +20,7 @@
 #define __FV_CONFIG_H
 
 #include <stdbool.h>
+#include <SDL2/SDL.h>
 
 /* Version */
 #define FV_VERSION     "0.1.0v BETA"
@@ -27,8 +28,11 @@
 /* Window */
 #define FV_WINDOW_NAME   "FVCode " FV_VERSION
 
-#define FV_WINDOW_SIZE_X     1280
-#define FV_WINDOW_SIZE_Y     720
+#define FV_WINDOW_SIZE_X  1280
+#define FV_WINDOW_SIZE_Y  720
+
+#define FV_WINDOW_FLAGS   (SDL_WINDOW_MOUSE_FOCUS | SDL_WINDOW_SHOWN)
+#define FV_RENDERER_FLAGS (SDL_RENDERER_ACCELERATED)
 
 #define FV_MAX_FORMAT_BUFFER (int)(1024 * 3)
 

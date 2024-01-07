@@ -25,83 +25,72 @@
 #include <fv/fv_alloc.h>
 #include <fv/fv_app.h>
 
-#include <GLFW/glfw3.h>
+#include <SDL2/SDL.h> 
 
 fv_render_t*
 FV_RenderInit(fv_app_t* parent_app)
 {
     FV_SUCCESS("Initalizing render", 0);
 
-    if (glfwInit() == false)
-        FV_ERROR("Couldn't initialize GLFW library.", 0);
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+        FV_ERROR("Couldn't initialize SDL2 library: \'%s\'", SDL_GetError());
 
     fv_render_t* render = FV_Calloc(1, sizeof(fv_render_t));
+    render->app  = parent_app;
+    render->exit = 0;
     return render;
-}
-
-void
-FV_RenderSetOpenGLVersion()
-{
-    FV_SUCCESS("Setting OpenGL Version to 3.3V", 0);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 }
 
 void
 FV_RenderCreateDefaultWindow(fv_render_t* render)
 {
-    FV_RenderSetOpenGLVersion();
     FV_SUCCESS("Creating a window", 0);
 
-    const int window_x = FV_WINDOW_SIZE_X;
-    const int window_y = FV_WINDOW_SIZE_Y;
+    const u32 renderer_flags = FV_RENDERER_FLAGS;
+    const u32 window_flags   = FV_WINDOW_FLAGS;
 
-    render->window = glfwCreateWindow(window_x, window_y, FV_WINDOW_NAME, NULL, NULL);
+    const i32 window_x     = FV_WINDOW_SIZE_X;
+    const i32 window_y     = FV_WINDOW_SIZE_Y;
 
-    if (render->window == NULL)
-    {
-        FV_ERROR_NO_EXIT("\'glfwCreateWindow\' failed returning NULL.", 0);
-        FV_DestroyAppAndExit(render->app, 1);
-    }
+    render->sdl_window = SDL_CreateWindow(FV_WINDOW_NAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
+                                          window_x, window_y, window_flags);
+    if (render->sdl_window == NULL)
+        FV_ERROR("Function \'SDL_CreateWindow\' failed, Couldn't create a window: \'%s\'", SDL_GetError());
 
-    glfwMakeContextCurrent(render->window);
+    render->sdl_renderer = SDL_CreateRenderer(render->sdl_window, -1, renderer_flags);
+    if (render->sdl_renderer == NULL)
+        FV_ERROR("Function \'SDL_CreateRenderer\' failed, Couldn't create a renderer: \'%s\'", SDL_GetError());
 }
 
 bool
 FV_RenderShouldExit(fv_render_t* render)
 {
-    return glfwWindowShouldClose(render->window);
+    return !render->exit;
 }
 
 void
-FV_RenderHandleViewportChange(GLFWwindow* window, int width, int height)
+FV_RenderCatchEvents(fv_render_t* render)
 {
-    glViewport(0, 0, width, height);
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) 
+        switch (event.type) 
+        {
+            case SDL_QUIT:
+                render->exit = 1;
+                break;
+        }
 }
 
 void
-FV_RenderInitHandleViewportChange(fv_render_t* render)
+FV_RenderClearWindow(fv_render_t* render)
 {
-    glfwSetFramebufferSizeCallback(render->window, FV_RenderHandleViewportChange);
+    SDL_SetRenderDrawColor(render->sdl_renderer, render->app->background.r, 
+                           render->app->background.g, render->app->background.b, render->app->background.a);
+    SDL_RenderClear(render->sdl_renderer);
 }
 
 void
-FV_RenderInitGL(fv_render_t* render)
+FV_RenderSwapBuffer(fv_render_t* render)
 {
-    FV_SUCCESS("Initializing OpenGL", 0);
-
-    /* This code makes drawing lines more smooth */
-    glEnable(GL_LINE_SMOOTH);
-    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-
-    /* Set the viewport */
-    glViewport(0, 0, FV_WINDOW_SIZE_X, FV_WINDOW_SIZE_Y);
-
-    // glMatrixMode(GL_PROJECTION);
-    // glLoadIdentity();
-    // glOrtho(0, FV_WINDOW_SIZE_X, FV_WINDOW_SIZE_Y, 0, -1, 1); // Adjust the parameters based on your needs
-
-    // glMatrixMode(GL_MODELVIEW);
-    // glLoadIdentity();
+    SDL_RenderPresent(render->sdl_renderer);
 }

@@ -21,7 +21,6 @@
 
 #include <fv/fv.h>
 
-#include <fv/fv_font_manager.h>
 #include <fv/fv_render.h>
 #include <fv/fv_color.h>
 
@@ -32,12 +31,11 @@ typedef struct __fv_render_t fv_render_t;
 
 typedef struct __fv_app_t {
     char** argv;
-    i32  argc;
+    i32    argc;
     fv_app_run_func  Run;
     fv_app_init_func Init;
     fv_render_t* render;
     fv_color_t   background;
-    fv_font_manager_t* font_manager;
 } fv_app_t;
 
 fv_app_t* FV_CreateApp(i32 argc, char** argv);

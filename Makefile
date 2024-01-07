@@ -17,14 +17,14 @@
 #
 
 CC = gcc
-CFLAGS = -O3 -std=c2x -I./include $(shell pkg-config --cflags glfw3) -Wno-deprecated-declarations $(shell pkg-config --cflags freetype2)
+CFLAGS = -O3 -std=c2x -I./include $(shell pkg-config --cflags SDL2) -Wno-deprecated-declarations
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
-LIBFLAGS = $(shell pkg-config --libs glfw3 freetype2 gl glew)
+LIBFLAGS = $(shell pkg-config --libs SDL2)
 endif
 ifeq ($(UNAME_S),Darwin)
-LIBFLAGS = $(shell pkg-config --libs glfw3) -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo $(shell pkg-config --libs freetype2)
+LIBFLAGS = $(shell pkg-config --libs SDL2) -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo
 endif
 
 SRC_DIR = ./src
