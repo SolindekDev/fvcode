@@ -26,10 +26,10 @@
 #include <fv/fv_color.h>
 #include <fv/fv_app.h>
 
-fv_vector_t FV_RenderFont(fv_app_t* app, i32 size, i32 newline, fv_color_t color, 
+fv_vector_t FV_RenderFont(fv_app_t* app, fv_font_t* font, i32 size, i32 newline, fv_color_t color, 
                           fv_vector_t pos, const char* msg);
 
-fv_vector_t FV_RenderFontFormat(fv_app_t* app, i32 size, i32 newline, fv_color_t color, 
+fv_vector_t FV_RenderFontFormat(fv_app_t* app, fv_font_t* font, i32 size, i32 newline, fv_color_t color, 
                                 fv_vector_t pos, const char* fmt, ...);
 
 #endif /* __FV_FONT_DRAW_H */

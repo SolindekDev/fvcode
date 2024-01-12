@@ -38,6 +38,6 @@
 
 /* Font */
 #define FV_DEFAULT_FONT_SIZE 16
-#define FV_DEFAULT_FONT_PATH "./fonts/inter/Inter-Black.ttf"
+#define FV_DEFAULT_FONT_PATH "./fonts/jetbrains/JetBrainsMono-Regular.ttf"
 
 #endif /* __FV_CONFIG_H */

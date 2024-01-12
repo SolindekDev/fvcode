@@ -28,11 +28,11 @@
 
 static char g_font_draw_buffer[FV_MAX_FORMAT_BUFFER] = { 0 };
 
-fv_vector_t FV_RenderFont(fv_app_t* app, i32 size, i32 newline, fv_color_t color, 
+fv_vector_t FV_RenderFont(fv_app_t* app, fv_font_t* font, i32 size, i32 newline, fv_color_t color, 
                           fv_vector_t pos, const char* msg)
 {
     FV_SetFontSize(app->font_manager, FV_GetDefaultFont(app->font_manager), size);
-    SDL_Surface* surface = TTF_RenderText_Blended_Wrapped(FV_GetDefaultFont(app->font_manager)->font, msg, (SDL_Color){ color.r, color.g, color.b, color.a }, newline);
+    SDL_Surface* surface = TTF_RenderText_Blended_Wrapped(font->font, msg, (SDL_Color){ color.r, color.g, color.b, color.a }, newline);
     SDL_Texture* texture = SDL_CreateTextureFromSurface(app->render->sdl_renderer, surface);
 
     fv_vector_t font_size = FV_NewVector(0, 0);
@@ -54,13 +54,13 @@ fv_vector_t FV_RenderFont(fv_app_t* app, i32 size, i32 newline, fv_color_t color
     return font_size;
 }
 
-fv_vector_t FV_RenderFontFormat(fv_app_t* app, i32 size, i32 newline, fv_color_t color, 
+fv_vector_t FV_RenderFontFormat(fv_app_t* app, fv_font_t* font, i32 size, i32 newline, fv_color_t color, 
                                 fv_vector_t pos, const char* fmt, ...)
 {
     va_list list;
     va_start(list, fmt);
     vsprintf(g_font_draw_buffer, fmt, list);
-    fv_vector_t font_size = FV_RenderFont(app, size, newline, color, pos, g_font_draw_buffer);
+    fv_vector_t font_size = FV_RenderFont(app, font, size, newline, color, pos, g_font_draw_buffer);
     memset(g_font_draw_buffer, 0, FV_MAX_FORMAT_BUFFER);
     va_end(list);
     return font_size;
