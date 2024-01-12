@@ -78,7 +78,7 @@ FV_AppInitFunctionDefault(fv_app_t* app)
     app->background   = FV_NewColorRGB(28, 29, 29, 255);
 
     app->font_manager = FV_FontManagerInit();
-    FV_SetFontSize(FV_CreateNewFontAsDefault(app->font_manager, FV_DEFAULT_FONT_PATH), 24);
+    FV_SetFontSize(app->font_manager, FV_CreateNewFontAsDefault(app->font_manager, FV_DEFAULT_FONT_PATH), 24);
     return 0;
 }  
 
@@ -93,10 +93,7 @@ FV_AppRunFunctionDefault (fv_app_t* app)
     {
         FV_RenderClearWindow(app->render);
         FV_RenderCatchEvents(app->render);        
-        FV_DrawFillRect(app, FV_NewVector(50, 50), FV_NewVector(200, 100), FV_NewColorRGB(20, 245, 30, 255));
-        FV_DrawRect(app, FV_NewVector(100, 75), FV_NewVector(200, 100), FV_NewColorRGB(240, 25, 20, 255));
-        FV_DrawCircle(app, FV_NewVector(300, 350), 128, FV_NewColorRGB(0, 0, 255, 255));
-        FV_DrawFillCircle(app, FV_NewVector(700, 475), 100, FV_NewColorRGB(0, 120, 255, 255));
+        FV_RenderFontFormat(app, 32, 1280, FV_NewColorRGB(255, 255, 255, 255), FV_NewVector(30, 30), "Doing well hbu my little stinky man dajskdsajdkasjdkasjdaskjdskjdakdjasdkjsakdjasjdksa");
         FV_RenderSwapBuffer(app->render);
         SDL_Delay(1000 / 60);
     }
