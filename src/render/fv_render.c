@@ -44,22 +44,21 @@ FV_RenderInit(fv_app_t* parent_app)
 void
 FV_RenderCreateDefaultWindow(fv_render_t* render)
 {
-    FV_SUCCESS("Creating a window", 0);
-
-    const u32 renderer_flags = FV_RENDERER_FLAGS;
-    const u32 window_flags   = FV_WINDOW_FLAGS;
+    FV_SUCCESS("Creating a new default window", 0);
 
     const i32 window_x     = FV_WINDOW_SIZE_X;
     const i32 window_y     = FV_WINDOW_SIZE_Y;
 
     render->sdl_window = SDL_CreateWindow(FV_WINDOW_NAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
-                                          window_x, window_y, window_flags);
+                                          window_x, window_y, FV_WINDOW_FLAGS);
     if (render->sdl_window == NULL)
         FV_ERROR("Function \'SDL_CreateWindow\' failed, Couldn't create a window: \'%s\'", SDL_GetError());
 
-    render->sdl_renderer = SDL_CreateRenderer(render->sdl_window, -1, renderer_flags);
+    render->sdl_renderer = SDL_CreateRenderer(render->sdl_window, -1, FV_RENDERER_FLAGS);
     if (render->sdl_renderer == NULL)
         FV_ERROR("Function \'SDL_CreateRenderer\' failed, Couldn't create a renderer: \'%s\'", SDL_GetError());
+
+    FV_SUCCESS("Created a window with size of %dx%d", window_x, window_y);
 }
 
 bool

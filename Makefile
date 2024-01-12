@@ -17,14 +17,14 @@
 #
 
 CC = gcc
-CFLAGS = -O3 -std=c2x -I./include $(shell pkg-config --cflags SDL2) -Wno-deprecated-declarations
+CFLAGS = -O3 -std=c2x -I./include $(shell pkg-config --cflags sdl2) -Wno-deprecated-declarations
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
-LIBFLAGS = $(shell pkg-config --libs SDL2)
+LIBFLAGS = $(shell pkg-config --libs sdl2) -lSDL2_ttf
 endif
 ifeq ($(UNAME_S),Darwin)
-LIBFLAGS = $(shell pkg-config --libs SDL2) -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo
+LIBFLAGS = $(shell pkg-config --libs sdl2) -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo
 endif
 
 SRC_DIR = ./src

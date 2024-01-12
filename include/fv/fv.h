@@ -40,8 +40,9 @@
 #include <fv/fv_types.h>
 #include <fv/fv_msg.h>
 
-/* OpenGL */
+/* SDL2 */
 #include <SDL2/SDL.h> 
+#include <SDL2/SDL_ttf.h>
 
 #define __FV_NO_RETURN__ __attribute__((noreturn))
 

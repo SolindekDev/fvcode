@@ -22,14 +22,14 @@
 #include <fv/fv_alloc.h>
 #include <fv/fv_app.h>
 
-#define FV_ERROR_MESSAGE                                                   \
-     "\e[0;31mFVCode Error\e[0m: %s:%d in %s: %s\nExiting with 1 code.\n"  \
+#define FV_ERROR_MESSAGE                                             \
+     "\e[0;31mFVCode\e[0m: %s:%d in %s: %s\nExiting with 1 code.\n"  \
 
-#define FV_ERROR_NO_EXIT_MESSAGE                      \
-     "\e[0;31mFVCode Error\e[0m: %s:%d in %s: %s\n"   \
+#define FV_ERROR_NO_EXIT_MESSAGE                \
+     "\e[0;31mFVCode\e[0m: %s:%d in %s: %s\n"   \
 
-#define FV_SUCCESS_MESSAGE                            \
-     "\e[0;32mFVCode Success\e[0m: %s:%d in %s: %s\n" \
+#define FV_SUCCESS_MESSAGE                    \
+     "\e[0;32mFVCode\e[0m: %s:%d in %s: %s\n" \
 
 void FV_Success(const char* file, i32 line, 
                 const char* func, const char* msg, ...)
