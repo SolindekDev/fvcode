@@ -72,12 +72,17 @@ FV_RenderCatchEvents(fv_render_t* render)
 {
     SDL_Event event;
     while (SDL_PollEvent(&event)) 
+    {
+        if (event.type != SDL_QUIT)
+            FV_EventComponents(render->app->component_manager, event);
+
         switch (event.type) 
         {
             case SDL_QUIT:
                 render->exit = 1;
                 break;
         }
+    }
 }
 
 void

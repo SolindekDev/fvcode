@@ -29,6 +29,21 @@
 typedef struct __fv_component_manager_t {
     fv_array_t* components; /* fv_component_t* */
     fv_app_t*   parent_app;
+    i32         last_id;
 } fv_component_manager_t;
+
+fv_component_manager_t* FV_CreateComponentManager(fv_app_t* app);
+
+/* Use FV_TRY */
+int FV_AppendComponent(fv_component_manager_t* manager, fv_component_t* component);
+
+/* Use FV_TRY */
+int FV_DeleteComponentByName(fv_component_manager_t* manager, const char* component_name);
+/* Use FV_TRY */
+int FV_DeleteComponentByID  (fv_component_manager_t* manager, i32 component_id);
+
+void FV_EventComponents(fv_component_manager_t* manager, SDL_Event event);
+void FV_RenderComponents(fv_component_manager_t* manager);
+void FV_RunComponents(fv_component_manager_t* manager);
 
 #endif /* __FV_COMPONENT_MANAGER_H */

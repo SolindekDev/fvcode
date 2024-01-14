@@ -16,31 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __FV_CONFIG_H
-#define __FV_CONFIG_H
+#ifndef __FV_COLLISIONS_H
+#define __FV_COLLISIONS_H
 
-#include <stdbool.h>
-#include <SDL2/SDL.h>
+#include <fv/fv.h>
+#include <fv/fv_vector.h>
 
-/* Version */
-#define FV_VERSION     "0.1.0v BETA"
+bool FV_CollisionBox(int x1, int y1, int w1, int h1, 
+                     int x2, int y2, int w2, int h2);
 
-/* Window */
-#define FV_WINDOW_NAME   "FVCode " FV_VERSION
+bool FV_CollisionBoxVector(fv_vector_t pos1, fv_vector_t size1, 
+                           fv_vector_t pos2, fv_vector_t size2);
 
-#define FV_WINDOW_SIZE_X  1280
-#define FV_WINDOW_SIZE_Y  720
-
-#define FV_WINDOW_FLAGS   (SDL_WINDOW_MOUSE_FOCUS | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE)
-#define FV_RENDERER_FLAGS (SDL_RENDERER_ACCELERATED)
-
-#define FV_MAX_FORMAT_BUFFER (int)(1024 * 4)
-
-/* Font */
-#define FV_DEFAULT_FONT_SIZE 16
-#define FV_DEFAULT_FONT_PATH "./fonts/jetbrains/JetBrainsMono-Regular.ttf"
-
-/* Highlight color */
-#define FV_HIGHLIGHT_COLOR 129, 125, 255, 120
-
-#endif /* __FV_CONFIG_H */
+#endif /* __FV_COLLISIONS_H */

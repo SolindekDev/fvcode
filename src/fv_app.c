@@ -19,6 +19,11 @@
 #include <fv/fv.h>
 #include <config/config.h>
 
+#include <fv/fv_component_manager.h>
+#include <fv/fv_component_textbox.h>
+#include <fv/fv_component_lable.h>
+#include <fv/fv_component.h>
+
 #include <fv/fv_font_manager.h>
 #include <fv/fv_font_draw.h>
 
@@ -79,8 +84,15 @@ FV_AppInitFunctionDefault(fv_app_t* app)
 
     app->font_manager = FV_FontManagerInit();
     FV_SetFontSize(app->font_manager, FV_CreateNewFontAsDefault(app->font_manager, FV_DEFAULT_FONT_PATH), 24);
+    
+    app->component_manager = FV_CreateComponentManager(app);
+    FV_TRY(
+        FV_AppendComponent(app->component_manager, 
+            FV_CreateComponentTextBox(FV_NewVector(5, 5), FV_NewVector(1270, 710), FV_NewColorRGB(19, 19, 19, 255), FV_NewColorRGB(255, 255, 255, 255), "Textbox value", FV_GetDefaultFont(app->font_manager), 18, FV_NewColorRGB(22, 22, 22, 255)
+        )
+    ));
     return 0;
-}  
+}   
 
 /* Function that will rn the app process.
  * Returns 0 on success, 1 on error */
@@ -88,37 +100,14 @@ int
 FV_AppRunFunctionDefault (fv_app_t* app)
 {
     FV_SUCCESS("Executing \'FV_AppRunFunctionDefault\'. App is running.", 0);
+    FV_SUCCESS("Calling all components 'run' function", 0);
+    FV_RunComponents(app->component_manager);
 
     while (!app->render->exit)
     {
         FV_RenderClearWindow(app->render);
         FV_RenderCatchEvents(app->render);        
-//         FV_RenderFontFormat(app, FV_GetDefaultFont(app->font_manager), 16, 1280, FV_NewColorRGB(255, 255, 255, 255), FV_NewVector(6, 6), "/*\n\
-//  * FVCode - Fast and easy code editor\n\
-//  * Copyright (C) 2023-2024 FVCode Developers\n\
-//  * \n\
-//  * This program is free software: you can redistribute it and/or modify\n\
-//  * it under the terms of the GNU General Public License as published by\n\
-//  * the Free Software Foundation, either version 3 of the License, or\n\
-//  * (at your option) any later version.\n\
-//  * \n\
-//  * This program is distributed in the hope that it will be useful,\n\
-//  * but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
-//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
-//  * GNU General Public License for more details.\n\
-//  * \n\
-//  * You should have received a copy of the GNU General Public License\n\
-//  * along with this program.  If not, see <https://www.gnu.org/licenses/>.\n\
-//  */\n\
-// \n\
-// #ifndef __FV_IO_H\n\
-// #define __FV_IO_H\n\
-// \n\
-// #include <fv/fv.h>\n\
-// \n\
-// const char* FV_ReadWholeFileContent(char* filename);\n\
-// \n\
-// #endif /* __FV_IO_H */");
+        FV_RenderComponents(app->component_manager);
         FV_RenderSwapBuffer(app->render);
         SDL_Delay(1000 / 60);
     }

@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __FV_COMPONENT_LABLE_H
-#define __FV_COMPONENT_LABLE_H
+#ifndef __FV_COMPONENT_TEXTBOX_H
+#define __FV_COMPONENT_TEXTBOX_H
 
 #include <fv/fv.h>
 
@@ -27,18 +27,24 @@
 #include <fv/fv_font_manager.h>
 #include <fv/fv_font_draw.h>
 
-typedef struct __fv_component_lable_t {
-    const char* lable_text;
+typedef struct __fv_component_textbox_t {
     fv_vector_t pos;
+    fv_vector_t size;
+    fv_color_t  border_color;
+    fv_color_t  bg;
+    fv_color_t  fg;
+    const char* textbox_value;
+    bool        disable_writting;
     fv_font_t*  font;
-    fv_color_t  color;
     i32         font_size;
-} fv_component_lable_t;
+    bool        focus;
+    fv_vector_t cursor;
+} fv_component_textbox_t;
 
-fv_component_t* FV_CreateComponentLable(const char* lable_text, fv_vector_t pos, fv_font_t* font, i32 font_size, fv_color_t color);
+fv_component_t* FV_CreateComponentTextBox(fv_vector_t pos, fv_vector_t size, fv_color_t bg, fv_color_t fg, char* textbox_value, fv_font_t* font, i32 font_size, fv_color_t border_color);
 
-int FV_ComponentLableRenderFunction(fv_component_t* component, fv_app_t* app);
-int FV_ComponentLableEventFunction (fv_component_t* component, fv_app_t* app, SDL_Event event);
-int FV_ComponentLableRunFunction   (fv_component_t* component, fv_app_t* app);
+int FV_ComponentTextBoxRenderFunction(fv_component_t* component, fv_app_t* app);
+int FV_ComponentTextBoxEventFunction (fv_component_t* component, fv_app_t* app, SDL_Event event);
+int FV_ComponentTextBoxRunFunction   (fv_component_t* component, fv_app_t* app);
 
-#endif /* __FV_COMPONENT_LABLE_H */
+#endif /* __FV_COMPONENT_TEXTBOX_H */

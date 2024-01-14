@@ -51,6 +51,9 @@ FV_AllocInit()
 void 
 FV_UnallocAll()
 {
+    printf("fv_allocated_pointers->length=%zu\n", fv_allocated_pointers->length);
+    FV_ARRAY_FOR(fv_allocated_pointers)
+        printf("fv_allocated_pointers[%d]=%p\n", i, ((fv_alloc_pointer_t*)(FV_GetElementFromArray(fv_allocated_pointers, i)))->ptr);
     FV_ARRAY_FOR(fv_allocated_pointers)
     {
         fv_alloc_pointer_t* curr_pointer = FV_GetElementFromArray(fv_allocated_pointers, i);
