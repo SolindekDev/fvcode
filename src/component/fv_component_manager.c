@@ -99,12 +99,30 @@ FV_RunComponents(fv_component_manager_t* manager)
 }
 
 void
-FV_EventComponents(fv_component_manager_t* manager, SDL_Event event)
+FV_UpdateResizeComponents(fv_component_manager_t* manager, SDL_Event event)
 {
     FV_ARRAY_FOR(manager->components)
     {
         fv_component_t* component = FV_GetElementFromArray(manager->components, i);
-        if (component->component_event != NULL)
-            component->component_event(component, manager->parent_app, event);
+        if (component->component_resize)
+        {
+            component->component_size.x = event.window.data1;
+            component->component_size.y = event.window.data2;
+        }
     }
+    return;
+}
+
+void
+FV_EventComponents(fv_component_manager_t* manager, SDL_Event event)
+{
+    if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED)
+        FV_UpdateResizeComponents(manager, event);
+    else
+        FV_ARRAY_FOR(manager->components)
+        {
+            fv_component_t* component = FV_GetElementFromArray(manager->components, i);
+            if (component->component_event != NULL)
+                component->component_event(component, manager->parent_app, event);
+        }
 }

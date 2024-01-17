@@ -40,9 +40,10 @@ FV_CreateComponentTextBox(fv_vector_t pos, fv_vector_t size, fv_color_t bg, fv_c
     textbox_component->component_render = FV_ComponentTextBoxRenderFunction;
     textbox_component->component_event  = FV_ComponentTextBoxEventFunction;
     textbox_component->component_run    = FV_ComponentTextBoxRunFunction;
+    textbox_component->component_resize = true;
+    textbox_component->component_size   = size;
 
     fv_component_textbox_t* textbox = calloc(1, sizeof(fv_component_textbox_t));
-    textbox->size             = size;
     textbox->pos              = pos;
     textbox->bg               = bg;
     textbox->fg               = fg;
@@ -134,7 +135,7 @@ FV_ComponentTextBoxRenderLineNumbers(fv_component_t* component, fv_app_t* app)
     fv_vector_t line_vector_pos = FV_NewVector(textbox->pos.x + 10, textbox->pos.y);
 
     FV_DrawFillRect(app, FV_NewVector(textbox->pos.x, textbox->pos.y), 
-                    FV_NewVector(textbox->pos.x + left_padding, textbox->pos.y + textbox->size.y),
+                    FV_NewVector(textbox->pos.x + left_padding, textbox->pos.y + component->component_size.y),
                     textbox->border_color);
 
     char line_num_buffer[64];
@@ -184,17 +185,34 @@ FV_ComponentTextBoxRenderText(fv_component_t* component, fv_app_t* app)
     }
 }
 
+void
+FV_ComponentTextBoxRenderInfo(fv_component_t* component, fv_app_t* app)
+{
+    fv_component_textbox_t* textbox = component->component_additional_data;
+
+    i32 lines_letters = floor(log10(abs(textbox->textbox_lines->length))) + 1;
+    i32 left_padding = round((lines_letters * textbox->font_size) * 1.3);
+    fv_vector_t pos = FV_NewVector(textbox->pos.x, component->component_size.y - (textbox->font_size));
+
+    FV_DrawFillRect(app, pos, FV_NewVector(component->component_size.x - pos.x, (textbox->font_size)), 
+                    textbox->border_color);
+    FV_RenderFontFormat(app, textbox->font, textbox->font_size - 4, 1280, FV_NewColorRGB(180, 180, 180, 255),
+                        FV_NewVector(pos.x + 10, pos.y), "Total lines: %d", textbox->textbox_lines->length);
+    FV_SetFontSize(app->font_manager, textbox->font, textbox->font_size);
+}
+
 int 
 FV_ComponentTextBoxRenderFunction(fv_component_t* component, fv_app_t* app)
 {
     fv_component_textbox_t* textbox = component->component_additional_data;
 
-    FV_DrawFillRect(app, textbox->pos, textbox->size, textbox->bg);
-    FV_DrawRect(app, textbox->pos, textbox->size, textbox->border_color);
-    // FV_RenderFont(app, textbox->font, textbox->font_size, textbox->size.x + textbox->pos.x, textbox->fg, FV_NewVector(textbox->pos.x + 7, textbox->pos.y), textbox->textbox_value);
+    FV_DrawFillRect(app, textbox->pos, component->component_size, textbox->bg);
+    FV_DrawRect(app, textbox->pos, component->component_size, textbox->border_color);
+    // FV_RenderFont(app, textbox->font, textbox->font_size, component->component_size.x + textbox->pos.x, textbox->fg, FV_NewVector(textbox->pos.x + 7, textbox->pos.y), textbox->textbox_value);
     
     FV_ComponentTextBoxRenderText(component, app);
     FV_ComponentTextBoxRenderLineNumbers(component, app);
+    FV_ComponentTextBoxRenderInfo(component, app);
 
     return 0;
 }
@@ -205,7 +223,7 @@ FV_ComponentTextBoxEventFunction(fv_component_t* component, fv_app_t* app, SDL_E
     fv_component_textbox_t* textbox = component->component_additional_data;
 
     bool mouse_collision = event.type == SDL_MOUSEBUTTONDOWN 
-                                ? FV_CollisionBoxVector(textbox->pos, textbox->size, FV_NewVector(event.button.x, event.button.y), FV_NewVector(2, 2))
+                                ? FV_CollisionBoxVector(textbox->pos, component->component_size, FV_NewVector(event.button.x, event.button.y), FV_NewVector(2, 2))
                                 : false;
 
     if (event.type == SDL_KEYDOWN && textbox->disable_writting == false && textbox->focus)

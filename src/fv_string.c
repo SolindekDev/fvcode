@@ -23,34 +23,63 @@
 
 #include <fv/fv_app.h>
 
+// 32kB
+#define MAX_LINE_LENGTH (1024 * 32)
+
+char*
+FV_DuplicateString(char* str)
+{
+    char* dup_string = (char*)calloc(strlen(str) + 1, sizeof(char));
+
+    FV_NO_NULL(dup_string);
+    strcpy(dup_string, str);
+
+    return dup_string;
+}
+
 fv_array_t* 
 FV_StringSplitByNewline(char* s)
 {
     fv_array_t* split_arr = FV_CreateArray(sizeof(char*));
-    size_t s_len          = strlen(s);
 
-    size_t line_index     = 0;
-    char* line            = malloc(2 * sizeof(char));
+    static char line_buffer[MAX_LINE_LENGTH];
+    size_t s_len = strlen(s);
+
+    int line_index = 0;
+    int char_index = 0;
 
     for (int i = 0; i < s_len; i++)
     {
-        char s_curr = s[i];
+        char s_char = s[i];
 
-        switch (s_curr)
+        if (s_char == '\n') 
         {
-            case '\n':
-                FV_AppendElementToArray(split_arr, line);
-                line_index = 0;
-                line = malloc(2 * sizeof(char));
-                break;
-            default:
-                line[line_index + 0] = s_curr;
-                line[line_index + 1] = '\0'  ;
-                line = realloc(line, (line_index + 2) * sizeof(char));
-                line_index++;
-                break;
+            line_buffer[char_index] = '\0';
+
+            char* line_copy = FV_DuplicateString(line_buffer);
+            FV_NO_NULL(line_copy);
+
+            FV_AppendElementToArray(split_arr, line_copy);
+            line_index += 1;
+            char_index =  0;
+            memset(line_buffer, 0, MAX_LINE_LENGTH); 
+        } 
+        else 
+        {
+            if (char_index < (MAX_LINE_LENGTH - 1)) 
+            {
+                line_buffer[char_index] = s_char;
+                char_index++;
+            } 
+            else
+                FV_ERROR_NO_EXIT("%d line is too long (1024 * 32 limit), skipping excess characters",
+                                    MAX_LINE_LENGTH);
         }
     }
+
+    char* line_copy = FV_DuplicateString(line_buffer);
+    FV_NO_NULL(line_copy);
+    FV_AppendElementToArray(split_arr, line_copy);
 
     FV_ARRAY_FOR(split_arr)
         printf("[i=%d]=%s\n", i, (char*)FV_GetElementFromArray(split_arr, i));

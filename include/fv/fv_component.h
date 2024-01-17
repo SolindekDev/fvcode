@@ -20,6 +20,7 @@
 #define __FV_COMPONENT_H
 
 #include <fv/fv.h>
+#include <fv/fv_vector.h>
 
 typedef struct __fv_component_t fv_component_t;
 typedef struct __fv_app_t       fv_app_t;
@@ -37,6 +38,8 @@ typedef struct __fv_component_t {
     const char*         component_name;
     fv_component_kind_t component_kind;
     i32                 component_id;
+    bool                component_resize;
+    fv_vector_t         component_size;
 
     /* functions */
     fv_component_render_f component_render;

@@ -29,7 +29,6 @@
 
 typedef struct __fv_component_textbox_t {
     fv_vector_t pos;
-    fv_vector_t size;
     fv_color_t  border_color;
     fv_color_t  cursor_color;
     fv_color_t  bg;
