@@ -20,7 +20,7 @@
 
 #include <fv/fv_array.h> 
 #include <fv/fv_assert.h>
-#include <fv/fv_alloc.h>
+
 #include <fv/fv_msg.h> 
 
 #ifndef ARRAY_VALIDATE_NUMBER
@@ -53,8 +53,8 @@ FV_DestroyArray(fv_array_t* array)
 {
     if (array == NULL) return NULL;
 
-    FV_Free(array->ptr);
-    FV_Free(array);
+    free(array->ptr);
+    free(array);
 
     return NULL;
 }

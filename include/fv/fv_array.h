@@ -37,7 +37,7 @@ void* FV_GetElementFromArray(fv_array_t* array, size_t index);
 
 i32 FV_AppendElementToArray(fv_array_t* array, void* element);
 i32 FV_DeleteElementFromArray(fv_array_t* array, size_t index);
-i32 FV_InsertElementToArray(fv_array_t* array, size_t index, void* element);
+i32 FV_InsertElementInArray(fv_array_t* array, size_t index, void* element);
 i32 FV_DeleteLastElementFromArray(fv_array_t* array);
 i32 FV_ResizeArray(fv_array_t* array, size_t n);
 

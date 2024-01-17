@@ -19,12 +19,12 @@
 #include <fv/fv.h>
 
 #include <fv/fv_component.h>
-#include <fv/fv_alloc.h>
+
 
 fv_component_t* 
 FV_CreateComponent(const char* component_name, fv_component_kind_t component_kind)
 {
-    fv_component_t* component = FV_Calloc(1, sizeof(fv_component_t));
+    fv_component_t* component = calloc(1, sizeof(fv_component_t));
     FV_NO_NULL(component);
 
     component->component_name = component_name;

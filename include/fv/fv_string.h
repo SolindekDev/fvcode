@@ -16,27 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __FV_ALLOC_H
-#define __FV_ALLOC_H
+#ifndef __FV_STRING_H
+#define __FV_STRING_H
 
 #include <fv/fv.h>
+#include <fv/fv_app.h>
 
-typedef struct __fv_alloc_pointer_t {
-    void* ptr;
-    u8    free;
-} fv_alloc_pointer_t;
+fv_array_t* FV_StringSplitByNewline(char* s);
 
-void FV_AllocInit ();
-void FV_UnallocAll();
-
-void*  FV_Calloc (size_t count, size_t size);
-void*  FV_Malloc (size_t size);
-void*  FV_Realloc(void *ptr, size_t size);
-
-void   FV_Free(void *ptr);
-size_t FV_GetAllocatedPointersLength();
-
-fv_alloc_pointer_t* FV_FindAllocatedPointerByAddress(void* address);
-fv_alloc_pointer_t* FV_CreateAllocatedPointer(void* ptr, u8 free);
-
-#endif /* __FV_ALLOC_H */
+#endif /* __FV_STRING_H */

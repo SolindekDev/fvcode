@@ -21,7 +21,7 @@
 
 #include <fv/fv_font_manager.h>
 #include <fv/fv_font_draw.h>
-#include <fv/fv_alloc.h>
+
 #include <fv/fv_array.h>
 
 fv_font_t* 
@@ -64,7 +64,8 @@ FV_SetFontSize(fv_font_manager_t* font_manager, fv_font_t* font, i32 size)
 fv_font_t* 
 FV_OpenNewFont(fv_font_manager_t* font_manager, char* font_path)
 {
-    fv_font_t* font = FV_Calloc(1, sizeof(fv_font_t));
+    fv_font_t* font = calloc(1, sizeof(fv_font_t));
+    FV_NO_NULL(font);
     FV_SUCCESS("Opening a new font at \'%s\'", 
         font_path, font->font_name);
     font->font = TTF_OpenFont(font_path, FV_DEFAULT_FONT_SIZE);
@@ -99,7 +100,7 @@ FV_GetDefaultFont(fv_font_manager_t* font_manager)
 fv_font_manager_t* 
 FV_FontManagerInit()
 {
-    fv_font_manager_t* font_manager = FV_Calloc(1, sizeof(fv_font_manager_t));
+    fv_font_manager_t* font_manager = calloc(1, sizeof(fv_font_manager_t));
     FV_NO_NULL(font_manager);
 
     if ((TTF_Init()) != 0)

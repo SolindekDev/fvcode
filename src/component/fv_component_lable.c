@@ -24,7 +24,7 @@
 #include <fv/fv_component.h>
 #include <fv/fv_collisions.h>
 #include <fv/fv_drawing.h>
-#include <fv/fv_alloc.h>
+
 
 #include <fv/fv_font_manager.h>
 #include <fv/fv_font_draw.h>
@@ -38,7 +38,7 @@ FV_CreateComponentLable(const char* lable_text, fv_vector_t pos,
     lable_component->component_event  = FV_ComponentLableEventFunction;
     lable_component->component_run    = FV_ComponentLableRunFunction;
 
-    fv_component_lable_t* lable = FV_Calloc(1, sizeof(fv_component_lable_t));
+    fv_component_lable_t* lable = calloc(1, sizeof(fv_component_lable_t));
     lable->lable_text           = lable_text;
     lable->font_size            = font_size;
     lable->color                = color;

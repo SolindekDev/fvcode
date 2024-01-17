@@ -24,6 +24,7 @@
 
 #include <fv/fv_app.h>
 #include <fv/fv_vector.h>
+
 #include <fv/fv_color.h>
 
 static char g_font_draw_buffer[FV_MAX_FORMAT_BUFFER] = { 0 };
@@ -61,7 +62,6 @@ fv_vector_t FV_RenderFontFormat(fv_app_t* app, fv_font_t* font, i32 size, i32 ne
     va_start(list, fmt);
     vsprintf(g_font_draw_buffer, fmt, list);
     fv_vector_t font_size = FV_RenderFont(app, font, size, newline, color, pos, g_font_draw_buffer);
-    memset(g_font_draw_buffer, 0, FV_MAX_FORMAT_BUFFER);
     va_end(list);
     return font_size;
 }

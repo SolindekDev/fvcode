@@ -21,7 +21,7 @@
 #include <fv/fv_component_manager.h>
 #include <fv/fv_component.h>
 
-#include <fv/fv_alloc.h>
+
 #include <fv/fv_vector.h>
 #include <fv/fv_array.h>
 #include <fv/fv_app.h>
@@ -29,7 +29,7 @@
 fv_component_manager_t* 
 FV_CreateComponentManager(fv_app_t* app)
 {
-    fv_component_manager_t* manager = FV_Calloc(1, sizeof(fv_component_manager_t));
+    fv_component_manager_t* manager = calloc(1, sizeof(fv_component_manager_t));
     FV_NO_NULL(manager);
 
     manager->components = FV_CreateArray(sizeof(fv_component_t*));

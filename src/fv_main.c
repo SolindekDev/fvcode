@@ -18,7 +18,7 @@
 
 #include <fv/fv.h>
 
-#include <fv/fv_alloc.h>
+
 #include <fv/fv_main.h>
 #include <fv/fv_app.h>
 
@@ -26,8 +26,6 @@
 i32 
 main(i32 argc, char** argv)
 {
-    /* Initialize memory manager and then create the app */
-    FV_AllocInit();
     fv_app_t* fv = FV_CreateApp(argc, argv);
 
     /* Initialize and run the app */ 

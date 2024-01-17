@@ -19,7 +19,7 @@
 #include <fv/fv.h>
 
 #include <fv/fv_msg.h>
-#include <fv/fv_alloc.h>
+
 #include <fv/fv_app.h>
 
 #define FV_ERROR_MESSAGE                                             \
@@ -36,12 +36,12 @@ void FV_Success(const char* file, i32 line,
 {
     va_list ap;
     va_start(ap, msg);
-    char* buffer = FV_Calloc(512, sizeof(char));
+    char* buffer = calloc(512, sizeof(char));
     vsprintf(buffer, msg, ap);
 
     printf(FV_SUCCESS_MESSAGE, file, line, func, buffer);
     va_end(ap);
-    FV_Free(buffer);
+    free(buffer);
 }
 
 __FV_NO_RETURN__ void 
@@ -50,11 +50,10 @@ FV_Error(const char* file, i32 line,
 {
     va_list ap;
     va_start(ap, error);
-    char* buffer = FV_Calloc(512, sizeof(char));
+    char* buffer = calloc(512, sizeof(char));
     vsprintf(buffer, error, ap);
 
     printf(FV_ERROR_MESSAGE, file, line, func, buffer);
-    FV_UnallocAll();
     SDL_Quit();
 
     va_end(ap);
@@ -67,10 +66,10 @@ void FV_ErrorNoExit(const char* file, i32 line,
 {
     va_list ap;
     va_start(ap, error);
-    char* buffer = FV_Calloc(512, sizeof(char));
+    char* buffer = calloc(512, sizeof(char));
     vsprintf(buffer, error, ap);
 
     printf(FV_ERROR_NO_EXIT_MESSAGE, file, line, func, buffer);
     va_end(ap);
-    FV_Free(buffer);
+    free(buffer);
 }

@@ -19,8 +19,6 @@
 #include <fv/fv.h>
 
 #include <fv/fv_assert.h>
-#include <fv/fv_alloc.h>
-
 #include <SDL2/SDL.h> 
 
 #define FV_ASSERT_MESSAGE                                                              \
@@ -31,7 +29,6 @@ FV_Assert(const char* file, i32 line,
           const char* func, const char* e)
 {
     printf(FV_ASSERT_MESSAGE, file, line, func, e);
-    FV_UnallocAll();
     SDL_Quit();
     exit(1);
 }

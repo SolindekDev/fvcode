@@ -43,4 +43,7 @@
 /* Highlight color */
 #define FV_HIGHLIGHT_COLOR 129, 125, 255, 120
 
+/* Cursor color */
+#define FV_DEFAULT_CURSOR_COLOR 94, 161, 242, 240
+
 #endif /* __FV_CONFIG_H */

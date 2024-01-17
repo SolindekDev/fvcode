@@ -18,7 +18,7 @@
 
 #include <fv/fv.h>
 
-#include <fv/fv_alloc.h>
+
 
 size_t
 FV_GetFileSize(FILE* f)
@@ -39,7 +39,7 @@ FV_ReadWholeFileContent(char* filename)
         return NULL;
 
     size_t file_size = FV_GetFileSize(f);
-    char* buffer     = FV_Calloc(file_size + 1, sizeof(char));
+    char* buffer     = calloc(file_size + 1, sizeof(char));
     FV_NO_NULL(buffer);
 
     /* Return value of fread need to be equal to

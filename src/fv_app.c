@@ -30,9 +30,40 @@
 #include <fv/fv_drawing.h>
 #include <fv/fv_render.h>
 #include <fv/fv_color.h>
-#include <fv/fv_alloc.h>
+
 #include <fv/fv_main.h>
 #include <fv/fv_app.h>
+
+#define DEFAULT_CODE "/*\n\
+ * FVCode - Fast and easy code editor\n\
+ * Copyright (C) 2023-2024 FVCode Developers\n\
+ *   \n\
+ * This program is free software: you can redistribute it and/or modify\n\
+ * it under the terms of the GNU General Public License as published by\n\
+ * the Free Software Foundation, either version 3 of the License, or\n\
+ * (at your option) any later version.\n\
+ *   \n\
+ * This program is distributed in the hope that it will be useful,\n\
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
+ * GNU General Public License for more details.\n\
+ *   \n\
+ * You should have received a copy of the GNU General Public License\n\
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.\n\
+ */\n\
+\n\
+#include <fv/fv.h>\n\
+\n\
+#include <fv/fv_string.h>\n\
+#include <fv/fv_array.h>\n\
+\n\
+#include <fv/fv_app.h>\n\
+\n\
+fv_array_t* \n\
+FV_StringSplitByNewline(char* s)\n\
+{\n\
+    return split_arr;\n\
+}"
 
 /* This function will initalize app structure 
  * that is used in main function for managing
@@ -41,7 +72,7 @@ fv_app_t*
 FV_CreateApp(i32 argc, char** argv)
 {
     /* Allocate app strucutre using FV alloc function */
-    fv_app_t* fv = FV_Calloc(1, sizeof(fv_app_t));
+    fv_app_t* fv = calloc(1, sizeof(fv_app_t));
 
     fv->argc     = argc;
     fv->argv     = argv;
@@ -58,7 +89,6 @@ void
 FV_DestroyApp(fv_app_t* app)
 {
     /* Unallocate everything by using FV_UnallocAll */
-    FV_UnallocAll();
     SDL_Quit();
 }
 
@@ -88,7 +118,7 @@ FV_AppInitFunctionDefault(fv_app_t* app)
     app->component_manager = FV_CreateComponentManager(app);
     FV_TRY(
         FV_AppendComponent(app->component_manager, 
-            FV_CreateComponentTextBox(FV_NewVector(5, 5), FV_NewVector(1270, 710), FV_NewColorRGB(19, 19, 19, 255), FV_NewColorRGB(255, 255, 255, 255), "Textbox value", FV_GetDefaultFont(app->font_manager), 18, FV_NewColorRGB(22, 22, 22, 255)
+            FV_CreateComponentTextBox(FV_NewVector(0, 0), FV_NewVector(1280, 720), FV_NewColorRGB(19, 19, 19, 255), FV_NewColorRGB(211, 215, 207, 255), DEFAULT_CODE, FV_GetDefaultFont(app->font_manager), 20, FV_NewColorRGB(26, 26, 26, 255), 7.0f
         )
     ));
     return 0;

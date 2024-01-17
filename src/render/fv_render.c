@@ -22,7 +22,7 @@
 
 #include <fv/fv_render.h>
 #include <fv/fv_msg.h>
-#include <fv/fv_alloc.h>
+
 #include <fv/fv_app.h>
 
 #include <SDL2/SDL.h> 
@@ -35,7 +35,7 @@ FV_RenderInit(fv_app_t* parent_app)
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
         FV_ERROR("Couldn't initialize SDL2 library: \'%s\'", SDL_GetError());
 
-    fv_render_t* render = FV_Calloc(1, sizeof(fv_render_t));
+    fv_render_t* render = calloc(1, sizeof(fv_render_t));
     render->app  = parent_app;
     render->exit = 0;
     return render;
