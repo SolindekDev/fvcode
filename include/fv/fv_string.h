@@ -22,6 +22,11 @@
 #include <fv/fv.h>
 #include <fv/fv_app.h>
 
+// 32kB
+#define MAX_LINE_LENGTH (1024 * 32)
+
+char* FV_DuplicateString(char* str);
+
 fv_array_t* FV_StringSplitByNewline(char* s);
 
 #endif /* __FV_STRING_H */

@@ -23,9 +23,6 @@
 
 #include <fv/fv_app.h>
 
-// 32kB
-#define MAX_LINE_LENGTH (1024 * 32)
-
 char*
 FV_DuplicateString(char* str)
 {
@@ -80,8 +77,5 @@ FV_StringSplitByNewline(char* s)
     char* line_copy = FV_DuplicateString(line_buffer);
     FV_NO_NULL(line_copy);
     FV_AppendElementToArray(split_arr, line_copy);
-
-    FV_ARRAY_FOR(split_arr)
-        printf("[i=%d]=%s\n", i, (char*)FV_GetElementFromArray(split_arr, i));
     return split_arr;
 }

@@ -90,18 +90,18 @@ FV_DeleteElementFromArray(fv_array_t* array, size_t index)
     if (array == NULL || index >= array->length)
         return -1;
 
-    for (size_t i = index; i < array->length - 1; i++)
-        array->ptr[i] = array->ptr[i + 1];
+    size_t bytesToMove = (array->length - index - 1) * sizeof(void*);
+    memmove(&(array->ptr[index]), &(array->ptr[index + 1]), bytesToMove);
 
+    array->ptr[array->length - 1] = NULL;
     array->length--;
- 
+
     void** new_ptr = (void**)realloc(array->ptr, array->length * sizeof(void*));
-    FV_NO_NULL(new_ptr);
 
     if (new_ptr != NULL || array->length == 0)
         array->ptr = new_ptr;
 
-    return 0;
+    return 0;  // Success
 }
 
 i32 

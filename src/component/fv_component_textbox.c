@@ -32,6 +32,8 @@
 
 #include <fv/fv_msg.h>
 
+static char rest_of_line[MAX_LINE_LENGTH] = { 0 };
+
 fv_component_t*
 FV_CreateComponentTextBox(fv_vector_t pos, fv_vector_t size, fv_color_t bg, fv_color_t fg, char* textbox_value, 
                           fv_font_t* font, i32 font_size, fv_color_t border_color, float line_space)
@@ -40,8 +42,6 @@ FV_CreateComponentTextBox(fv_vector_t pos, fv_vector_t size, fv_color_t bg, fv_c
     textbox_component->component_render = FV_ComponentTextBoxRenderFunction;
     textbox_component->component_event  = FV_ComponentTextBoxEventFunction;
     textbox_component->component_run    = FV_ComponentTextBoxRunFunction;
-    textbox_component->component_resize = true;
-    textbox_component->component_size   = size;
 
     fv_component_textbox_t* textbox = calloc(1, sizeof(fv_component_textbox_t));
     textbox->pos              = pos;
@@ -53,6 +53,7 @@ FV_CreateComponentTextBox(fv_vector_t pos, fv_vector_t size, fv_color_t bg, fv_c
     textbox->disable_writting = false;
     textbox->line_space       = line_space;
     textbox->cursor_color     = FV_NewColorRGB(FV_DEFAULT_CURSOR_COLOR);
+    textbox->size             = size;
 
     textbox->textbox_value = calloc(strlen(textbox_value) + 1, sizeof(char));
     memcpy(textbox->textbox_value, textbox_value, strlen(textbox_value) + 1);
@@ -135,7 +136,7 @@ FV_ComponentTextBoxRenderLineNumbers(fv_component_t* component, fv_app_t* app)
     fv_vector_t line_vector_pos = FV_NewVector(textbox->pos.x + 10, textbox->pos.y);
 
     FV_DrawFillRect(app, FV_NewVector(textbox->pos.x, textbox->pos.y), 
-                    FV_NewVector(textbox->pos.x + left_padding, textbox->pos.y + component->component_size.y),
+                    FV_NewVector(textbox->pos.x + left_padding, textbox->pos.y + textbox->size.y),
                     textbox->border_color);
 
     char line_num_buffer[64];
@@ -192,12 +193,30 @@ FV_ComponentTextBoxRenderInfo(fv_component_t* component, fv_app_t* app)
 
     i32 lines_letters = floor(log10(abs(textbox->textbox_lines->length))) + 1;
     i32 left_padding = round((lines_letters * textbox->font_size) * 1.3);
-    fv_vector_t pos = FV_NewVector(textbox->pos.x, component->component_size.y - (textbox->font_size));
+    fv_vector_t pos = FV_NewVector(textbox->pos.x, textbox->size.y - (textbox->font_size));
 
-    FV_DrawFillRect(app, pos, FV_NewVector(component->component_size.x - pos.x, (textbox->font_size)), 
+    FV_DrawFillRect(app, pos, FV_NewVector(textbox->size.x - pos.x, (textbox->font_size) + 4), 
                     textbox->border_color);
-    FV_RenderFontFormat(app, textbox->font, textbox->font_size - 4, 1280, FV_NewColorRGB(180, 180, 180, 255),
-                        FV_NewVector(pos.x + 10, pos.y), "Total lines: %d", textbox->textbox_lines->length);
+    FV_SetFontSize(app->font_manager, textbox->font, textbox->font_size - 6);
+    SDL_Surface* surface = TTF_RenderText_Blended_Wrapped(textbox->font->font, "Total lines: %d, Filename: fv_string.c, Path: ~/Documents/fvcode/src/fv_string.c", (SDL_Color){ 199, 199, 199, 255 }, 1280);
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(app->render->sdl_renderer, surface);
+
+    fv_vector_t font_size = FV_NewVector(0, 0);
+    i32 font_size_x, font_size_y;
+    SDL_QueryTexture(texture, NULL, NULL,  
+                     &font_size_x, &font_size_y);
+
+    font_size.x = font_size_x;
+    font_size.y = font_size_y;
+
+    SDL_Rect rect = { 
+        .x = textbox->size.x - font_size.x - 10, .y = pos.y, 
+        .w = font_size.x,                        .h = font_size.y
+    };
+    SDL_RenderCopy(app->render->sdl_renderer, texture, NULL, &rect);
+
+    SDL_DestroyTexture(texture);
+    SDL_FreeSurface(surface);
     FV_SetFontSize(app->font_manager, textbox->font, textbox->font_size);
 }
 
@@ -206,9 +225,9 @@ FV_ComponentTextBoxRenderFunction(fv_component_t* component, fv_app_t* app)
 {
     fv_component_textbox_t* textbox = component->component_additional_data;
 
-    FV_DrawFillRect(app, textbox->pos, component->component_size, textbox->bg);
-    FV_DrawRect(app, textbox->pos, component->component_size, textbox->border_color);
-    // FV_RenderFont(app, textbox->font, textbox->font_size, component->component_size.x + textbox->pos.x, textbox->fg, FV_NewVector(textbox->pos.x + 7, textbox->pos.y), textbox->textbox_value);
+    FV_DrawFillRect(app, textbox->pos, textbox->size, textbox->bg);
+    FV_DrawRect(app, textbox->pos, textbox->size, textbox->border_color);
+    // FV_RenderFont(app, textbox->font, textbox->font_size, textbox->size.x + textbox->pos.x, textbox->fg, FV_NewVector(textbox->pos.x + 7, textbox->pos.y), textbox->textbox_value);
     
     FV_ComponentTextBoxRenderText(component, app);
     FV_ComponentTextBoxRenderLineNumbers(component, app);
@@ -217,14 +236,145 @@ FV_ComponentTextBoxRenderFunction(fv_component_t* component, fv_app_t* app)
     return 0;
 }
 
+void
+FV_ComponentTextBoxBackspaceKey(fv_component_t* component, fv_app_t* app, SDL_Event event)
+{
+    fv_component_textbox_t* textbox = component->component_additional_data;
+
+    if (textbox->cursor.x == 0)
+    {
+        if (textbox->cursor.y == 0)
+            return;
+        // else if (textbox->cursor.y == 1 && textbox->textbox_lines->length == 2)
+            // return;
+
+        char* line_return    = FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y - 1);
+        char* line_backspace = FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y);
+
+        size_t line_backspace_size = strlen(line_backspace);
+        size_t line_return_size    = strlen(line_return);
+
+        // if (line_backspace_size == 0)
+        // {
+        //     printf("line_backspace_size == 0\n");
+        //     FV_DeleteElementFromArray(textbox->textbox_lines, textbox->cursor.y);
+        //     textbox->cursor.x = line_return_size - 1;
+        //     textbox->cursor.y--;
+        // }
+
+        char* new_line_return = calloc((line_return_size + line_backspace_size), sizeof(char));
+        strcpy(new_line_return, line_return);
+
+        for (size_t i = line_return_size; i < (line_return_size + line_backspace_size); i++)
+            new_line_return[i] = line_backspace[i - line_return_size];
+
+        FV_DeleteElementFromArray(textbox->textbox_lines, textbox->cursor.y);
+        FV_DeleteElementFromArray(textbox->textbox_lines, textbox->cursor.y - 1);
+        FV_InsertElementInArray(textbox->textbox_lines, textbox->cursor.y - 1, new_line_return);
+        textbox->cursor.y--;
+        textbox->cursor.x = (float)strlen(new_line_return);
+
+        return;
+    }
+
+    char* current_line = FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y);
+    char* cursor_position = &current_line[(i32)textbox->cursor.x];
+
+    // Shift the characters to the left
+    memmove(cursor_position - 1, cursor_position, strlen(cursor_position) + 1);
+
+    textbox->cursor.x--;
+}
+
+void 
+FV_ComponentTextBoxAddChar(fv_component_textbox_t* textbox, char* current_line, char append_char)
+{
+    size_t current_line_length = strlen(current_line);
+
+    strcpy(rest_of_line, current_line);
+    free(current_line);
+    for (size_t i = current_line_length + 1; i > textbox->cursor.x; --i) {
+        rest_of_line[i] = rest_of_line[i - 1];
+    }
+
+    rest_of_line[(i32)textbox->cursor.x ] = append_char;
+    rest_of_line[current_line_length + 1] = '\0';
+    FV_DeleteElementFromArray(textbox->textbox_lines, textbox->cursor.y);
+    FV_InsertElementInArray(textbox->textbox_lines, textbox->cursor.y, FV_DuplicateString(rest_of_line));
+    memset(rest_of_line, 0, MAX_LINE_LENGTH);
+    textbox->cursor.x++;
+}
+
+void
+FV_ComponentTextBoxTextInput(fv_component_t* component, fv_app_t* app, SDL_Event event)
+{
+    fv_component_textbox_t* textbox = component->component_additional_data;
+
+    char* current_line = FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y);
+    char append_char = event.text.text[0];
+
+    FV_ComponentTextBoxAddChar(textbox, current_line, append_char);
+}
+
+void
+FV_ComponentTextBoxTabKey(fv_component_t* component, fv_app_t* app, SDL_Event event)
+{
+    fv_component_textbox_t* textbox = component->component_additional_data;
+
+    char* current_line = FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y);
+    char append_char   = '\t';
+
+    FV_ComponentTextBoxAddChar(textbox, current_line, append_char);
+}
+
+void
+FV_ComponentTextBoxEnterKey(fv_component_t* component, fv_app_t* app, SDL_Event event)
+{
+    fv_component_textbox_t* textbox = component->component_additional_data;
+
+    if (textbox->cursor.x == 0)
+    {
+        FV_InsertElementInArray(textbox->textbox_lines, textbox->cursor.y, calloc(1, sizeof(char)));
+        textbox->cursor.x = 0;
+        textbox->cursor.y++;
+        return;
+    }
+    
+    char* line         = FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y);
+    size_t line_length = strlen(line);
+    if (textbox->cursor.x != line_length)
+    {
+        /* This code is so messy but basically what it does it 
+         * delete the rest of line and make it appear in new line */
+        for (size_t i = textbox->cursor.x; i < line_length; i++)
+            rest_of_line[i - (size_t)textbox->cursor.x] = line[i];
+        rest_of_line[line_length] = '\0';
+        line = realloc(line, (textbox->cursor.x + 1) * sizeof(char));
+        line[(i32)textbox->cursor.x] = '\0';
+        FV_InsertElementInArray(textbox->textbox_lines, textbox->cursor.y + 1, FV_DuplicateString(rest_of_line));
+        memset(rest_of_line, 0, MAX_LINE_LENGTH);
+    }
+    else
+        FV_InsertElementInArray(textbox->textbox_lines, textbox->cursor.y + 1, calloc(1, sizeof(char)));
+
+    textbox->cursor.x = 0;
+    textbox->cursor.y++;
+}
+
 int 
 FV_ComponentTextBoxEventFunction(fv_component_t* component, fv_app_t* app, SDL_Event event)
 {
     fv_component_textbox_t* textbox = component->component_additional_data;
 
     bool mouse_collision = event.type == SDL_MOUSEBUTTONDOWN 
-                                ? FV_CollisionBoxVector(textbox->pos, component->component_size, FV_NewVector(event.button.x, event.button.y), FV_NewVector(2, 2))
+                                ? FV_CollisionBoxVector(textbox->pos, textbox->size, FV_NewVector(event.button.x, event.button.y), FV_NewVector(2, 2))
                                 : false;
+
+    if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED)
+    {
+        textbox->size.x = event.window.data1;
+        textbox->size.y = event.window.data2;
+    }
 
     if (event.type == SDL_KEYDOWN && textbox->disable_writting == false && textbox->focus)
     {   
@@ -239,11 +389,23 @@ FV_ComponentTextBoxEventFunction(fv_component_t* component, fv_app_t* app, SDL_E
 
             if (textbox->cursor.x != strlen(curr_line))
                 textbox->cursor.x++;
+            else
+                if (textbox->cursor.y != textbox->textbox_lines->length)
+                {
+                    textbox->cursor.x = 0;
+                    textbox->cursor.y++;
+                }
         }
         else if (event.key.keysym.sym == SDLK_LEFT)
         {
             if (textbox->cursor.x != 0)
-                textbox->cursor.x--;            
+                textbox->cursor.x--;   
+            else
+                if (textbox->cursor.y != 0)
+                {
+                    textbox->cursor.x = strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y - 1));
+                    textbox->cursor.y--;
+                }         
         }
         else if (event.key.keysym.sym == SDLK_DOWN)
         {
@@ -256,29 +418,15 @@ FV_ComponentTextBoxEventFunction(fv_component_t* component, fv_app_t* app, SDL_E
                 textbox->cursor.x = moved_line_len == 0 ? 0 : moved_line_len;
         } 
         else if (event.key.keysym.sym == SDLK_RETURN || event.key.keysym.sym == SDLK_KP_ENTER)
-        {
-            textbox->cursor.y++;
-            textbox->cursor.x = 0;
-            FV_InsertElementInArray(textbox->textbox_lines, textbox->cursor.y, calloc(1, sizeof(char)));
-        }
+            FV_ComponentTextBoxEnterKey(component, app, event);
         else if (event.key.keysym.sym == SDLK_BACKSPACE)
-        {
-            
-        }
+            FV_ComponentTextBoxBackspaceKey(component, app, event);
+        else if (event.key.keysym.sym == SDLK_TAB)
+            FV_ComponentTextBoxTabKey(component, app, event);
     }
 
     if (event.type == SDL_TEXTINPUT)
-    {
-        // char* new_textbox_value = realloc(textbox->textbox_value, (strlen(textbox->textbox_value) + 2) * sizeof(char));
-        // FV_NO_NULL(new_textbox_value);
-
-        // textbox->textbox_value = new_textbox_value;
-        // for (size_t i = strlen(new_textbox_value); i > textbox->cursor.x; i--)
-        //     textbox->textbox_value[i] = textbox->textbox_value[i - 1];
-
-        // textbox->textbox_value[(int)textbox->cursor.x] = event.text.text[0];
-        // textbox->cursor.x++;
-    }
+        FV_ComponentTextBoxTextInput(component, app, event);
 
     if (event.type == SDL_MOUSEBUTTONDOWN && mouse_collision)
     {
