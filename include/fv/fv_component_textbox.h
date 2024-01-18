@@ -35,6 +35,8 @@ typedef struct __fv_component_textbox_t {
     fv_color_t  fg;
     float       line_space;
     char*       textbox_value;
+    char*       filename;
+    char*       path;
     bool        disable_writting;
     fv_font_t*  font;
     i32         font_size;
@@ -44,7 +46,7 @@ typedef struct __fv_component_textbox_t {
     fv_vector_t size;
 } fv_component_textbox_t;
 
-fv_component_t* FV_CreateComponentTextBox(fv_vector_t pos, fv_vector_t size, fv_color_t bg, fv_color_t fg, char* textbox_value, fv_font_t* font, i32 font_size, fv_color_t border_color, float line_space);
+fv_component_t* FV_CreateComponentTextBox(fv_vector_t pos, fv_vector_t size, fv_color_t bg, fv_color_t fg, char* textbox_value, fv_font_t* font, i32 font_size, fv_color_t border_color, float line_space, char* filename, char* path);
 
 int FV_ComponentTextBoxRenderFunction(fv_component_t* component, fv_app_t* app);
 int FV_ComponentTextBoxEventFunction (fv_component_t* component, fv_app_t* app, SDL_Event event);

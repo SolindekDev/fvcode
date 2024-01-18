@@ -38,7 +38,8 @@
 
 /* Font */
 #define FV_DEFAULT_FONT_SIZE 16
-#define FV_DEFAULT_FONT_PATH "./fonts/jetbrains/JetBrainsMono-Regular.ttf"
+// #define FV_DEFAULT_FONT_PATH "./fonts/jetbrains/JetBrainsMono-Regular.ttf"
+#define FV_DEFAULT_FONT_PATH "./fonts/poggy/proggyfonts-1.1.7/ProggyVector/ProggyVector-Regular.ttf"
 
 /* Highlight color */
 #define FV_HIGHLIGHT_COLOR 129, 125, 255, 120

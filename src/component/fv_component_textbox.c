@@ -32,11 +32,14 @@
 
 #include <fv/fv_msg.h>
 
-static char rest_of_line[MAX_LINE_LENGTH] = { 0 };
+static char info_box_fmt[FV_MAX_FORMAT_BUFFER] = { 0 };
+static char rest_of_line[MAX_LINE_LENGTH     ] = { 0 };
+static i32  glyph_size_ = 1;
 
 fv_component_t*
 FV_CreateComponentTextBox(fv_vector_t pos, fv_vector_t size, fv_color_t bg, fv_color_t fg, char* textbox_value, 
-                          fv_font_t* font, i32 font_size, fv_color_t border_color, float line_space)
+                          fv_font_t* font, i32 font_size, fv_color_t border_color, float line_space, char* filename,
+                          char* path)
 {   
     fv_component_t* textbox_component   = FV_CreateComponent("textbox", COMPONENT_TEXTBOX);
     textbox_component->component_render = FV_ComponentTextBoxRenderFunction;
@@ -54,6 +57,9 @@ FV_CreateComponentTextBox(fv_vector_t pos, fv_vector_t size, fv_color_t bg, fv_c
     textbox->line_space       = line_space;
     textbox->cursor_color     = FV_NewColorRGB(FV_DEFAULT_CURSOR_COLOR);
     textbox->size             = size;
+
+    textbox->filename         = filename;
+    textbox->path             = path;
 
     textbox->textbox_value = calloc(strlen(textbox_value) + 1, sizeof(char));
     memcpy(textbox->textbox_value, textbox_value, strlen(textbox_value) + 1);
@@ -114,6 +120,7 @@ FV_ComponentTextBoxRenderLine(fv_component_t* component, fv_app_t* app,
                 SDL_DestroyTexture(glyph_texture);
                 SDL_FreeSurface(glyph_surface);
                 character_vector_pos->x += glyph_size_x + 1;
+                glyph_size_ = glyph_size.x;
             }
         }
     }
@@ -158,7 +165,7 @@ FV_ComponentTextBoxRenderLineNumbers(fv_component_t* component, fv_app_t* app)
 
         SDL_Rect rect = { 
             .x = left_padding / 2 - font_size.x / 2, .y = line_vector_pos.y, 
-            .w = font_size.x,                             .h = font_size.y
+            .w = font_size.x,                        .h = font_size.y
         };
         SDL_RenderCopy(app->render->sdl_renderer, texture, NULL, &rect);
 
@@ -191,15 +198,20 @@ FV_ComponentTextBoxRenderInfo(fv_component_t* component, fv_app_t* app)
 {
     fv_component_textbox_t* textbox = component->component_additional_data;
 
+    sprintf((char*)info_box_fmt, "Total lines: %d, Cursor: %d:%d, Filename: \"%s\", Path: \"%s\"",
+        textbox->textbox_lines->length, (i32)textbox->cursor.x, (i32)textbox->cursor.y,
+        textbox->filename, textbox->path);
+
     i32 lines_letters = floor(log10(abs(textbox->textbox_lines->length))) + 1;
     i32 left_padding = round((lines_letters * textbox->font_size) * 1.3);
-    fv_vector_t pos = FV_NewVector(textbox->pos.x, textbox->size.y - (textbox->font_size));
+    fv_vector_t pos = FV_NewVector(textbox->pos.x, textbox->size.y - (textbox->font_size) - 10);
 
-    FV_DrawFillRect(app, pos, FV_NewVector(textbox->size.x - pos.x, (textbox->font_size) + 4), 
+    FV_DrawFillRect(app, pos, FV_NewVector(textbox->size.x - pos.x, (textbox->font_size) + 10), 
                     textbox->border_color);
-    FV_SetFontSize(app->font_manager, textbox->font, textbox->font_size - 6);
-    SDL_Surface* surface = TTF_RenderText_Blended_Wrapped(textbox->font->font, "Total lines: %d, Filename: fv_string.c, Path: ~/Documents/fvcode/src/fv_string.c", (SDL_Color){ 199, 199, 199, 255 }, 1280);
+    FV_SetFontSize(app->font_manager, textbox->font, textbox->font_size);
+    SDL_Surface* surface = TTF_RenderText_Blended_Wrapped(textbox->font->font, info_box_fmt, (SDL_Color){ 199, 199, 199, 255 }, 1280);
     SDL_Texture* texture = SDL_CreateTextureFromSurface(app->render->sdl_renderer, surface);
+    memset(info_box_fmt, 0, FV_MAX_FORMAT_BUFFER);
 
     fv_vector_t font_size = FV_NewVector(0, 0);
     i32 font_size_x, font_size_y;
@@ -210,7 +222,7 @@ FV_ComponentTextBoxRenderInfo(fv_component_t* component, fv_app_t* app)
     font_size.y = font_size_y;
 
     SDL_Rect rect = { 
-        .x = textbox->size.x - font_size.x - 10, .y = pos.y, 
+        .x = textbox->size.x - font_size.x - 10, .y = pos.y + 3, 
         .w = font_size.x,                        .h = font_size.y
     };
     SDL_RenderCopy(app->render->sdl_renderer, texture, NULL, &rect);
@@ -361,13 +373,55 @@ FV_ComponentTextBoxEnterKey(fv_component_t* component, fv_app_t* app, SDL_Event 
     textbox->cursor.y++;
 }
 
+void
+FV_ComponentTextButtonMotion(fv_component_t* component, fv_app_t* app, SDL_Event event)
+{
+    event.motion.x;
+    event.motion.y;
+}
+
+void
+FV_ComponentTextBoxSetCursorByMouse(fv_component_t* component, fv_app_t* app, SDL_Event event)
+{
+    fv_component_textbox_t* textbox = component->component_additional_data;
+
+    i32 mouse_x = event.button.x;
+    i32 mouse_y = event.button.y;
+
+    i32 lines_letters = floor(log10(abs(textbox->textbox_lines->length))) + 1;
+    i32 left_padding = round((lines_letters * textbox->font_size) * 1.3);
+
+    f32 determite_x = (mouse_x - (textbox->pos.x + 12 + left_padding + 18)) / glyph_size_;
+    f32 determite_y = mouse_y / (textbox->font_size + textbox->line_space);
+
+    if ((i32)determite_y > textbox->textbox_lines->length)
+        textbox->cursor.y = textbox->textbox_lines->length - 1;
+    else
+        textbox->cursor.y = (i32)determite_y;
+
+    if (determite_x <= 0)
+        textbox->cursor.x = 0;
+    else    
+        if ((i32)determite_x < strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y)))
+            textbox->cursor.x = (i32)determite_x + 1;
+        else
+            textbox->cursor.x = strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y));
+
+    FV_SUCCESS("determite_x=%f, determite_y=%f, cursor.x=%d, cursor.y=%d", 
+        determite_x, determite_y, (i32)textbox->cursor.x, (i32)textbox->cursor.y);
+}
+
 int 
 FV_ComponentTextBoxEventFunction(fv_component_t* component, fv_app_t* app, SDL_Event event)
 {
     fv_component_textbox_t* textbox = component->component_additional_data;
 
+    i32 lines_letters = floor(log10(abs(textbox->textbox_lines->length))) + 1;
+    i32 left_padding = round((lines_letters * textbox->font_size) * 1.3);
     bool mouse_collision = event.type == SDL_MOUSEBUTTONDOWN 
-                                ? FV_CollisionBoxVector(textbox->pos, textbox->size, FV_NewVector(event.button.x, event.button.y), FV_NewVector(2, 2))
+                                ? FV_CollisionBoxVector(FV_NewVector(textbox->pos.x + 12 + left_padding, textbox->pos.y), textbox->size, 
+                                                        FV_NewVector(event.button.x, event.button.y), 
+                                                        FV_NewVector(2, 2))
                                 : false;
 
     if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED)
@@ -428,12 +482,17 @@ FV_ComponentTextBoxEventFunction(fv_component_t* component, fv_app_t* app, SDL_E
     if (event.type == SDL_TEXTINPUT)
         FV_ComponentTextBoxTextInput(component, app, event);
 
-    if (event.type == SDL_MOUSEBUTTONDOWN && mouse_collision)
+    if (event.type == SDL_MOUSEMOTION && mouse_collision)
+        FV_ComponentTextButtonMotion(component, app, event);
+
+    if (event.type == SDL_MOUSEBUTTONDOWN && mouse_collision && !textbox->focus)
     {
         FV_SUCCESS("Focus on textbox [id=%d]", component->component_id);
         textbox->focus = true;
         SDL_StartTextInput();
     }
+    else if (event.type == SDL_MOUSEBUTTONDOWN && mouse_collision && textbox->focus)
+        FV_ComponentTextBoxSetCursorByMouse(component, app, event);
     else if (event.type == SDL_MOUSEBUTTONDOWN && !mouse_collision)
     {
         textbox->focus = false;
@@ -446,7 +505,7 @@ FV_ComponentTextBoxEventFunction(fv_component_t* component, fv_app_t* app, SDL_E
 int 
 FV_ComponentTextBoxRunFunction(fv_component_t* component, fv_app_t* app)
 {
-    // fv_component_textbox_t* textbox = component->component_additional_data;
-    // FV_SetFontSize(app->font_manager, textbox->font, textbox->font_size);
+    fv_component_textbox_t* textbox = component->component_additional_data;
+    FV_SetFontSize(app->font_manager, textbox->font, textbox->font_size);
     return 0;
 }   

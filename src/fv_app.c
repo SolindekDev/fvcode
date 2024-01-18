@@ -34,38 +34,36 @@
 #include <fv/fv_main.h>
 #include <fv/fv_app.h>
 
-#define DEFAULT_CODE ""
-
-// #define DEFAULT_CODE "/*\n\
-//  * FVCode - Fast and easy code editor\n\
-//  * Copyright (C) 2023-2024 FVCode Developers\n\
-//  *   \n\
-//  * This program is free software: you can redistribute it and/or modify\n\
-//  * it under the terms of the GNU General Public License as published by\n\
-//  * the Free Software Foundation, either version 3 of the License, or\n\
-//  * (at your option) any later version.\n\
-//  *   \n\
-//  * This program is distributed in the hope that it will be useful,\n\
-//  * but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
-//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
-//  * GNU General Public License for more details.\n\
-//  *   \n\
-//  * You should have received a copy of the GNU General Public License\n\
-//  * along with this program.  If not, see <https://www.gnu.org/licenses/>.\n\
-//  */\n\
-// \n\
-// #include <fv/fv.h>\n\
-// \n\
-// #include <fv/fv_string.h>\n\
-// #include <fv/fv_array.h>\n\
-// \n\
-// #include <fv/fv_app.h>\n\
-// \n\
-// fv_array_t* \n\
-// FV_StringSplitByNewline(char* s)\n\
-// {\n\
-//     return split_arr;\n\
-// }"
+#define DEFAULT_CODE "/*\n\
+ * FVCode - Fast and easy code editor\n\
+ * Copyright (C) 2023-2024 FVCode Developers\n\
+ *   \n\
+ * This program is free software: you can redistribute it and/or modify\n\
+ * it under the terms of the GNU General Public License as published by\n\
+ * the Free Software Foundation, either version 3 of the License, or\n\
+ * (at your option) any later version.\n\
+ *   \n\
+ * This program is distributed in the hope that it will be useful,\n\
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
+ * GNU General Public License for more details.\n\
+ *   \n\
+ * You should have received a copy of the GNU General Public License\n\
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.\n\
+ */\n\
+\n\
+#include <fv/fv.h>\n\
+\n\
+#include <fv/fv_string.h>\n\
+#include <fv/fv_array.h>\n\
+\n\
+#include <fv/fv_app.h>\n\
+\n\
+fv_array_t* \n\
+FV_StringSplitByNewline(char* s)\n\
+{\n\
+    return split_arr;\n\
+}"
 
 /* This function will initalize app structure 
  * that is used in main function for managing
@@ -120,7 +118,8 @@ FV_AppInitFunctionDefault(fv_app_t* app)
     app->component_manager = FV_CreateComponentManager(app);
     FV_TRY(
         FV_AppendComponent(app->component_manager, 
-            FV_CreateComponentTextBox(FV_NewVector(0, 0), FV_NewVector(1280, 720), FV_NewColorRGB(19, 19, 19, 255), FV_NewColorRGB(211, 215, 207, 255), DEFAULT_CODE, FV_GetDefaultFont(app->font_manager), 20, FV_NewColorRGB(26, 26, 26, 255), 7.0f
+            FV_CreateComponentTextBox(FV_NewVector(0, 0), FV_NewVector(1280, 720), FV_NewColorRGB(19, 19, 19, 255), FV_NewColorRGB(211, 215, 207, 255), 
+            DEFAULT_CODE, FV_GetDefaultFont(app->font_manager), 14, FV_NewColorRGB(26, 26, 26, 255), 7.0f, "<none>", "<none>"
         )
     ));
     return 0;
