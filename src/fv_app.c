@@ -119,7 +119,7 @@ FV_AppInitFunctionDefault(fv_app_t* app)
     FV_TRY(
         FV_AppendComponent(app->component_manager, 
             FV_CreateComponentTextBox(FV_NewVector(0, 0), FV_NewVector(1280, 720), FV_NewColorRGB(19, 19, 19, 255), FV_NewColorRGB(211, 215, 207, 255), 
-            DEFAULT_CODE, FV_GetDefaultFont(app->font_manager), 14, FV_NewColorRGB(26, 26, 26, 255), 7.0f, "<none>", "<none>"
+            DEFAULT_CODE, FV_GetDefaultFont(app->font_manager), 20, FV_NewColorRGB(26, 26, 26, 255), 7.0f, "<none>", "<none>"
         )
     ));
     return 0;

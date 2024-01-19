@@ -29,6 +29,7 @@
 #include <fv/fv_collisions.h>
 #include <fv/fv_drawing.h>
 #include <fv/fv_string.h>
+#include <fv/fv_math.h>
 
 #include <fv/fv_msg.h>
 
@@ -120,7 +121,7 @@ FV_ComponentTextBoxRenderLine(fv_component_t* component, fv_app_t* app,
                 SDL_DestroyTexture(glyph_texture);
                 SDL_FreeSurface(glyph_surface);
                 character_vector_pos->x += glyph_size_x + 1;
-                glyph_size_ = glyph_size.x;
+                glyph_size_ = FV_MAX(glyph_size_, glyph_size.x);
             }
         }
     }
@@ -376,6 +377,8 @@ FV_ComponentTextBoxEnterKey(fv_component_t* component, fv_app_t* app, SDL_Event 
 void
 FV_ComponentTextButtonMotion(fv_component_t* component, fv_app_t* app, SDL_Event event)
 {
+    SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM));
+
     event.motion.x;
     event.motion.y;
 }
@@ -388,10 +391,11 @@ FV_ComponentTextBoxSetCursorByMouse(fv_component_t* component, fv_app_t* app, SD
     i32 mouse_x = event.button.x;
     i32 mouse_y = event.button.y;
 
-    i32 lines_letters = floor(log10(abs(textbox->textbox_lines->length))) + 1;
-    i32 left_padding = round((lines_letters * textbox->font_size) * 1.3);
+    i32 lines_letters  = floor(log10(abs(textbox->textbox_lines->length))) + 1;
+    i32 left_padding   = round((lines_letters * textbox->font_size) * 1.3);
+    i32 text_pos_start = textbox->pos.x + 12 + left_padding;
 
-    f32 determite_x = (mouse_x - (textbox->pos.x + 12 + left_padding + 18)) / glyph_size_;
+    // f32 determite_x = round((mouse_x - text_pos_start) / glyph_size_);
     f32 determite_y = mouse_y / (textbox->font_size + textbox->line_space);
 
     if ((i32)determite_y > textbox->textbox_lines->length)
@@ -399,13 +403,25 @@ FV_ComponentTextBoxSetCursorByMouse(fv_component_t* component, fv_app_t* app, SD
     else
         textbox->cursor.y = (i32)determite_y;
 
-    if (determite_x <= 0)
-        textbox->cursor.x = 0;
-    else    
-        if ((i32)determite_x < strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y)))
-            textbox->cursor.x = (i32)determite_x + 1;
-        else
-            textbox->cursor.x = strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y));
+    // if (determite_x <= 0)
+    //     textbox->cursor.x = 0;
+    // else    
+    //     if ((i32)determite_x < strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y)))
+    //         textbox->cursor.x = (i32)determite_x;
+    //     else
+    //         textbox->cursor.x = strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y));
+
+    // if ((mouse_x - text_pos_start) < glyph_size_)
+    //     textbox->cursor.x = 0;
+    // else
+    {
+        size_t current_line_len = strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y));
+        char*  current_line     = FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y);
+        for (i32 i = 0; i < current_line_len; i++)
+        {
+            char current_line_char = current_line[i];
+        }
+    }
 
     FV_SUCCESS("determite_x=%f, determite_y=%f, cursor.x=%d, cursor.y=%d", 
         determite_x, determite_y, (i32)textbox->cursor.x, (i32)textbox->cursor.y);
@@ -484,6 +500,8 @@ FV_ComponentTextBoxEventFunction(fv_component_t* component, fv_app_t* app, SDL_E
 
     if (event.type == SDL_MOUSEMOTION && mouse_collision)
         FV_ComponentTextButtonMotion(component, app, event);
+    else if (event.type == SDL_MOUSEMOTION && !mouse_collision)
+        SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
 
     if (event.type == SDL_MOUSEBUTTONDOWN && mouse_collision && !textbox->focus)
     {

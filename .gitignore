@@ -9,3 +9,6 @@ fvcode
 
 # Ignore obj folder
 obj/
+
+# Ignore a.out file
+a.out
