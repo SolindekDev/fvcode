@@ -35,7 +35,7 @@
 
 static char info_box_fmt[FV_MAX_FORMAT_BUFFER] = { 0 };
 static char rest_of_line[MAX_LINE_LENGTH     ] = { 0 };
-static i32  glyph_size_ = 1;
+static i32  glyph_size_                        = 0;
 
 fv_component_t*
 FV_CreateComponentTextBox(fv_vector_t pos, fv_vector_t size, fv_color_t bg, fv_color_t fg, char* textbox_value, 
@@ -120,8 +120,8 @@ FV_ComponentTextBoxRenderLine(fv_component_t* component, fv_app_t* app,
                 SDL_RenderCopy(app->render->sdl_renderer, glyph_texture, NULL, &rect);
                 SDL_DestroyTexture(glyph_texture);
                 SDL_FreeSurface(glyph_surface);
+                glyph_size_ = glyph_size_x + 1;
                 character_vector_pos->x += glyph_size_x + 1;
-                glyph_size_ = FV_MAX(glyph_size_, glyph_size.x);
             }
         }
     }
@@ -139,7 +139,7 @@ void
 FV_ComponentTextBoxRenderLineNumbers(fv_component_t* component, fv_app_t* app)
 {
     fv_component_textbox_t* textbox = component->component_additional_data;
-    i32 lines_letters = floor(log10(abs(textbox->textbox_lines->length))) + 1;
+    i32 lines_letters = floor(log10(textbox->textbox_lines->length)) + 1;
     i32 left_padding = round((lines_letters * textbox->font_size) * 1.3);
     fv_vector_t line_vector_pos = FV_NewVector(textbox->pos.x + 10, textbox->pos.y);
 
@@ -183,7 +183,7 @@ FV_ComponentTextBoxRenderText(fv_component_t* component, fv_app_t* app)
 {
     fv_component_textbox_t* textbox = component->component_additional_data;
 
-    i32 lines_letters = floor(log10(abs(textbox->textbox_lines->length))) + 1;
+    i32 lines_letters = floor(log10(textbox->textbox_lines->length)) + 1;
     i32 left_padding = round((lines_letters * textbox->font_size) * 1.3);
     fv_vector_t character_vector_pos = FV_NewVector(textbox->pos.x + 12 + left_padding, textbox->pos.y);
 
@@ -199,11 +199,11 @@ FV_ComponentTextBoxRenderInfo(fv_component_t* component, fv_app_t* app)
 {
     fv_component_textbox_t* textbox = component->component_additional_data;
 
-    sprintf((char*)info_box_fmt, "Total lines: %d, Cursor: %d:%d, Filename: \"%s\", Path: \"%s\"",
+    sprintf((char*)info_box_fmt, "Total lines: %zu, Cursor: %d:%d, Filename: \"%s\", Path: \"%s\"",
         textbox->textbox_lines->length, (i32)textbox->cursor.x, (i32)textbox->cursor.y,
         textbox->filename, textbox->path);
 
-    i32 lines_letters = floor(log10(abs(textbox->textbox_lines->length))) + 1;
+    i32 lines_letters = floor(log10(textbox->textbox_lines->length)) + 1;
     i32 left_padding = round((lines_letters * textbox->font_size) * 1.3);
     fv_vector_t pos = FV_NewVector(textbox->pos.x, textbox->size.y - (textbox->font_size) - 10);
 
@@ -245,6 +245,7 @@ FV_ComponentTextBoxRenderFunction(fv_component_t* component, fv_app_t* app)
     FV_ComponentTextBoxRenderText(component, app);
     FV_ComponentTextBoxRenderLineNumbers(component, app);
     FV_ComponentTextBoxRenderInfo(component, app);
+    FV_DrawFillRect(app, textbox->highlight_pos, textbox->highlight_size, FV_NewColorRGB(FV_HIGHLIGHT_COLOR));
 
     return 0;
 }
@@ -374,13 +375,90 @@ FV_ComponentTextBoxEnterKey(fv_component_t* component, fv_app_t* app, SDL_Event 
     textbox->cursor.y++;
 }
 
+fv_vector_t
+FV_ComponentTextBoxDetermiteCursorInText(fv_component_t* component, i32 _mouse_x, i32 _mouse_y)
+{
+    fv_component_textbox_t* textbox = component->component_additional_data;
+
+    fv_vector_t new_cursor = FV_NewVector(0, 0);
+
+    i32 lines_letters  = floor(log10(textbox->textbox_lines->length)) + 1;
+    i32 left_padding   = round((lines_letters * textbox->font_size) * 1.3);
+    i32 text_pos_start = textbox->pos.x + 12 + left_padding;
+
+    i32 mouse_x = _mouse_x - text_pos_start;
+    i32 mouse_y = _mouse_y;
+
+    /* Determite Y cursor position */
+    f32 determite_y = mouse_y / (textbox->font_size + textbox->line_space);
+
+    if ((i32)determite_y > textbox->textbox_lines->length)
+        new_cursor.y = textbox->textbox_lines->length - 1;
+    else
+        new_cursor.y = (i32)determite_y;
+
+    /* Determite X cursor position */
+    size_t current_line_len = strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y));
+    char*  current_line     = FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y);
+    i32    x_cord, i;
+    for (i = 0; i < current_line_len; i++)
+    {
+        char current_line_char = current_line[i];
+        i32  adv = 0;
+        TTF_GlyphMetrics32(textbox->font->font, current_line_char, NULL, NULL, NULL, NULL, &adv);
+        adv    += 1;
+        glyph_size_ = adv;
+        x_cord += adv;
+        if (x_cord < mouse_x && (x_cord + adv) > mouse_x)
+            break;
+        else
+            continue;
+    }
+
+    new_cursor.x = i + 1;
+    return new_cursor;
+}
+
 void
 FV_ComponentTextButtonMotion(fv_component_t* component, fv_app_t* app, SDL_Event event)
 {
     SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM));
+    fv_component_textbox_t* textbox = component->component_additional_data;
 
-    event.motion.x;
-    event.motion.y;
+    if (textbox->mouse_button_state == true)
+    {
+        i32 mouse_x = event.motion.x;
+        i32 mouse_y = event.motion.y;
+
+        i32 lines_letters  = floor(log10(textbox->textbox_lines->length)) + 1;
+        i32 left_padding   = round((lines_letters * textbox->font_size) * 1.3);
+        i32 text_pos_start = textbox->pos.x + 12 + left_padding;
+
+        fv_vector_t hightlight_cursor = FV_ComponentTextBoxDetermiteCursorInText(component, mouse_x, mouse_y);
+        printf("start_cursor: .x=%f, .y=%f end_cursor: .x=%f, .y=%f\n",
+            textbox->cursor.x, textbox->cursor.y, hightlight_cursor.x, hightlight_cursor.y);
+        if (textbox->cursor.y == hightlight_cursor.y)
+        {
+            if (textbox->cursor.x > hightlight_cursor.x)
+            {
+                // hightlight_cursor.x is lower
+                
+            }
+            else
+            {
+                // hightlight_cursor.x is bigger
+                printf("cos\n");
+                textbox->highlight_pos  = FV_NewVector(text_pos_start + (textbox->cursor.x * glyph_size_), 
+                                                          textbox->pos.y + (textbox->cursor.y * (textbox->font_size + textbox->line_space)));
+                textbox->highlight_size = FV_NewVector((hightlight_cursor.x - textbox->cursor.x) * glyph_size_, textbox->font_size + textbox->line_space);
+                
+            }
+        }
+        else
+        {
+
+        }
+    }
 }
 
 void
@@ -391,40 +469,12 @@ FV_ComponentTextBoxSetCursorByMouse(fv_component_t* component, fv_app_t* app, SD
     i32 mouse_x = event.button.x;
     i32 mouse_y = event.button.y;
 
-    i32 lines_letters  = floor(log10(abs(textbox->textbox_lines->length))) + 1;
-    i32 left_padding   = round((lines_letters * textbox->font_size) * 1.3);
-    i32 text_pos_start = textbox->pos.x + 12 + left_padding;
+    fv_vector_t new_cursor = FV_ComponentTextBoxDetermiteCursorInText(component, mouse_x, mouse_y);
 
-    // f32 determite_x = round((mouse_x - text_pos_start) / glyph_size_);
-    f32 determite_y = mouse_y / (textbox->font_size + textbox->line_space);
-
-    if ((i32)determite_y > textbox->textbox_lines->length)
-        textbox->cursor.y = textbox->textbox_lines->length - 1;
-    else
-        textbox->cursor.y = (i32)determite_y;
-
-    // if (determite_x <= 0)
-    //     textbox->cursor.x = 0;
-    // else    
-    //     if ((i32)determite_x < strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y)))
-    //         textbox->cursor.x = (i32)determite_x;
-    //     else
-    //         textbox->cursor.x = strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y));
-
-    // if ((mouse_x - text_pos_start) < glyph_size_)
-    //     textbox->cursor.x = 0;
-    // else
-    {
-        size_t current_line_len = strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y));
-        char*  current_line     = FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y);
-        for (i32 i = 0; i < current_line_len; i++)
-        {
-            char current_line_char = current_line[i];
-        }
-    }
-
-    FV_SUCCESS("determite_x=%f, determite_y=%f, cursor.x=%d, cursor.y=%d", 
-        determite_x, determite_y, (i32)textbox->cursor.x, (i32)textbox->cursor.y);
+    FV_SUCCESS("new cursor position: .x=%d, .y=%d", 
+        (i32)new_cursor.x, (i32)new_cursor.y);
+    textbox->cursor = new_cursor;
+    textbox->mouse_button_state = true;
 }
 
 int 
@@ -432,13 +482,24 @@ FV_ComponentTextBoxEventFunction(fv_component_t* component, fv_app_t* app, SDL_E
 {
     fv_component_textbox_t* textbox = component->component_additional_data;
 
-    i32 lines_letters = floor(log10(abs(textbox->textbox_lines->length))) + 1;
+    i32 lines_letters = floor(log10(textbox->textbox_lines->length)) + 1;
     i32 left_padding = round((lines_letters * textbox->font_size) * 1.3);
     bool mouse_collision = event.type == SDL_MOUSEBUTTONDOWN 
                                 ? FV_CollisionBoxVector(FV_NewVector(textbox->pos.x + 12 + left_padding, textbox->pos.y), textbox->size, 
                                                         FV_NewVector(event.button.x, event.button.y), 
-                                                        FV_NewVector(2, 2))
+                                                        FV_NewVector(1, 1))
                                 : false;
+
+    if (event.type == SDL_MOUSEMOTION)
+    {
+        bool motion_collision = FV_CollisionBoxVector(FV_NewVector(textbox->pos.x + 12 + left_padding, textbox->pos.y), textbox->size, 
+                                                        FV_NewVector(event.motion.x, event.motion.y), 
+                                                        FV_NewVector(1, 1));
+        if (event.type == SDL_MOUSEMOTION && motion_collision)
+            FV_ComponentTextButtonMotion(component, app, event);
+        else if (event.type == SDL_MOUSEMOTION && !motion_collision)
+            SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
+    }
 
     if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED)
     {
@@ -498,11 +559,6 @@ FV_ComponentTextBoxEventFunction(fv_component_t* component, fv_app_t* app, SDL_E
     if (event.type == SDL_TEXTINPUT)
         FV_ComponentTextBoxTextInput(component, app, event);
 
-    if (event.type == SDL_MOUSEMOTION && mouse_collision)
-        FV_ComponentTextButtonMotion(component, app, event);
-    else if (event.type == SDL_MOUSEMOTION && !mouse_collision)
-        SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
-
     if (event.type == SDL_MOUSEBUTTONDOWN && mouse_collision && !textbox->focus)
     {
         FV_SUCCESS("Focus on textbox [id=%d]", component->component_id);
@@ -516,6 +572,9 @@ FV_ComponentTextBoxEventFunction(fv_component_t* component, fv_app_t* app, SDL_E
         textbox->focus = false;
         SDL_StopTextInput();
     }
+
+    if (event.type == SDL_MOUSEBUTTONUP)
+        textbox->mouse_button_state = false;
 
     return 0;
 }   

@@ -44,6 +44,9 @@ typedef struct __fv_component_textbox_t {
     fv_vector_t cursor;
     fv_array_t* textbox_lines;
     fv_vector_t size;
+    bool        mouse_button_state;
+    fv_vector_t highlight_size;
+    fv_vector_t highlight_pos;
 } fv_component_textbox_t;
 
 fv_component_t* FV_CreateComponentTextBox(fv_vector_t pos, fv_vector_t size, fv_color_t bg, fv_color_t fg, char* textbox_value, fv_font_t* font, i32 font_size, fv_color_t border_color, float line_space, char* filename, char* path);
@@ -51,5 +54,7 @@ fv_component_t* FV_CreateComponentTextBox(fv_vector_t pos, fv_vector_t size, fv_
 int FV_ComponentTextBoxRenderFunction(fv_component_t* component, fv_app_t* app);
 int FV_ComponentTextBoxEventFunction (fv_component_t* component, fv_app_t* app, SDL_Event event);
 int FV_ComponentTextBoxRunFunction   (fv_component_t* component, fv_app_t* app);
+
+fv_vector_t FV_ComponentTextBoxDetermiteCursorInText(fv_component_t* component, i32 _mouse_x, i32 _mouse_y);
 
 #endif /* __FV_COMPONENT_TEXTBOX_H */
