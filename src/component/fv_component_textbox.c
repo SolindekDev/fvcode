@@ -333,8 +333,8 @@ FV_ComponentTextBoxRenderFunction(fv_component_t* component, fv_app_t* app)
     
     FV_ComponentTextBoxRenderText(component, app);
     FV_ComponentTextBoxRenderLineNumbers(component, app);
-    FV_ComponentTextBoxRenderInfo(component, app);
     FV_ComponentTextBoxRenderHighlight(component, app);
+    FV_ComponentTextBoxRenderInfo(component, app);
 
     return 0;
 }
@@ -490,19 +490,26 @@ FV_ComponentTextBoxDetermiteCursorInText(fv_component_t* component, i32 _mouse_x
     size_t current_line_len = strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y));
     char*  current_line     = FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y);
     i32    x_cord, i;
-    for (i = 0; i < current_line_len; i++)
+
+    if (mouse_x < glyph_size_)
+        i = -1;
+    else
     {
-        char current_line_char = current_line[i];
-        i32  adv = 0;
-        TTF_GlyphMetrics32(textbox->font->font, current_line_char, NULL, NULL, NULL, NULL, &adv);
-        adv    += 1;
-        glyph_size_ = adv;
-        x_cord += adv;
-        if (x_cord <= mouse_x && (x_cord + adv) >= mouse_x)
-            break;
-        else
-            continue;
+        for (i = 0; i < current_line_len; i++)
+        {
+            char current_line_char = current_line[i];
+            i32  adv = 0;
+            TTF_GlyphMetrics32(textbox->font->font, current_line_char, NULL, NULL, NULL, NULL, &adv);
+            adv    += 1;
+            glyph_size_ = adv;
+            x_cord += adv;
+            if (x_cord <= mouse_x && (x_cord + adv) >= mouse_x)
+                break;
+            else
+                continue;
+        }
     }
+        
 
     new_cursor.x = i + 1;
     return new_cursor;
@@ -526,6 +533,13 @@ FV_ComponentTextButtonMotion(fv_component_t* component, fv_app_t* app, SDL_Event
         fv_vector_t highlight_cursor = FV_ComponentTextBoxDetermiteCursorInText(component, mouse_x, mouse_y);
         FV_SUCCESS("start_cursor: .x=%f, .y=%f end_cursor: .x=%f, .y=%f\n",
             textbox->cursor.x, textbox->cursor.y, highlight_cursor.x, highlight_cursor.y);
+
+        if (highlight_cursor.y >= textbox->textbox_lines->length)
+            highlight_cursor.y = textbox->textbox_lines->length - 1;
+
+        if (highlight_cursor.x > strlen(FV_GetElementFromArray(textbox->textbox_lines, highlight_cursor.y)))
+            highlight_cursor.x = strlen(FV_GetElementFromArray(textbox->textbox_lines, highlight_cursor.y));
+
         if (textbox->cursor.y == highlight_cursor.y)
         {
             if (textbox->cursor.x > highlight_cursor.x)
@@ -687,6 +701,7 @@ FV_ComponentTextBoxEventFunction(fv_component_t* component, fv_app_t* app, SDL_E
     if (event.type == SDL_MOUSEBUTTONUP)
         textbox->mouse_button_state = false;
 
+    app->need_redraw = true;
     return 0;
 }   
 

@@ -59,6 +59,14 @@ FV_RenderCreateDefaultWindow(fv_render_t* render)
         FV_ERROR("Function \'SDL_CreateRenderer\' failed, Couldn't create a renderer: \'%s\'", SDL_GetError());
 
     FV_SUCCESS("Created a window with size of %dx%d", window_x, window_y);
+
+    SDL_RendererInfo render_info;
+    SDL_GetRendererInfo(render->sdl_renderer, &render_info);
+
+    if (render_info.flags & SDL_RENDERER_ACCELERATED)
+        FV_SUCCESS("Renderer is using hardware acceleration.\n", 0);
+    else
+        FV_SUCCESS("Renderer is not using hardware acceleration.\n", 0);
 }
 
 bool

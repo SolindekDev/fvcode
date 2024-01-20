@@ -44,6 +44,8 @@ typedef struct __fv_app_t {
 
     fv_component_manager_t* component_manager;
     fv_font_manager_t* font_manager;
+
+    bool need_redraw;
 } fv_app_t;
 
 fv_app_t* FV_CreateApp(i32 argc, char** argv);

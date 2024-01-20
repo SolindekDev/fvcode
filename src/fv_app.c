@@ -134,13 +134,32 @@ FV_AppRunFunctionDefault (fv_app_t* app)
     FV_SUCCESS("Calling all components 'run' function", 0);
     FV_RunComponents(app->component_manager);
 
+    u32 last_fps_update_time, start_time, end_time, frames;
+    f32 fps;
+    app->need_redraw = true;
+
     while (!app->render->exit)
     {
-        FV_RenderClearWindow(app->render);
-        FV_RenderCatchEvents(app->render);        
-        FV_RenderComponents(app->component_manager);
-        FV_RenderSwapBuffer(app->render);
-        SDL_Delay(1000 / 60);
+        start_time = SDL_GetTicks();
+        FV_RenderCatchEvents(app->render);
+
+        if (app->need_redraw)
+        {
+            FV_RenderClearWindow(app->render);
+            FV_RenderComponents(app->component_manager);
+            FV_RenderSwapBuffer(app->render);
+        }
+
+        end_time = SDL_GetTicks();
+        frames++;
+        fps = 1.0f / ((end_time - start_time) / 1000.0f);
+
+        if (end_time - last_fps_update_time >= 1000)
+        {
+            FV_SUCCESS("FPS: %.4f\n", fps);
+            last_fps_update_time = end_time;
+            frames = 0;
+        }
     }
 
     FV_SUCCESS("Destroying the app", 0);
