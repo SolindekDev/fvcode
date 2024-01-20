@@ -199,9 +199,8 @@ FV_ComponentTextBoxRenderInfo(fv_component_t* component, fv_app_t* app)
 {
     fv_component_textbox_t* textbox = component->component_additional_data;
 
-    sprintf((char*)info_box_fmt, "Total lines: %zu, Cursor: %d:%d, Filename: \"%s\", Path: \"%s\"",
-        textbox->textbox_lines->length, (i32)textbox->cursor.x, (i32)textbox->cursor.y,
-        textbox->filename, textbox->path);
+    sprintf((char*)info_box_fmt, "Total lines: %zu, Cursor: %d:%d, Path: \"%s\"",
+        textbox->textbox_lines->length, (i32)textbox->cursor.x, (i32)textbox->cursor.y, textbox->path);
 
     i32 lines_letters = floor(log10(textbox->textbox_lines->length)) + 1;
     i32 left_padding = round((lines_letters * textbox->font_size) * 1.3);
@@ -233,6 +232,96 @@ FV_ComponentTextBoxRenderInfo(fv_component_t* component, fv_app_t* app)
     FV_SetFontSize(app->font_manager, textbox->font, textbox->font_size);
 }
 
+void
+FV_ComponentTextBoxRenderHighlight(fv_component_t* component, fv_app_t* app)
+{
+    fv_component_textbox_t* textbox = component->component_additional_data;
+
+    i32 lines_letters  = floor(log10(textbox->textbox_lines->length)) + 1;
+    i32 left_padding   = round((lines_letters * textbox->font_size) * 1.3);
+    i32 text_pos_start = textbox->pos.x + 12 + left_padding;
+
+    if (textbox->highlight_multiply_lines)
+    {
+        i32 row_difference = FV_MAX(textbox->highlight_start_pos.y, textbox->highlight_end_pos.y) -
+                             FV_MIN(textbox->highlight_start_pos.y, textbox->highlight_end_pos.y);
+        if (row_difference == 1)
+        {
+            if (textbox->highlight_start_pos.y < textbox->highlight_end_pos.y)
+            {
+                fv_vector_t first_line_highlight_pos   = FV_NewVector(text_pos_start + (textbox->highlight_start_pos.x * glyph_size_),
+                                                                    textbox->pos.y + (textbox->highlight_start_pos.y * (textbox->font_size + textbox->line_space)));
+                fv_vector_t first_line_hightlight_size = FV_NewVector(
+                                                            (strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->highlight_start_pos.y)) - textbox->highlight_start_pos.x) * glyph_size_, 
+                                                            textbox->font_size + textbox->line_space);
+                FV_DrawFillRect(app, first_line_highlight_pos, first_line_hightlight_size, FV_NewColorRGB(FV_HIGHLIGHT_COLOR));
+                fv_vector_t last_line_highlight_pos   = FV_NewVector(text_pos_start,
+                                                                    textbox->pos.y + (textbox->highlight_end_pos.y * (textbox->font_size + textbox->line_space)));
+                fv_vector_t last_line_hightlight_size = FV_NewVector(
+                                                            (textbox->highlight_end_pos.x) * glyph_size_, 
+                                                            textbox->font_size + textbox->line_space);
+                FV_DrawFillRect(app, last_line_highlight_pos, last_line_hightlight_size, FV_NewColorRGB(FV_HIGHLIGHT_COLOR));
+            }
+            else
+            {
+                fv_vector_t first_line_highlight_pos   = FV_NewVector(text_pos_start, textbox->pos.y + (textbox->highlight_start_pos.y * (textbox->font_size + textbox->line_space)));
+                fv_vector_t first_line_hightlight_size = FV_NewVector((textbox->highlight_start_pos.x) * glyph_size_, textbox->font_size + textbox->line_space);
+                FV_DrawFillRect(app, first_line_highlight_pos, first_line_hightlight_size, FV_NewColorRGB(FV_HIGHLIGHT_COLOR));
+                fv_vector_t last_line_highlight_pos   = FV_NewVector(text_pos_start + (textbox->highlight_end_pos.x * glyph_size_),
+                                                                    textbox->pos.y + (textbox->highlight_end_pos.y * (textbox->font_size + textbox->line_space)));
+                fv_vector_t last_line_hightlight_size = FV_NewVector(
+                                                            (strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->highlight_end_pos.y)) - textbox->highlight_end_pos.x) * glyph_size_, 
+                                                            textbox->font_size + textbox->line_space);
+                FV_DrawFillRect(app, last_line_highlight_pos, last_line_hightlight_size, FV_NewColorRGB(FV_HIGHLIGHT_COLOR));
+            }
+        }
+        else
+        {
+            if (textbox->highlight_start_pos.y < textbox->highlight_end_pos.y)
+            {
+                fv_vector_t first_line_highlight_pos   = FV_NewVector(text_pos_start + (textbox->highlight_start_pos.x * glyph_size_),
+                                                                    textbox->pos.y + (textbox->highlight_start_pos.y * (textbox->font_size + textbox->line_space)));
+                fv_vector_t first_line_hightlight_size = FV_NewVector(
+                                                            (strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->highlight_start_pos.y)) - textbox->highlight_start_pos.x) * glyph_size_, 
+                                                            textbox->font_size + textbox->line_space);
+                FV_DrawFillRect(app, first_line_highlight_pos, first_line_hightlight_size, FV_NewColorRGB(FV_HIGHLIGHT_COLOR));
+                fv_vector_t last_line_highlight_pos   = FV_NewVector(text_pos_start,
+                                                                    textbox->pos.y + (textbox->highlight_end_pos.y * (textbox->font_size + textbox->line_space)));
+                fv_vector_t last_line_hightlight_size = FV_NewVector(
+                                                            (textbox->highlight_end_pos.x) * glyph_size_, 
+                                                            textbox->font_size + textbox->line_space);
+                FV_DrawFillRect(app, last_line_highlight_pos, last_line_hightlight_size, FV_NewColorRGB(FV_HIGHLIGHT_COLOR));
+                for (int i = 1; i < row_difference; i++)
+                {
+                    FV_DrawFillRect(app, FV_NewVector(text_pos_start, textbox->pos.y + (textbox->highlight_start_pos.y + i) * (textbox->font_size + textbox->line_space)),
+                                    FV_NewVector(strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->highlight_start_pos.y + i)) * glyph_size_, textbox->font_size + textbox->line_space),
+                                    FV_NewColorRGB(FV_HIGHLIGHT_COLOR));
+                }
+            }
+            else
+            {
+                fv_vector_t first_line_highlight_pos   = FV_NewVector(text_pos_start, textbox->pos.y + (textbox->highlight_start_pos.y * (textbox->font_size + textbox->line_space)));
+                fv_vector_t first_line_hightlight_size = FV_NewVector((textbox->highlight_start_pos.x) * glyph_size_, textbox->font_size + textbox->line_space);
+                FV_DrawFillRect(app, first_line_highlight_pos, first_line_hightlight_size, FV_NewColorRGB(FV_HIGHLIGHT_COLOR));
+                fv_vector_t last_line_highlight_pos   = FV_NewVector(text_pos_start + (textbox->highlight_end_pos.x * glyph_size_),
+                                                                    textbox->pos.y + (textbox->highlight_end_pos.y * (textbox->font_size + textbox->line_space)));
+                fv_vector_t last_line_hightlight_size = FV_NewVector(
+                                                            (strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->highlight_end_pos.y)) - textbox->highlight_end_pos.x) * glyph_size_, 
+                                                            textbox->font_size + textbox->line_space);
+                FV_DrawFillRect(app, last_line_highlight_pos, last_line_hightlight_size, FV_NewColorRGB(FV_HIGHLIGHT_COLOR));
+                for (int i = 1; i < row_difference; i++)
+                {
+                    FV_DrawFillRect(app, FV_NewVector(text_pos_start, textbox->pos.y + (textbox->highlight_end_pos.y + i) * (textbox->font_size + textbox->line_space)),
+                                    FV_NewVector(strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->highlight_end_pos.y + i)) * glyph_size_, textbox->font_size + textbox->line_space),
+                                    FV_NewColorRGB(FV_HIGHLIGHT_COLOR));
+                }
+            }
+        }
+    }
+    else
+        FV_DrawFillRect(app, textbox->highlight_pos, textbox->highlight_size, FV_NewColorRGB(FV_HIGHLIGHT_COLOR));
+}
+
 int 
 FV_ComponentTextBoxRenderFunction(fv_component_t* component, fv_app_t* app)
 {
@@ -245,7 +334,7 @@ FV_ComponentTextBoxRenderFunction(fv_component_t* component, fv_app_t* app)
     FV_ComponentTextBoxRenderText(component, app);
     FV_ComponentTextBoxRenderLineNumbers(component, app);
     FV_ComponentTextBoxRenderInfo(component, app);
-    FV_DrawFillRect(app, textbox->highlight_pos, textbox->highlight_size, FV_NewColorRGB(FV_HIGHLIGHT_COLOR));
+    FV_ComponentTextBoxRenderHighlight(component, app);
 
     return 0;
 }
@@ -409,7 +498,7 @@ FV_ComponentTextBoxDetermiteCursorInText(fv_component_t* component, i32 _mouse_x
         adv    += 1;
         glyph_size_ = adv;
         x_cord += adv;
-        if (x_cord < mouse_x && (x_cord + adv) > mouse_x)
+        if (x_cord <= mouse_x && (x_cord + adv) >= mouse_x)
             break;
         else
             continue;
@@ -434,30 +523,43 @@ FV_ComponentTextButtonMotion(fv_component_t* component, fv_app_t* app, SDL_Event
         i32 left_padding   = round((lines_letters * textbox->font_size) * 1.3);
         i32 text_pos_start = textbox->pos.x + 12 + left_padding;
 
-        fv_vector_t hightlight_cursor = FV_ComponentTextBoxDetermiteCursorInText(component, mouse_x, mouse_y);
-        printf("start_cursor: .x=%f, .y=%f end_cursor: .x=%f, .y=%f\n",
-            textbox->cursor.x, textbox->cursor.y, hightlight_cursor.x, hightlight_cursor.y);
-        if (textbox->cursor.y == hightlight_cursor.y)
+        fv_vector_t highlight_cursor = FV_ComponentTextBoxDetermiteCursorInText(component, mouse_x, mouse_y);
+        FV_SUCCESS("start_cursor: .x=%f, .y=%f end_cursor: .x=%f, .y=%f\n",
+            textbox->cursor.x, textbox->cursor.y, highlight_cursor.x, highlight_cursor.y);
+        if (textbox->cursor.y == highlight_cursor.y)
         {
-            if (textbox->cursor.x > hightlight_cursor.x)
+            if (textbox->cursor.x > highlight_cursor.x)
             {
-                // hightlight_cursor.x is lower
-                
+                // highlight_cursor.x is lower
+                textbox->highlight_pos  = FV_NewVector(text_pos_start + (highlight_cursor.x * glyph_size_), 
+                                                          textbox->pos.y + (highlight_cursor.y * (textbox->font_size + textbox->line_space)));
+                textbox->highlight_size = FV_NewVector((textbox->cursor.x - highlight_cursor.x) * glyph_size_, textbox->font_size + textbox->line_space);
             }
             else
             {
-                // hightlight_cursor.x is bigger
-                printf("cos\n");
+                // highlight_cursor.x is bigger
                 textbox->highlight_pos  = FV_NewVector(text_pos_start + (textbox->cursor.x * glyph_size_), 
                                                           textbox->pos.y + (textbox->cursor.y * (textbox->font_size + textbox->line_space)));
-                textbox->highlight_size = FV_NewVector((hightlight_cursor.x - textbox->cursor.x) * glyph_size_, textbox->font_size + textbox->line_space);
-                
+                textbox->highlight_size = FV_NewVector((highlight_cursor.x - textbox->cursor.x) * glyph_size_, textbox->font_size + textbox->line_space);
             }
         }
         else
         {
-
+            textbox->highlight_multiply_lines = true;
+            textbox->highlight_start_pos      = textbox->cursor;
+            textbox->highlight_end_pos        = highlight_cursor;
         }
+        // else
+        // {
+        //     if (textbox->cursor.x > highlight_cursor.x)
+        //     {
+
+        //     }
+        //     else
+        //     {
+
+        //     }
+        // }
     }
 }
 
@@ -475,6 +577,15 @@ FV_ComponentTextBoxSetCursorByMouse(fv_component_t* component, fv_app_t* app, SD
         (i32)new_cursor.x, (i32)new_cursor.y);
     textbox->cursor = new_cursor;
     textbox->mouse_button_state = true;
+
+    if ((textbox->highlight_size.x != 0 && textbox->highlight_size.y != 0) || (textbox->highlight_multiply_lines))
+    {
+        textbox->highlight_multiply_lines  = false;
+        textbox->highlight_start_pos       = FV_NewVector(0, 0);
+        textbox->highlight_end_pos         = FV_NewVector(0, 0);
+        textbox->highlight_size            = FV_NewVector(0, 0);
+        textbox->highlight_pos             = FV_NewVector(0, 0);
+    }
 }
 
 int 

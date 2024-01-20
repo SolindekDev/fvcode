@@ -21,10 +21,10 @@
 
 #include <fv/fv.h>
 
-#define FV_MIN(i, j)            \
-    ((i) < (j)) ? (i) : (j)     \
+#define FV_MIN(i, j)             \
+    (((i) < (j)) ? (i) : (j))    \
 
-#define FV_MAX(i, j)            \
-    ((i) > (j)) ? (i) : (j)     \
+#define FV_MAX(i, j)             \
+    (((i) > (j)) ? (i) : (j))    \
 
 #endif /* __FV_MATH_H */
