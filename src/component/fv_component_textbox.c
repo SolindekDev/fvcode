@@ -58,9 +58,9 @@ FV_CreateComponentTextBox(fv_vector_t pos, fv_vector_t size, fv_color_t bg, fv_c
     textbox->line_space       = line_space;
     textbox->cursor_color     = FV_NewColorRGB(FV_DEFAULT_CURSOR_COLOR);
     textbox->size             = size;
-
     textbox->filename         = filename;
     textbox->path             = path;
+    textbox->view_line_start  = 0;
 
     textbox->textbox_value = calloc(strlen(textbox_value) + 1, sizeof(char));
     memcpy(textbox->textbox_value, textbox_value, strlen(textbox_value) + 1);
@@ -69,6 +69,49 @@ FV_CreateComponentTextBox(fv_vector_t pos, fv_vector_t size, fv_color_t bg, fv_c
 
     textbox_component->component_additional_data = textbox;
     return textbox_component;
+}
+
+i32
+FV_ComponentTextBoxGetLinesToSee(fv_component_t* component, fv_app_t* app)
+{
+    fv_component_textbox_t* textbox = component->component_additional_data;
+
+    i32 line_pos_y = textbox->pos.y;
+    i32 index      = 0;
+
+    for (index = 0; index < textbox->textbox_lines->length; index++)
+    {
+        if (line_pos_y > (textbox->size.y + textbox->pos.y))
+            break;
+
+        line_pos_y += textbox->font_size + textbox->line_space;
+    }
+
+    return index - 2;
+}
+
+void
+FV_ComponentTextBoxDecrementCursorY(fv_component_t* component, fv_app_t* app)
+{
+    fv_component_textbox_t* textbox = component->component_additional_data;
+
+    if (textbox->cursor.y != 0)
+        textbox->cursor.y--;
+
+    if (textbox->cursor.y < textbox->view_line_start)
+        textbox->view_line_start--;
+}
+
+void
+FV_ComponentTextBoxIncrementCursorY(fv_component_t* component, fv_app_t* app)
+{
+    fv_component_textbox_t* textbox = component->component_additional_data;
+
+    if (textbox->cursor.y != textbox->textbox_lines->length)
+        textbox->cursor.y++;
+
+    if (textbox->cursor.y == (textbox->view_line_start + FV_ComponentTextBoxGetLinesToSee(component, app)))
+        textbox->view_line_start++;
 }
 
 void
@@ -147,10 +190,13 @@ FV_ComponentTextBoxRenderLineNumbers(fv_component_t* component, fv_app_t* app)
                     FV_NewVector(textbox->pos.x + left_padding, textbox->pos.y + textbox->size.y),
                     textbox->border_color);
 
-    char line_num_buffer[64];
+    char line_num_buffer[64] = { 0 };
     FV_SetFontSize(app->font_manager, textbox->font, textbox->font_size);
-    for (int i = 0; i < textbox->textbox_lines->length; i++)
+    for (int i = textbox->view_line_start; i < textbox->textbox_lines->length; i++)
     {
+        if (line_vector_pos.y > (textbox->size.y + textbox->pos.y))
+            break;
+
         SDL_itoa(i, (char*)line_num_buffer, 10);
         
         SDL_Surface* surface = TTF_RenderText_Blended_Wrapped(textbox->font->font, (char*)line_num_buffer, (SDL_Color){ textbox->fg.r, textbox->fg.g, textbox->fg.b, textbox->fg.a }, line_vector_pos.x + left_padding);
@@ -187,8 +233,11 @@ FV_ComponentTextBoxRenderText(fv_component_t* component, fv_app_t* app)
     i32 left_padding = round((lines_letters * textbox->font_size) * 1.3);
     fv_vector_t character_vector_pos = FV_NewVector(textbox->pos.x + 12 + left_padding, textbox->pos.y);
 
-    FV_ARRAY_FOR(textbox->textbox_lines)
+    for (int i = textbox->view_line_start; i < textbox->textbox_lines->length; i++)
     {
+        if (character_vector_pos.y > (textbox->size.y + textbox->pos.y))
+            break;
+
         FV_ComponentTextBoxRenderLine(component, app, i, &character_vector_pos, left_padding);
         character_vector_pos.y += textbox->font_size + textbox->line_space;
     }
@@ -233,6 +282,18 @@ FV_ComponentTextBoxRenderInfo(fv_component_t* component, fv_app_t* app)
 }
 
 void
+FV_ComponentTextBoxRenderScrollBar(fv_component_t* component, fv_app_t* app)
+{
+    fv_component_textbox_t* textbox = component->component_additional_data;
+
+    // fv_color_t scrollbar_color = FV_NewColorRGB(textbox->border_color.r + 10, textbox->border_color.g + 10, 
+    //                                             textbox->border_color.b + 10, 255                          );
+    // FV_DrawFillRect(app, FV_NewVector((textbox->pos.x + textbox->size.x) - 16, textbox->pos.y),
+    //                 FV_NewVector(16, textbox->size.y - (textbox->font_size) - 10), scrollbar_color);
+
+}
+
+void
 FV_ComponentTextBoxRenderHighlight(fv_component_t* component, fv_app_t* app)
 {
     fv_component_textbox_t* textbox = component->component_additional_data;
@@ -240,6 +301,16 @@ FV_ComponentTextBoxRenderHighlight(fv_component_t* component, fv_app_t* app)
     i32 lines_letters  = floor(log10(textbox->textbox_lines->length)) + 1;
     i32 left_padding   = round((lines_letters * textbox->font_size) * 1.3);
     i32 text_pos_start = textbox->pos.x + 12 + left_padding;
+
+    // if (textbox->highlight_start_pos.y == textbox->highlight_end_pos.y)
+    // {
+    //     textbox->highlight_multiply_lines = false;
+    //     textbox->highlight_pos  = textbox->highlight_start_pos;
+    //     textbox->highlight_size = FV_NewVector(
+    //         FV_MAX(textbox->highlight_start_pos.x, textbox->highlight_end_pos.x) -
+    //         FV_MIN(textbox->highlight_start_pos.x, textbox->highlight_end_pos.x), 
+    //         textbox->highlight_start_pos.y);
+    // }
 
     if (textbox->highlight_multiply_lines)
     {
@@ -252,7 +323,7 @@ FV_ComponentTextBoxRenderHighlight(fv_component_t* component, fv_app_t* app)
                 fv_vector_t first_line_highlight_pos   = FV_NewVector(text_pos_start + (textbox->highlight_start_pos.x * glyph_size_),
                                                                     textbox->pos.y + (textbox->highlight_start_pos.y * (textbox->font_size + textbox->line_space)));
                 fv_vector_t first_line_hightlight_size = FV_NewVector(
-                                                            (strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->highlight_start_pos.y)) - textbox->highlight_start_pos.x) * glyph_size_, 
+                                                            (strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->highlight_start_pos.y + textbox->view_line_start)) - textbox->highlight_start_pos.x) * glyph_size_, 
                                                             textbox->font_size + textbox->line_space);
                 FV_DrawFillRect(app, first_line_highlight_pos, first_line_hightlight_size, FV_NewColorRGB(FV_HIGHLIGHT_COLOR));
                 fv_vector_t last_line_highlight_pos   = FV_NewVector(text_pos_start,
@@ -270,11 +341,13 @@ FV_ComponentTextBoxRenderHighlight(fv_component_t* component, fv_app_t* app)
                 fv_vector_t last_line_highlight_pos   = FV_NewVector(text_pos_start + (textbox->highlight_end_pos.x * glyph_size_),
                                                                     textbox->pos.y + (textbox->highlight_end_pos.y * (textbox->font_size + textbox->line_space)));
                 fv_vector_t last_line_hightlight_size = FV_NewVector(
-                                                            (strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->highlight_end_pos.y)) - textbox->highlight_end_pos.x) * glyph_size_, 
+                                                            (strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->highlight_end_pos.y + textbox->view_line_start)) - textbox->highlight_end_pos.x) * glyph_size_, 
                                                             textbox->font_size + textbox->line_space);
                 FV_DrawFillRect(app, last_line_highlight_pos, last_line_hightlight_size, FV_NewColorRGB(FV_HIGHLIGHT_COLOR));
             }
         }
+        else if (row_difference == 0)
+            FV_DrawFillRect(app, textbox->highlight_pos, textbox->highlight_size, FV_NewColorRGB(FV_HIGHLIGHT_COLOR));
         else
         {
             if (textbox->highlight_start_pos.y < textbox->highlight_end_pos.y)
@@ -282,7 +355,7 @@ FV_ComponentTextBoxRenderHighlight(fv_component_t* component, fv_app_t* app)
                 fv_vector_t first_line_highlight_pos   = FV_NewVector(text_pos_start + (textbox->highlight_start_pos.x * glyph_size_),
                                                                     textbox->pos.y + (textbox->highlight_start_pos.y * (textbox->font_size + textbox->line_space)));
                 fv_vector_t first_line_hightlight_size = FV_NewVector(
-                                                            (strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->highlight_start_pos.y)) - textbox->highlight_start_pos.x) * glyph_size_, 
+                                                            (strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->highlight_start_pos.y + textbox->view_line_start)) - textbox->highlight_start_pos.x) * glyph_size_, 
                                                             textbox->font_size + textbox->line_space);
                 FV_DrawFillRect(app, first_line_highlight_pos, first_line_hightlight_size, FV_NewColorRGB(FV_HIGHLIGHT_COLOR));
                 fv_vector_t last_line_highlight_pos   = FV_NewVector(text_pos_start,
@@ -294,7 +367,7 @@ FV_ComponentTextBoxRenderHighlight(fv_component_t* component, fv_app_t* app)
                 for (int i = 1; i < row_difference; i++)
                 {
                     FV_DrawFillRect(app, FV_NewVector(text_pos_start, textbox->pos.y + (textbox->highlight_start_pos.y + i) * (textbox->font_size + textbox->line_space)),
-                                    FV_NewVector(strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->highlight_start_pos.y + i)) * glyph_size_, textbox->font_size + textbox->line_space),
+                                    FV_NewVector(strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->highlight_start_pos.y + textbox->view_line_start + i)) * glyph_size_, textbox->font_size + textbox->line_space),
                                     FV_NewColorRGB(FV_HIGHLIGHT_COLOR));
                 }
             }
@@ -306,13 +379,13 @@ FV_ComponentTextBoxRenderHighlight(fv_component_t* component, fv_app_t* app)
                 fv_vector_t last_line_highlight_pos   = FV_NewVector(text_pos_start + (textbox->highlight_end_pos.x * glyph_size_),
                                                                     textbox->pos.y + (textbox->highlight_end_pos.y * (textbox->font_size + textbox->line_space)));
                 fv_vector_t last_line_hightlight_size = FV_NewVector(
-                                                            (strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->highlight_end_pos.y)) - textbox->highlight_end_pos.x) * glyph_size_, 
+                                                            (strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->highlight_end_pos.y + textbox->view_line_start)) - textbox->highlight_end_pos.x) * glyph_size_, 
                                                             textbox->font_size + textbox->line_space);
                 FV_DrawFillRect(app, last_line_highlight_pos, last_line_hightlight_size, FV_NewColorRGB(FV_HIGHLIGHT_COLOR));
                 for (int i = 1; i < row_difference; i++)
                 {
                     FV_DrawFillRect(app, FV_NewVector(text_pos_start, textbox->pos.y + (textbox->highlight_end_pos.y + i) * (textbox->font_size + textbox->line_space)),
-                                    FV_NewVector(strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->highlight_end_pos.y + i)) * glyph_size_, textbox->font_size + textbox->line_space),
+                                    FV_NewVector(strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->highlight_end_pos.y + textbox->view_line_start + i)) * glyph_size_, textbox->font_size + textbox->line_space),
                                     FV_NewColorRGB(FV_HIGHLIGHT_COLOR));
                 }
             }
@@ -331,10 +404,11 @@ FV_ComponentTextBoxRenderFunction(fv_component_t* component, fv_app_t* app)
     FV_DrawRect(app, textbox->pos, textbox->size, textbox->border_color);
     // FV_RenderFont(app, textbox->font, textbox->font_size, textbox->size.x + textbox->pos.x, textbox->fg, FV_NewVector(textbox->pos.x + 7, textbox->pos.y), textbox->textbox_value);
     
-    FV_ComponentTextBoxRenderText(component, app);
+    FV_ComponentTextBoxRenderText       (component, app);
     FV_ComponentTextBoxRenderLineNumbers(component, app);
-    FV_ComponentTextBoxRenderHighlight(component, app);
-    FV_ComponentTextBoxRenderInfo(component, app);
+    FV_ComponentTextBoxRenderHighlight  (component, app);
+    FV_ComponentTextBoxRenderInfo       (component, app);
+    FV_ComponentTextBoxRenderScrollBar  (component, app);
 
     return 0;
 }
@@ -362,7 +436,7 @@ FV_ComponentTextBoxBackspaceKey(fv_component_t* component, fv_app_t* app, SDL_Ev
         //     printf("line_backspace_size == 0\n");
         //     FV_DeleteElementFromArray(textbox->textbox_lines, textbox->cursor.y);
         //     textbox->cursor.x = line_return_size - 1;
-        //     textbox->cursor.y--;
+        //     FV_ComponentTextBoxDecrementCursorY(component, app);
         // }
 
         char* new_line_return = calloc((line_return_size + line_backspace_size), sizeof(char));
@@ -374,7 +448,7 @@ FV_ComponentTextBoxBackspaceKey(fv_component_t* component, fv_app_t* app, SDL_Ev
         FV_DeleteElementFromArray(textbox->textbox_lines, textbox->cursor.y);
         FV_DeleteElementFromArray(textbox->textbox_lines, textbox->cursor.y - 1);
         FV_InsertElementInArray(textbox->textbox_lines, textbox->cursor.y - 1, new_line_return);
-        textbox->cursor.y--;
+        FV_ComponentTextBoxDecrementCursorY(component, app);
         textbox->cursor.x = (float)strlen(new_line_return);
 
         return;
@@ -439,7 +513,7 @@ FV_ComponentTextBoxEnterKey(fv_component_t* component, fv_app_t* app, SDL_Event 
     {
         FV_InsertElementInArray(textbox->textbox_lines, textbox->cursor.y, calloc(1, sizeof(char)));
         textbox->cursor.x = 0;
-        textbox->cursor.y++;
+        FV_ComponentTextBoxIncrementCursorY(component, app);
         return;
     }
     
@@ -461,7 +535,7 @@ FV_ComponentTextBoxEnterKey(fv_component_t* component, fv_app_t* app, SDL_Event 
         FV_InsertElementInArray(textbox->textbox_lines, textbox->cursor.y + 1, calloc(1, sizeof(char)));
 
     textbox->cursor.x = 0;
-    textbox->cursor.y++;
+    FV_ComponentTextBoxIncrementCursorY(component, app);
 }
 
 fv_vector_t
@@ -484,12 +558,13 @@ FV_ComponentTextBoxDetermiteCursorInText(fv_component_t* component, i32 _mouse_x
     if ((i32)determite_y > textbox->textbox_lines->length)
         new_cursor.y = textbox->textbox_lines->length - 1;
     else
-        new_cursor.y = (i32)determite_y;
+        new_cursor.y = (i32)determite_y + textbox->view_line_start;
 
     /* Determite X cursor position */
     size_t current_line_len = strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y));
     char*  current_line     = FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y);
-    i32    x_cord, i;
+    i32    x_cord = 0;
+    i32    i      = 0;
 
     if (mouse_x < glyph_size_)
         i = -1;
@@ -500,9 +575,11 @@ FV_ComponentTextBoxDetermiteCursorInText(fv_component_t* component, i32 _mouse_x
             char current_line_char = current_line[i];
             i32  adv = 0;
             TTF_GlyphMetrics32(textbox->font->font, current_line_char, NULL, NULL, NULL, NULL, &adv);
-            adv    += 1;
-            glyph_size_ = adv;
-            x_cord += adv;
+            adv         += 1;
+            glyph_size_ =  adv;
+            x_cord      += adv;
+            printf("x_cord: %d, mouse_x: %d, adv: %d\n",
+                x_cord, mouse_x, adv);
             if (x_cord <= mouse_x && (x_cord + adv) >= mouse_x)
                 break;
             else
@@ -510,7 +587,6 @@ FV_ComponentTextBoxDetermiteCursorInText(fv_component_t* component, i32 _mouse_x
         }
     }
         
-
     new_cursor.x = i + 1;
     return new_cursor;
 }
@@ -531,16 +607,17 @@ FV_ComponentTextButtonMotion(fv_component_t* component, fv_app_t* app, SDL_Event
         i32 text_pos_start = textbox->pos.x + 12 + left_padding;
 
         fv_vector_t highlight_cursor = FV_ComponentTextBoxDetermiteCursorInText(component, mouse_x, mouse_y);
-        FV_SUCCESS("start_cursor: .x=%f, .y=%f end_cursor: .x=%f, .y=%f\n",
-            textbox->cursor.x, textbox->cursor.y, highlight_cursor.x, highlight_cursor.y);
+        FV_SUCCESS("start_cursor: .x=%f, .y=%f end_cursor: .x=%f, .y=%f, view_line_start: %d\n",
+            textbox->cursor.x, textbox->cursor.y, highlight_cursor.x, highlight_cursor.y, textbox->view_line_start);
+        highlight_cursor.y -= textbox->view_line_start;
 
         if (highlight_cursor.y >= textbox->textbox_lines->length)
             highlight_cursor.y = textbox->textbox_lines->length - 1;
 
-        if (highlight_cursor.x > strlen(FV_GetElementFromArray(textbox->textbox_lines, highlight_cursor.y)))
-            highlight_cursor.x = strlen(FV_GetElementFromArray(textbox->textbox_lines, highlight_cursor.y));
+        if (highlight_cursor.x > strlen(FV_GetElementFromArray(textbox->textbox_lines, highlight_cursor.y + textbox->view_line_start)))
+            highlight_cursor.x = strlen(FV_GetElementFromArray(textbox->textbox_lines, highlight_cursor.y + textbox->view_line_start));
 
-        if (textbox->cursor.y == highlight_cursor.y)
+        if ((textbox->cursor.y - textbox->view_line_start) == highlight_cursor.y)
         {
             if (textbox->cursor.x > highlight_cursor.x)
             {
@@ -553,27 +630,19 @@ FV_ComponentTextButtonMotion(fv_component_t* component, fv_app_t* app, SDL_Event
             {
                 // highlight_cursor.x is bigger
                 textbox->highlight_pos  = FV_NewVector(text_pos_start + (textbox->cursor.x * glyph_size_), 
-                                                          textbox->pos.y + (textbox->cursor.y * (textbox->font_size + textbox->line_space)));
+                                                          textbox->pos.y + ((textbox->cursor.y - textbox->view_line_start) * (textbox->font_size + textbox->line_space)));
                 textbox->highlight_size = FV_NewVector((highlight_cursor.x - textbox->cursor.x) * glyph_size_, textbox->font_size + textbox->line_space);
             }
+            textbox->highlight_multiply_lines  = false;
         }
         else
         {
             textbox->highlight_multiply_lines = true;
-            textbox->highlight_start_pos      = textbox->cursor;
-            textbox->highlight_end_pos        = highlight_cursor;
+            textbox->highlight_start_pos = textbox->cursor;
+            textbox->highlight_end_pos = highlight_cursor;
+
+            textbox->highlight_start_pos.y -= textbox->view_line_start;
         }
-        // else
-        // {
-        //     if (textbox->cursor.x > highlight_cursor.x)
-        //     {
-
-        //     }
-        //     else
-        //     {
-
-        //     }
-        // }
     }
 }
 
@@ -587,10 +656,14 @@ FV_ComponentTextBoxSetCursorByMouse(fv_component_t* component, fv_app_t* app, SD
 
     fv_vector_t new_cursor = FV_ComponentTextBoxDetermiteCursorInText(component, mouse_x, mouse_y);
 
-    FV_SUCCESS("new cursor position: .x=%d, .y=%d", 
-        (i32)new_cursor.x, (i32)new_cursor.y);
+    size_t cursor_line_length = strlen(FV_GetElementFromArray(textbox->textbox_lines, new_cursor.y));
+    if (cursor_line_length <= new_cursor.x)
+        new_cursor.x -= 1;
+
+    FV_SUCCESS("new cursor position: .x=%d, .y=%d, mouse_x:%d", 
+        (i32)new_cursor.x, (i32)new_cursor.y, mouse_x);
     textbox->cursor = new_cursor;
-    textbox->mouse_button_state = true;
+    textbox->mouse_button_state = true; 
 
     if ((textbox->highlight_size.x != 0 && textbox->highlight_size.y != 0) || (textbox->highlight_multiply_lines))
     {
@@ -637,7 +710,7 @@ FV_ComponentTextBoxEventFunction(fv_component_t* component, fv_app_t* app, SDL_E
         if (event.key.keysym.sym == SDLK_UP)
         {    
             if (textbox->cursor.y != 0)
-                textbox->cursor.y--;
+                FV_ComponentTextBoxDecrementCursorY(component, app);
         }
         else if (event.key.keysym.sym == SDLK_RIGHT)
         {
@@ -649,7 +722,7 @@ FV_ComponentTextBoxEventFunction(fv_component_t* component, fv_app_t* app, SDL_E
                 if (textbox->cursor.y != textbox->textbox_lines->length)
                 {
                     textbox->cursor.x = 0;
-                    textbox->cursor.y++;
+                    FV_ComponentTextBoxIncrementCursorY(component, app);
                 }
         }
         else if (event.key.keysym.sym == SDLK_LEFT)
@@ -660,13 +733,13 @@ FV_ComponentTextBoxEventFunction(fv_component_t* component, fv_app_t* app, SDL_E
                 if (textbox->cursor.y != 0)
                 {
                     textbox->cursor.x = strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y - 1));
-                    textbox->cursor.y--;
+                    FV_ComponentTextBoxDecrementCursorY(component, app);
                 }         
         }
         else if (event.key.keysym.sym == SDLK_DOWN)
         {
             if (textbox->cursor.y != (textbox->textbox_lines->length - 1))
-                textbox->cursor.y++;       
+                FV_ComponentTextBoxIncrementCursorY(component, app);       
 
             char* moved_line = FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y);
             size_t moved_line_len = strlen(moved_line);
@@ -701,7 +774,6 @@ FV_ComponentTextBoxEventFunction(fv_component_t* component, fv_app_t* app, SDL_E
     if (event.type == SDL_MOUSEBUTTONUP)
         textbox->mouse_button_state = false;
 
-    app->need_redraw = true;
     return 0;
 }   
 

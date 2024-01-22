@@ -64,6 +64,76 @@ FV_StringSplitByNewline(char* s)\n\
 {\n\
     return split_arr;\n\
 }"
+// #define DEFAULT_CODE "a\n\
+// b\n\
+// a\n\
+// b\n\
+// a\n\
+// a\n\
+// 3\n\
+// a\n\
+// dfa\n\
+// a\n\
+// a\n\
+// a\n\
+// ca\n\
+// a\n\
+// a\n\
+// ad\n\
+// a\n\
+// da\n\
+// a\n\
+// fa\n\
+// ad\n\
+// a\n\
+// 3\n\
+// a\n\
+// dfa\n\
+// a\n\
+// a\n\
+// a\n\
+// ca\n\
+// a\n\
+// a\n\
+// ad\n\
+// a\n\
+// da\n\
+// a\n\
+// fa\n\
+// ad\n\
+// a\n\
+// 3\n\
+// a\n\
+// dfa\n\
+// a\n\
+// a\n\
+// a\n\
+// ca\n\
+// a\n\
+// a\n\
+// ad\n\
+// a\n\
+// da\n\
+// a\n\
+// fa\n\
+// ad\n\
+// a\n\
+// 3\n\
+// a\n\
+// dfa\n\
+// a\n\
+// a\n\
+// a\n\
+// ca\n\
+// a\n\
+// a\n\
+// ad\n\
+// a\n\
+// da\n\
+// a\n\
+// fa\n\
+// ad\n\
+// a\n"
 
 /* This function will initalize app structure 
  * that is used in main function for managing
@@ -76,6 +146,7 @@ FV_CreateApp(i32 argc, char** argv)
 
     fv->argc     = argc;
     fv->argv     = argv;
+    
     fv->Init     = (fv_app_init_func)&FV_AppInitFunctionDefault;
     fv->Run      = (fv_app_run_func) &FV_AppRunFunctionDefault;
 
@@ -134,21 +205,17 @@ FV_AppRunFunctionDefault (fv_app_t* app)
     FV_SUCCESS("Calling all components 'run' function", 0);
     FV_RunComponents(app->component_manager);
 
-    u32 last_fps_update_time, start_time, end_time, frames;
-    f32 fps;
-    app->need_redraw = true;
+    u32 last_fps_update_time, start_time, end_time, frames = 0;
+    f32 fps = 0;
 
     while (!app->render->exit)
     {
         start_time = SDL_GetTicks();
-        FV_RenderCatchEvents(app->render);
 
-        if (app->need_redraw)
-        {
-            FV_RenderClearWindow(app->render);
-            FV_RenderComponents(app->component_manager);
-            FV_RenderSwapBuffer(app->render);
-        }
+        FV_RenderClearWindow(app->render);
+        FV_RenderCatchEvents(app->render);
+        FV_RenderComponents(app->component_manager);
+        FV_RenderSwapBuffer(app->render);
 
         end_time = SDL_GetTicks();
         frames++;
@@ -156,7 +223,7 @@ FV_AppRunFunctionDefault (fv_app_t* app)
 
         if (end_time - last_fps_update_time >= 1000)
         {
-            FV_SUCCESS("FPS: %.4f\n", fps);
+            FV_SUCCESS("FPS: %.4f", fps);
             last_fps_update_time = end_time;
             frames = 0;
         }
