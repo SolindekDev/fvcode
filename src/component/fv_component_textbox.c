@@ -115,6 +115,24 @@ FV_ComponentTextBoxIncrementCursorY(fv_component_t* component, fv_app_t* app)
 }
 
 void
+FV_ComponentTextBoxIncrementViewLine(fv_component_t* component, fv_app_t* app)
+{
+    fv_component_textbox_t* textbox = component->component_additional_data;
+
+    if (textbox->view_line_start != (textbox->textbox_lines->length - 1))
+        textbox->view_line_start++;
+}
+
+void
+FV_ComponentTextBoxDecrementViewLine(fv_component_t* component, fv_app_t* app)
+{
+    fv_component_textbox_t* textbox = component->component_additional_data;
+
+    if (textbox->view_line_start != 0)
+        textbox->view_line_start--;
+}
+
+void
 FV_ComponentTextBoxRenderLine(fv_component_t* component, fv_app_t* app, 
                               i32 line_index, fv_vector_t* character_vector_pos, i32 left_padding)
 {
@@ -675,6 +693,19 @@ FV_ComponentTextBoxSetCursorByMouse(fv_component_t* component, fv_app_t* app, SD
     }
 }
 
+void
+FV_ComponentTextBoxMouseWheelEvent(fv_component_t* component, fv_app_t* app, SDL_Event event)
+{
+    fv_component_textbox_t* textbox = component->component_additional_data;
+
+    if (event.wheel.y < 0)
+        for (int i = 0; i < abs(event.wheel.y); i++)
+            FV_ComponentTextBoxIncrementViewLine(component, app);
+    else if (event.wheel.y > 0)
+        for (int i = 0; i < abs(event.wheel.y); i++)
+            FV_ComponentTextBoxDecrementViewLine(component, app);
+}
+
 int 
 FV_ComponentTextBoxEventFunction(fv_component_t* component, fv_app_t* app, SDL_Event event)
 {
@@ -687,6 +718,9 @@ FV_ComponentTextBoxEventFunction(fv_component_t* component, fv_app_t* app, SDL_E
                                                         FV_NewVector(event.button.x, event.button.y), 
                                                         FV_NewVector(1, 1))
                                 : false;
+
+    if (event.type == SDL_MOUSEWHEEL)
+        FV_ComponentTextBoxMouseWheelEvent(component, app, event);
 
     if (event.type == SDL_MOUSEMOTION)
     {
