@@ -71,6 +71,27 @@ FV_CreateComponentTextBox(fv_vector_t pos, fv_vector_t size, fv_color_t bg, fv_c
     return textbox_component;
 }
 
+void
+FV_ComponentTextBoxDisableHighlight(fv_component_t* component, fv_app_t* app)
+{
+    fv_component_textbox_t* textbox = component->component_additional_data;
+
+    textbox->highlight_multiply_lines  = false;
+    textbox->highlight_start_pos       = FV_NewVector(0, 0);
+    textbox->highlight_end_pos         = FV_NewVector(0, 0);
+    textbox->highlight_size            = FV_NewVector(0, 0);
+    textbox->highlight_pos             = FV_NewVector(0, 0);
+    textbox->highlight                 = false;
+}
+
+bool
+FV_ComponentTextBoxIsHighlight(fv_component_t* component, fv_app_t* app)
+{
+    fv_component_textbox_t* textbox = component->component_additional_data;
+
+    // TODO: FV_ComponentTextBoxIsHighlight
+}
+
 i32
 FV_ComponentTextBoxGetLinesToSee(fv_component_t* component, fv_app_t* app)
 {
@@ -432,30 +453,66 @@ FV_ComponentTextBoxRenderFunction(fv_component_t* component, fv_app_t* app)
 }
 
 void
+FV_ComponentTextBoxBackspaceHighlight(fv_component_t* component, fv_app_t* app, SDL_Event event)
+{
+    fv_component_textbox_t* textbox = component->component_additional_data;
+
+    i32 lines_letters  = floor(log10(textbox->textbox_lines->length)) + 1;
+    i32 left_padding   = round((lines_letters * textbox->font_size) * 1.3);
+    i32 text_pos_start = textbox->pos.x + 12 + left_padding;
+
+    // Are we dealing with multiline selection?
+    if (textbox->highlight_multiply_lines)
+    {
+        // TODO: Backspacing when multiply lines are highlighted
+        FV_ERROR_NO_EXIT("Backspacing when multiply lines are highlighted is not supported yet.", 0);
+        return;
+    }
+    printf("okok\n");
+
+    // Uff we are not 
+    char* current_line = FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y);
+
+    f32 start = (textbox->highlight_pos.x - text_pos_start) / glyph_size_;
+    f32 end   = ((textbox->highlight_pos.x + textbox->highlight_size.x) - text_pos_start) / glyph_size_;
+    i32 len   = strlen(current_line);
+
+    if (start < 0 || end >= len || start > end) 
+    {
+        // invalid values
+        FV_ERROR_NO_EXIT("invalid indices for deletion.", 0);
+        return;
+    }
+
+    i32 delete_count = end - start + 1;
+    memmove(&current_line[(i32)start], &current_line[(i32)end + 1], len - (i32)end);
+    len -= delete_count;
+    current_line[len] = '\0';
+
+    FV_ComponentTextBoxDisableHighlight(component, app);
+}
+
+void
 FV_ComponentTextBoxBackspaceKey(fv_component_t* component, fv_app_t* app, SDL_Event event)
 {
     fv_component_textbox_t* textbox = component->component_additional_data;
+
+    if (textbox->highlight)
+    {
+        FV_ComponentTextBoxBackspaceHighlight(component, app, event);
+        return;
+    }
 
     if (textbox->cursor.x == 0)
     {
         if (textbox->cursor.y == 0)
             return;
-        // else if (textbox->cursor.y == 1 && textbox->textbox_lines->length == 2)
-            // return;
 
         char* line_return    = FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y - 1);
         char* line_backspace = FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y);
 
         size_t line_backspace_size = strlen(line_backspace);
         size_t line_return_size    = strlen(line_return);
-
-        // if (line_backspace_size == 0)
-        // {
-        //     printf("line_backspace_size == 0\n");
-        //     FV_DeleteElementFromArray(textbox->textbox_lines, textbox->cursor.y);
-        //     textbox->cursor.x = line_return_size - 1;
-        //     FV_ComponentTextBoxDecrementCursorY(component, app);
-        // }
 
         char* new_line_return = calloc((line_return_size + line_backspace_size), sizeof(char));
         strcpy(new_line_return, line_return);
@@ -472,7 +529,7 @@ FV_ComponentTextBoxBackspaceKey(fv_component_t* component, fv_app_t* app, SDL_Ev
         return;
     }
 
-    char* current_line = FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y);
+    char* current_line    = FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y);
     char* cursor_position = &current_line[(i32)textbox->cursor.x];
 
     // Shift the characters to the left
@@ -652,12 +709,14 @@ FV_ComponentTextButtonMotion(fv_component_t* component, fv_app_t* app, SDL_Event
                 textbox->highlight_size = FV_NewVector((highlight_cursor.x - textbox->cursor.x) * glyph_size_, textbox->font_size + textbox->line_space);
             }
             textbox->highlight_multiply_lines  = false;
+            textbox->highlight = true;
         }
         else
         {
             textbox->highlight_multiply_lines = true;
             textbox->highlight_start_pos = textbox->cursor;
             textbox->highlight_end_pos = highlight_cursor;
+            textbox->highlight = true;
 
             textbox->highlight_start_pos.y -= textbox->view_line_start;
         }
@@ -684,13 +743,7 @@ FV_ComponentTextBoxSetCursorByMouse(fv_component_t* component, fv_app_t* app, SD
     textbox->mouse_button_state = true; 
 
     if ((textbox->highlight_size.x != 0 && textbox->highlight_size.y != 0) || (textbox->highlight_multiply_lines))
-    {
-        textbox->highlight_multiply_lines  = false;
-        textbox->highlight_start_pos       = FV_NewVector(0, 0);
-        textbox->highlight_end_pos         = FV_NewVector(0, 0);
-        textbox->highlight_size            = FV_NewVector(0, 0);
-        textbox->highlight_pos             = FV_NewVector(0, 0);
-    }
+        FV_ComponentTextBoxDisableHighlight(component, app);
 }
 
 void

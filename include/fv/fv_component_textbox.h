@@ -51,6 +51,7 @@ typedef struct __fv_component_textbox_t {
     fv_vector_t highlight_start_pos;
     fv_vector_t highlight_end_pos;  
     bool        highlight_multiply_lines;
+    bool        highlight;
 
     i32         view_line_start;
 } fv_component_textbox_t;
