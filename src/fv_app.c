@@ -34,37 +34,37 @@
 #include <fv/fv_main.h>
 #include <fv/fv_app.h>
 
-#define DEFAULT_CODE "okoko\n"
-// #define DEFAULT_CODE "/*\n\
-//  * FVCode - Fast and easy code editor\n\
-//  * Copyright (C) 2023-2024 FVCode Developers\n\
-//  *   \n\
-//  * This program is free software: you can redistribute it and/or modify\n\
-//  * it under the terms of the GNU General Public License as published by\n\
-//  * the Free Software Foundation, either version 3 of the License, or\n\
-//  * (at your option) any later version.\n\
-//  *   \n\
-//  * This program is distributed in the hope that it will be useful,\n\
-//  * but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
-//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
-//  * GNU General Public License for more details.\n\
-//  *   \n\
-//  * You should have received a copy of the GNU General Public License\n\
-//  * along with this program.  If not, see <https://www.gnu.org/licenses/>.\n\
-//  */\n\
-// \n\
-// #include <fv/fv.h>\n\
-// \n\
-// #include <fv/fv_string.h>\n\
-// #include <fv/fv_array.h>\n\
-// \n\
-// #include <fv/fv_app.h>\n\
-// \n\
-// fv_array_t* \n\
-// FV_StringSplitByNewline(char* s)\n\
-// {\n\
-//     return split_arr;\n\
-// }"
+// #define DEFAULT_CODE "okoko\n"
+#define DEFAULT_CODE "/*\n\
+ * FVCode - Fast and easy code editor\n\
+ * Copyright (C) 2023-2024 FVCode Developers\n\
+ *   \n\
+ * This program is free software: you can redistribute it and/or modify\n\
+ * it under the terms of the GNU General Public License as published by\n\
+ * the Free Software Foundation, either version 3 of the License, or\n\
+ * (at your option) any later version.\n\
+ *   \n\
+ * This program is distributed in the hope that it will be useful,\n\
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
+ * GNU General Public License for more details.\n\
+ *   \n\
+ * You should have received a copy of the GNU General Public License\n\
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.\n\
+ */\n\
+\n\
+#include <fv/fv.h>\n\
+\n\
+#include <fv/fv_string.h>\n\
+#include <fv/fv_array.h>\n\
+\n\
+#include <fv/fv_app.h>\n\
+\n\
+fv_array_t* \n\
+FV_StringSplitByNewline(char* s)\n\
+{\n\
+    return split_arr;\n\
+}"
 // #define DEFAULT_CODE "a\n\
 // b\n\
 // a\n\

@@ -700,14 +700,14 @@ FV_ComponentTextBoxDetermiteCursorInText(fv_component_t* component, i32 _mouse_x
     /* Determite Y cursor position */
     f32 determite_y = mouse_y / (textbox->font_size + textbox->line_space);
 
-    if ((i32)determite_y > textbox->textbox_lines->length)
+    if ((i32)determite_y >= textbox->textbox_lines->length)
         new_cursor.y = textbox->textbox_lines->length - 1;
     else
         new_cursor.y = (i32)determite_y + textbox->view_line_start;
 
     /* Determite X cursor position */
-    size_t current_line_len = strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y));
-    char*  current_line     = FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y);
+    size_t current_line_len = strlen(FV_GetElementFromArray(textbox->textbox_lines, new_cursor.y));
+    char*  current_line     = FV_GetElementFromArray(textbox->textbox_lines, new_cursor.y);
     i32    x_cord = 0;
     i32    i      = 0;
 
@@ -800,16 +800,12 @@ FV_ComponentTextBoxSetCursorByMouse(fv_component_t* component, fv_app_t* app, SD
     i32 mouse_y = event.button.y;
 
     fv_vector_t new_cursor = FV_ComponentTextBoxDetermiteCursorInText(component, mouse_x, mouse_y);
-
-    size_t cursor_line_length = strlen(FV_GetElementFromArray(textbox->textbox_lines, new_cursor.y));
-    if (cursor_line_length <= new_cursor.x)
-        new_cursor.x -= 1;
-
-    FV_SUCCESS("new cursor position: .x=%d, .y=%d, mouse_x:%d", 
-        (i32)new_cursor.x, (i32)new_cursor.y, mouse_x);
     textbox->cursor = new_cursor;
-    textbox->mouse_button_state = true; 
+    
+    if (textbox->cursor.x != 0)
+        textbox->cursor.x--;
 
+    textbox->mouse_button_state = true;
     if ((textbox->highlight_size.x != 0 && textbox->highlight_size.y != 0) || (textbox->highlight_multiply_lines))
         FV_ComponentTextBoxDisableHighlight(component, app);
 }
