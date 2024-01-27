@@ -811,6 +811,45 @@ FV_ComponentTextBoxSetCursorByMouse(fv_component_t* component, fv_app_t* app, SD
 }
 
 void
+FV_ComponentTextBoxHandleTextCopy(fv_component_t* component, fv_app_t* app)
+{
+    fv_component_textbox_t* textbox = component->component_additional_data;
+
+    i32 lines_letters  = floor(log10(textbox->textbox_lines->length)) + 1;
+    i32 left_padding   = round((lines_letters * textbox->font_size) * 1.3);
+    i32 text_pos_start = textbox->pos.x + 12 + left_padding;
+
+    if (textbox->highlight == false)
+    {
+        FV_ERROR_NO_EXIT("no text to be copied.", 0);
+        return;
+    }
+
+    char* selected_text_buffer = NULL;
+
+    if (textbox->highlight_multiply_lines)
+    {
+        FV_FIXME("coping more than 1 line is not supported yet", 0);
+        selected_text_buffer = "fixme";
+    }
+    else
+    {
+        char* current_line = FV_GetElementFromArray(textbox->textbox_lines, 
+                (i32)(((textbox->highlight_pos.y) / (textbox->font_size + textbox->line_space)) - textbox->pos.y) + textbox->view_line_start);
+
+        i32 start = (i32)((textbox->highlight_pos.x - text_pos_start) / glyph_size_);
+        i32 end   = (i32)(((textbox->highlight_pos.x + textbox->highlight_size.x) - text_pos_start) / glyph_size_);
+
+        selected_text_buffer = calloc((end - start) + 1, sizeof(char));
+        FV_NO_NULL(selected_text_buffer);
+        memmove(selected_text_buffer, current_line + start, end - start);
+    }
+
+    if (selected_text_buffer != NULL)
+        SDL_SetClipboardText(selected_text_buffer);
+}
+
+void
 FV_ComponentTextBoxHandleCtrlMod(fv_component_t* component, fv_app_t* app, SDL_Event event)
 {
     fv_component_textbox_t* textbox = component->component_additional_data;
@@ -839,6 +878,10 @@ FV_ComponentTextBoxHandleCtrlMod(fv_component_t* component, fv_app_t* app, SDL_E
             textbox->highlight_start_pos = FV_NewVector(0, 0);
             textbox->highlight_end_pos = FV_NewVector(strlen(last_line), textbox->textbox_lines->length - 1);
         }
+    }
+    else if (event.key.keysym.sym == SDLK_c)
+    {
+        FV_ComponentTextBoxHandleTextCopy(component, app);
     }
 }
 
