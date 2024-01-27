@@ -47,4 +47,10 @@
 /* Cursor color */
 #define FV_DEFAULT_CURSOR_COLOR 94, 161, 242, 240
 
+#ifdef __APPLE__
+# define FV_CONFIG_CONTROL_MOD (KMOD_LGUI | KMOD_RGUI)
+#else
+# define FV_CONFIG_CONTROL_MOD (KMOD_LCTRL | KMOD_RCTRL)
+#endif
+
 #endif /* __FV_CONFIG_H */

@@ -31,8 +31,12 @@
 #define FV_SUCCESS_MESSAGE                    \
      "\e[0;32mFVCode\e[0m: %s:%d in %s: %s\n" \
 
-void FV_Success(const char* file, i32 line, 
-                const char* func, const char* msg, ...)
+#define FV_FIXME_MESSAGE                                          \
+     "\e[0;34mFIXME\e[0m: %s:%d in %s: %s\n" \
+
+void
+FV_Success(const char* file, i32 line, 
+           const char* func, const char* msg, ...)
 {
     va_list ap;
     va_start(ap, msg);
@@ -61,8 +65,9 @@ FV_Error(const char* file, i32 line,
 }
 
 
-void FV_ErrorNoExit(const char* file, i32 line, 
-                    const char* func, const char* error, ...)
+void 
+FV_ErrorNoExit(const char* file, i32 line, 
+               const char* func, const char* error, ...)
 {
     va_list ap;
     va_start(ap, error);
@@ -72,4 +77,20 @@ void FV_ErrorNoExit(const char* file, i32 line,
     printf(FV_ERROR_NO_EXIT_MESSAGE, file, line, func, buffer);
     va_end(ap);
     free(buffer);
+}
+
+void 
+FV_Fixme(const char* file, i32 line, 
+         const char* func, const char* msg, ...)
+{
+    va_list ap;
+    va_start(ap, msg);
+    char* buffer = calloc(512, sizeof(char));
+    vsprintf(buffer, msg, ap);
+
+    printf("-------\n");
+    printf(FV_FIXME_MESSAGE, file, line, func, buffer);
+    printf("-------\n");
+    va_end(ap);
+    free(buffer); 
 }

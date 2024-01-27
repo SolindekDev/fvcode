@@ -23,6 +23,7 @@
 
 #define FV_ERROR_NO_EXIT(err, ...) (FV_ErrorNoExit(__FILE__, __LINE__, __func__, err, __VA_ARGS__))
 #define FV_SUCCESS(msg, ...)       (FV_Success(__FILE__, __LINE__, __func__, msg, __VA_ARGS__))
+#define FV_FIXME(fixme, ...)       (FV_Fixme(__FILE__, __LINE__, __func__, fixme, __VA_ARGS__))
 #define FV_ERROR(err, ...)         (FV_Error(__FILE__, __LINE__, __func__, err, __VA_ARGS__))
 
 __FV_NO_RETURN__ void FV_Error(const char* file, i32 line, 
@@ -32,5 +33,7 @@ void FV_ErrorNoExit(const char* file, i32 line,
                     const char* func, const char* error, ...);
 
 void FV_Success(const char* file, i32 line, const char* func, const char* msg, ...);
+
+void FV_Fixme(const char* file, i32 line, const char* func, const char* msg, ...);
 
 #endif /* __FV_MSG_H */
