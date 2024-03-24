@@ -39,17 +39,17 @@ FV_CreateComponentManager(fv_app_t* app)
 }
 
 /* Use FV_TRY */
-int 
+i32 
 FV_AppendComponent(fv_component_manager_t* manager, fv_component_t* component)
 {
     component->component_id = manager->last_id;
-    int _r = FV_AppendElementToArray(manager->components, component);
+    i32 _r = FV_AppendElementToArray(manager->components, component);
     manager->last_id++;
     return _r;
 }
 
 /* Use FV_TRY */
-int
+i32
 FV_DeleteComponentByName(fv_component_manager_t* manager, const char* component_name)
 {
     FV_ARRAY_FOR(manager->components)
@@ -63,7 +63,7 @@ FV_DeleteComponentByName(fv_component_manager_t* manager, const char* component_
 }
 
 /* Use FV_TRY */
-int
+i32
 FV_DeleteComponentByID(fv_component_manager_t* manager, i32 component_id)
 {
     FV_ARRAY_FOR(manager->components)

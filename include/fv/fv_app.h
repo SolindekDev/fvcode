@@ -26,8 +26,8 @@
 #include <fv/fv_render.h>
 #include <fv/fv_color.h>
 
-typedef int (*fv_app_init_func)(void* app);
-typedef int (*fv_app_run_func) (void* app);
+typedef i32 (*fv_app_init_func)(void* app);
+typedef i32 (*fv_app_run_func) (void* app);
 
 typedef struct __fv_component_manager_t fv_component_manager_t;
 typedef struct __fv_render_t fv_render_t;
@@ -53,7 +53,7 @@ fv_app_t* FV_CreateApp(i32 argc, char** argv);
 __FV_NO_RETURN__ void FV_DestroyAppAndExit(fv_app_t* app, i32 code);
                  void FV_DestroyApp(fv_app_t* app);
 
-int FV_AppInitFunctionDefault(fv_app_t* app);
-int FV_AppRunFunctionDefault(fv_app_t* app);
+i32 FV_AppInitFunctionDefault(fv_app_t* app);
+i32 FV_AppRunFunctionDefault(fv_app_t* app);
 
 #endif /* __FV_APP_H */

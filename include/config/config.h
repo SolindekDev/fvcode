@@ -34,23 +34,28 @@
 #define FV_WINDOW_FLAGS   (SDL_WINDOW_MOUSE_FOCUS | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE)
 #define FV_RENDERER_FLAGS (SDL_RENDERER_ACCELERATED)
 
-#define FV_MAX_FORMAT_BUFFER (int)(1024 * 4)
+#define FV_MAX_FORMAT_BUFFER (i32)(1024 * 4)
 
 /* Font */
 #define FV_DEFAULT_FONT_SIZE 16
 #define FV_DEFAULT_FONT_PATH "./fonts/jetbrains/JetBrainsMono-Regular.ttf"
-// #define FV_DEFAULT_FONT_PATH "./fonts/poggy/proggyfonts-1.1.7/ProggyVector/ProggyVector-Regular.ttf"
 
-/* Highlight color */
-#define FV_HIGHLIGHT_COLOR 129, 125, 255, 120
+/* Code area color pallet */
+#define FV_CODE_AREA_HIGHLIGHT_COLOR  129, 125, 255, 120
+#define FV_CODE_AREA_CURSOR_COLOR     94,  161, 242, 240
+#define FV_CODE_AREA_BORDER_COLOR     26,  26,  26,  255
+#define FV_CODE_AREA_BACKGROUND_COLOR 19,  19,  19,  255
+#define FV_CODE_AREA_FOREGROUND_COLOR 211, 215, 207, 255
 
-/* Cursor color */
-#define FV_DEFAULT_CURSOR_COLOR 94, 161, 242, 240
+/* Code area line space */
+#define FV_CODE_AREA_LINE_SPACE 7.0f
 
 #ifdef __APPLE__
 # define FV_CONFIG_CONTROL_MOD (KMOD_LGUI | KMOD_RGUI)
 #else
 # define FV_CONFIG_CONTROL_MOD (KMOD_LCTRL | KMOD_RCTRL)
 #endif
+
+#define FV_BACKGROUND_COLOR 28, 29, 29, 255
 
 #endif /* __FV_CONFIG_H */

@@ -63,7 +63,7 @@ FV_DrawHorizontalLine(fv_app_t* app, fv_vector_t pos, i64 width, fv_color_t colo
     FV_BLEND_MODE;
     FV_SET_COLOR ;
 
-    for (int i = 0; i < width; i++)
+    for (i32 i = 0; i < width; i++)
         SDL_RenderDrawPoint(app->render->sdl_renderer, pos.x + i, pos.y);
     return;
 }

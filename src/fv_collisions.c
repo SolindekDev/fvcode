@@ -19,8 +19,8 @@
 #include <fv/fv.h>
 #include <fv/fv_vector.h>
 
-bool FV_CollisionBox(int x1, int y1, int w1, int h1, 
-                     int x2, int y2, int w2, int h2)
+bool FV_CollisionBox(i32 x1, i32 y1, i32 w1, i32 h1, 
+                     i32 x2, i32 y2, i32 w2, i32 h2)
 {
     return x1 + w1 > x2 && x1 < x2 + w2 && y1 + h1 > y2 && y1 < y2 + h2;
 }

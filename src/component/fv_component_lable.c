@@ -49,7 +49,7 @@ FV_CreateComponentLable(const char* lable_text, fv_vector_t pos,
     return lable_component;
 }
 
-int 
+i32 
 FV_ComponentLableRenderFunction(fv_component_t* component, fv_app_t* app)
 {
     fv_component_lable_t* lable = component->component_additional_data;
@@ -57,13 +57,13 @@ FV_ComponentLableRenderFunction(fv_component_t* component, fv_app_t* app)
     return 0;
 }
 
-int 
+i32 
 FV_ComponentLableEventFunction(fv_component_t* component, fv_app_t* app, SDL_Event event)
 {
     return 0;
 }
 
-int 
+i32 
 FV_ComponentLableRunFunction(fv_component_t* component, fv_app_t* app)
 {
     fv_component_lable_t* lable = component->component_additional_data;

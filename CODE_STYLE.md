@@ -73,7 +73,7 @@ Copyright comment should be put in every file at the top of it
 ## Variables
 Variables should be named in `snake_case` for example:
 ```c
-int total_words = FV_GetTotalWordsFromFile(file);
+i32 total_words = FV_GetTotalWordsFromFile(file);
 ```
 ## Structures
 Structures should be named in `snake_case`. All names should start with `fv_` and end with `_t` for example:

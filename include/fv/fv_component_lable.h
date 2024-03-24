@@ -37,8 +37,8 @@ typedef struct __fv_component_lable_t {
 
 fv_component_t* FV_CreateComponentLable(const char* lable_text, fv_vector_t pos, fv_font_t* font, i32 font_size, fv_color_t color);
 
-int FV_ComponentLableRenderFunction(fv_component_t* component, fv_app_t* app);
-int FV_ComponentLableEventFunction (fv_component_t* component, fv_app_t* app, SDL_Event event);
-int FV_ComponentLableRunFunction   (fv_component_t* component, fv_app_t* app);
+i32 FV_ComponentLableRenderFunction(fv_component_t* component, fv_app_t* app);
+i32 FV_ComponentLableEventFunction (fv_component_t* component, fv_app_t* app, SDL_Event event);
+i32 FV_ComponentLableRunFunction   (fv_component_t* component, fv_app_t* app);
 
 #endif /* __FV_COMPONENT_LABLE_H */

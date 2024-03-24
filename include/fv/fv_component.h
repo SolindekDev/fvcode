@@ -31,7 +31,7 @@ typedef int (*fv_component_run_f)   (fv_component_t*, fv_app_t*);
 
 typedef enum __fv_component_kind_t {
     COMPONENT_LABLE,
-    COMPONENT_TEXTBOX
+    COMPONENT_CODE_AREA
 } fv_component_kind_t;
 
 typedef struct __fv_component_t {

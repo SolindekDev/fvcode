@@ -19,7 +19,6 @@
 #include <fv/fv.h>
 
 
-
 size_t
 FV_GetFileSize(FILE* f)
 {

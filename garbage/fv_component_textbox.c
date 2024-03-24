@@ -19,7 +19,7 @@
 #include <fv/fv.h>
 #include <config/config.h>
 
-#include <fv/fv_component_textbox.h>
+#include <fv/fv_component_code_area.h>
 #include <fv/fv_component_manager.h>
 #include <fv/fv_component.h>
 
@@ -39,7 +39,7 @@ static i32  glyph_size_                        = 0;
 
 fv_component_t*
 FV_CreateComponentTextBox(fv_vector_t pos, fv_vector_t size, fv_color_t bg, fv_color_t fg, char* textbox_value, 
-                          fv_font_t* font, i32 font_size, fv_color_t border_color, float line_space, char* filename,
+                          fv_font_t* font, i32 font_size, fv_color_t border_color, f32 line_space, char* filename,
                           char* path)
 {   
     fv_component_t* textbox_component   = FV_CreateComponent("textbox", COMPONENT_TEXTBOX);
@@ -161,7 +161,7 @@ FV_ComponentTextBoxRenderLine(fv_component_t* component, fv_app_t* app,
     char* current_line = FV_GetElementFromArray(textbox->textbox_lines, line_index);
     size_t current_line_len = strlen(current_line);
 
-    for (int i = 0; i < (current_line_len == 0 ? 0 : (current_line_len + 1)); i++) 
+    for (i32 i = 0; i < (current_line_len == 0 ? 0 : (current_line_len + 1)); i++) 
     {
         if ((textbox->cursor.x == i && textbox->cursor.y == line_index) && textbox->focus)
         {
@@ -231,7 +231,7 @@ FV_ComponentTextBoxRenderLineNumbers(fv_component_t* component, fv_app_t* app)
 
     char line_num_buffer[64] = { 0 };
     FV_SetFontSize(app->font_manager, textbox->font, textbox->font_size);
-    for (int i = textbox->view_line_start; i < textbox->textbox_lines->length; i++)
+    for (i32 i = textbox->view_line_start; i < textbox->textbox_lines->length; i++)
     {
         if (line_vector_pos.y > (textbox->size.y + textbox->pos.y))
             break;
@@ -272,7 +272,7 @@ FV_ComponentTextBoxRenderText(fv_component_t* component, fv_app_t* app)
     i32 left_padding = round((lines_letters * textbox->font_size) * 1.3);
     fv_vector_t character_vector_pos = FV_NewVector(textbox->pos.x + 12 + left_padding, textbox->pos.y);
 
-    for (int i = textbox->view_line_start; i < textbox->textbox_lines->length; i++)
+    for (i32 i = textbox->view_line_start; i < textbox->textbox_lines->length; i++)
     {
         if (character_vector_pos.y > (textbox->size.y + textbox->pos.y))
             break;
@@ -403,7 +403,7 @@ FV_ComponentTextBoxRenderHighlight(fv_component_t* component, fv_app_t* app)
                                                             (textbox->highlight_end_pos.x) * glyph_size_, 
                                                             textbox->font_size + textbox->line_space);
                 FV_DrawFillRect(app, last_line_highlight_pos, last_line_hightlight_size, FV_NewColorRGB(FV_HIGHLIGHT_COLOR));
-                for (int i = 1; i < row_difference; i++)
+                for (i32 i = 1; i < row_difference; i++)
                 {
                     FV_DrawFillRect(app, FV_NewVector(text_pos_start, textbox->pos.y + (textbox->highlight_start_pos.y + i) * (textbox->font_size + textbox->line_space)),
                                     FV_NewVector(strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->highlight_start_pos.y + textbox->view_line_start + i)) * glyph_size_, textbox->font_size + textbox->line_space),
@@ -421,7 +421,7 @@ FV_ComponentTextBoxRenderHighlight(fv_component_t* component, fv_app_t* app)
                                                             (strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->highlight_end_pos.y + textbox->view_line_start)) - textbox->highlight_end_pos.x) * glyph_size_, 
                                                             textbox->font_size + textbox->line_space);
                 FV_DrawFillRect(app, last_line_highlight_pos, last_line_hightlight_size, FV_NewColorRGB(FV_HIGHLIGHT_COLOR));
-                for (int i = 1; i < row_difference; i++)
+                for (i32 i = 1; i < row_difference; i++)
                 {
                     FV_DrawFillRect(app, FV_NewVector(text_pos_start, textbox->pos.y + (textbox->highlight_end_pos.y + i) * (textbox->font_size + textbox->line_space)),
                                     FV_NewVector(strlen(FV_GetElementFromArray(textbox->textbox_lines, textbox->highlight_end_pos.y + textbox->view_line_start + i)) * glyph_size_, textbox->font_size + textbox->line_space),
@@ -434,7 +434,7 @@ FV_ComponentTextBoxRenderHighlight(fv_component_t* component, fv_app_t* app)
         FV_DrawFillRect(app, textbox->highlight_pos, textbox->highlight_size, FV_NewColorRGB(FV_HIGHLIGHT_COLOR));
 }
 
-int 
+i32 
 FV_ComponentTextBoxRenderFunction(fv_component_t* component, fv_app_t* app)
 {
     fv_component_textbox_t* textbox = component->component_additional_data;
@@ -594,7 +594,7 @@ FV_ComponentTextBoxBackspaceKey(fv_component_t* component, fv_app_t* app, SDL_Ev
         FV_DeleteElementFromArray(textbox->textbox_lines, textbox->cursor.y - 1);
         FV_InsertElementInArray(textbox->textbox_lines, textbox->cursor.y - 1, new_line_return);
         FV_ComponentTextBoxDecrementCursorY(component, app);
-        textbox->cursor.x = (float)strlen(new_line_return);
+        textbox->cursor.x = (f32)strlen(new_line_return);
 
         return;
     }
@@ -891,14 +891,14 @@ FV_ComponentTextBoxMouseWheelEvent(fv_component_t* component, fv_app_t* app, SDL
     fv_component_textbox_t* textbox = component->component_additional_data;
 
     if (event.wheel.y < 0)
-        for (int i = 0; i < abs(event.wheel.y); i++)
+        for (i32 i = 0; i < abs(event.wheel.y); i++)
             FV_ComponentTextBoxIncrementViewLine(component, app);
     else if (event.wheel.y > 0)
-        for (int i = 0; i < abs(event.wheel.y); i++)
+        for (i32 i = 0; i < abs(event.wheel.y); i++)
             FV_ComponentTextBoxDecrementViewLine(component, app);
 }
 
-int 
+i32 
 FV_ComponentTextBoxEventFunction(fv_component_t* component, fv_app_t* app, SDL_Event event)
 {
     fv_component_textbox_t* textbox = component->component_additional_data;
@@ -1009,7 +1009,7 @@ FV_ComponentTextBoxEventFunction(fv_component_t* component, fv_app_t* app, SDL_E
     return 0;
 }   
 
-int 
+i32 
 FV_ComponentTextBoxRunFunction(fv_component_t* component, fv_app_t* app)
 {
     fv_component_textbox_t* textbox = component->component_additional_data;

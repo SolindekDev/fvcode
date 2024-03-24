@@ -42,10 +42,10 @@ FV_StringSplitByNewline(char* s)
     static char line_buffer[MAX_LINE_LENGTH];
     size_t s_len = strlen(s);
 
-    int line_index = 0;
-    int char_index = 0;
+    i32 line_index = 0;
+    i32 char_index = 0;
 
-    for (int i = 0; i < s_len; i++)
+    for (i32 i = 0; i < s_len; i++)
     {
         char s_char = s[i];
 

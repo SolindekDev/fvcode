@@ -21,7 +21,7 @@
 #include <fv/fv_vector.h>
 
 fv_vector_t 
-FV_NewVector(float x, float y)
+FV_NewVector(f32 x, f32 y)
 {
     return ((fv_vector_t){x,y});
 }

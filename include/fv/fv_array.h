@@ -27,7 +27,7 @@ typedef struct __fv_array_t {
     void** ptr;
 } fv_array_t;
 
-#define FV_ARRAY_FOR(arr) for (int i = 0; i < arr->length; i++)
+#define FV_ARRAY_FOR(arr) for (i32 i = 0; i < arr->length; i++)
 #define FV_ARRAY_IS_LAST_ELEMENT(arr, i) (arr->length == (i + 1))
 
 fv_array_t* FV_CreateArray(size_t size_of_element);

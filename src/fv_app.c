@@ -20,7 +20,7 @@
 #include <config/config.h>
 
 #include <fv/fv_component_manager.h>
-#include <fv/fv_component_textbox.h>
+#include <fv/fv_component_code_area.h>
 #include <fv/fv_component_lable.h>
 #include <fv/fv_component.h>
 
@@ -175,31 +175,31 @@ FV_DestroyAppAndExit(fv_app_t* app, i32 code)
 
 /* Function that will initalize the app process.
  * Returns 0 on success, 1 on error */
-int 
+i32 
 FV_AppInitFunctionDefault(fv_app_t* app)
 {
     FV_SUCCESS("Executing \'FV_AppInitFunctionDefault\'. App is being initalized.", 0);
 
     app->render = FV_RenderInit(app);
     FV_RenderCreateDefaultWindow(app->render);
-    app->background   = FV_NewColorRGB(28, 29, 29, 255);
+    app->background   = FV_NewColorRGB(FV_BACKGROUND_COLOR);
 
     app->font_manager = FV_FontManagerInit();
     FV_SetFontSize(app->font_manager, FV_CreateNewFontAsDefault(app->font_manager, FV_DEFAULT_FONT_PATH), 24);
     
     app->component_manager = FV_CreateComponentManager(app);
-    FV_TRY(
-        FV_AppendComponent(app->component_manager, 
-            FV_CreateComponentTextBox(FV_NewVector(0, 0), FV_NewVector(1280, 720), FV_NewColorRGB(19, 19, 19, 255), FV_NewColorRGB(211, 215, 207, 255), 
-            DEFAULT_CODE, FV_GetDefaultFont(app->font_manager), 20, FV_NewColorRGB(26, 26, 26, 255), 7.0f, "<none>", "<none>"
-        )
-    ));
+    // FV_TRY(
+    //     FV_AppendComponent(app->component_manager, 
+    //         FV_CreateComponentTextBox(FV_NewVector(0, 0), FV_NewVector(1280, 720), FV_NewColorRGB(19, 19, 19, 255), FV_NewColorRGB(211, 215, 207, 255), 
+    //         DEFAULT_CODE, FV_GetDefaultFont(app->font_manager), 20, FV_NewColorRGB(26, 26, 26, 255), 7.0f, "<none>", "<none>"
+    //     )
+    // ));
     return 0;
 }   
 
 /* Function that will rn the app process.
  * Returns 0 on success, 1 on error */
-int 
+i32 
 FV_AppRunFunctionDefault (fv_app_t* app)
 {
     FV_SUCCESS("Executing \'FV_AppRunFunctionDefault\'. App is running.", 0);

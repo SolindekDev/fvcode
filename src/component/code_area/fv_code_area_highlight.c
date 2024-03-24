@@ -16,21 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __FV_TYPES_H
-#define __FV_TYPES_H
+#include <fv/fv.h>
+#include <config/config.h>
 
-#include <stdint.h>
+#include <fv/fv_component_code_area.h>
 
-typedef int64_t  i64;
-typedef int32_t  i32;
-typedef int16_t  i16;
-typedef int8_t   i8;
-typedef uint64_t u64;
-typedef uint32_t u32;
-typedef uint16_t u16;
-typedef uint8_t  u8;
+#include <fv/fv_component_lable.h>
+#include <fv/fv_component_manager.h>
+#include <fv/fv_component.h>
+#include <fv/fv_collisions.h>
+#include <fv/fv_drawing.h>
 
-typedef f32    f32;
-typedef double   f64;
+#include <fv/fv_font_manager.h>
+#include <fv/fv_font_draw.h>
 
-#endif /* __FV_TYPES_H */

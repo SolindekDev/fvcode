@@ -22,9 +22,9 @@
 #include <fv/fv.h>
 
 typedef struct __fv_vector_t {
-    float x, y;
+    f32 x, y;
 } fv_vector_t;
 
-fv_vector_t FV_NewVector(float x, float y);
+fv_vector_t FV_NewVector(f32 x, f32 y);
 
 #endif /* __FV_VECTOR_H */
