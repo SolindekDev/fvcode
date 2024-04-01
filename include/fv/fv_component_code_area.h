@@ -27,8 +27,13 @@
 #include <fv/fv_font_manager.h>
 #include <fv/fv_font_draw.h>
 
-typedef struct __fv_code_area_highlight_t fv_code_area_highlight_t;
-typedef struct __fv_code_area_cursor_t    fv_code_area_cursor_t;
+typedef struct __fv_code_area_highlight_t {
+    i32 x;
+} fv_code_area_highlight_t;
+
+typedef struct {
+    i32 x, y;
+} fv_code_area_cursor_t;
 
 typedef struct __fv_component_code_area_t {
     /* Position & size */
@@ -69,12 +74,15 @@ typedef struct __fv_component_code_area_t {
 } fv_component_code_area_t;
 
 #define GET_CODE_AREA(component)                                                        \
-        fv_componentcode_area_t* code_area = component->component_additional_data;      \
+         fv_component_code_area_t* code_area = component->component_additional_data;    \
 
-fv_component_t* FV_CreateComponentCodeArea(fv_vector_t pos, fv_vecotr_t size, i32 font_size, fv_font_t* font, char* code_value, char* filename);
+fv_component_t* FV_CreateComponentCodeArea(fv_vector_t pos, fv_vector_t size, i32 font_size, fv_font_t* font, char* code_value, char* filename);
 
 i32 FV_ComponentCodeAreaRenderFunction(fv_component_t* component, fv_app_t* app);
 i32 FV_ComponentCodeAreaEventFunction (fv_component_t* component, fv_app_t* app, SDL_Event event);
 i32 FV_ComponentCodeAreaRunFunction   (fv_component_t* component, fv_app_t* app);
+
+void FV_ComponentCodeAreaRenderText(fv_component_t* component, fv_app_t* app);
+void FV_ComponentTextBoxRenderLineNumbers(fv_component_t* component, fv_app_t* app);
 
 #endif /* __FV_COMPONENT_CODE_AREA_H */

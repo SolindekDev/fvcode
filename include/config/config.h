@@ -58,4 +58,8 @@
 
 #define FV_BACKGROUND_COLOR 28, 29, 29, 255
 
+/* Line number alignment */
+#define FV_CENTER_ALIGN_LINE_NUMBERS
+// #define FV_RIGHT_ALIGN_LINE_NUMBERS
+
 #endif /* __FV_CONFIG_H */

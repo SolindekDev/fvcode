@@ -33,5 +33,11 @@
 i32 
 FV_ComponentCodeAreaEventFunction(fv_component_t* component, fv_app_t* app, SDL_Event event)
 {
-    
+    GET_CODE_AREA(component);
+
+    if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED)
+    {
+        code_area->size.x = event.window.data1;
+        code_area->size.y = event.window.data2;
+    }
 }

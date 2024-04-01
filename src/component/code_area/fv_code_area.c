@@ -31,7 +31,7 @@
 #include <fv/fv_font_draw.h>
 
 fv_component_t* 
-FV_CreateComponentCodeArea(fv_vector_t pos, fv_vecotr_t size, i32 font_size, 
+FV_CreateComponentCodeArea(fv_vector_t pos, fv_vector_t size, i32 font_size, 
                            fv_font_t* font, char* code_value, char* filename)
 {
     fv_component_t* code_area_component   = FV_CreateComponent("code_area", COMPONENT_CODE_AREA);
@@ -58,12 +58,12 @@ FV_CreateComponentCodeArea(fv_vector_t pos, fv_vecotr_t size, i32 font_size,
 
     code_area->background_color = FV_NewColorRGB(FV_CODE_AREA_BACKGROUND_COLOR);
     code_area->foreground_color = FV_NewColorRGB(FV_CODE_AREA_FOREGROUND_COLOR);
-    code_area->border_color     = FV_NewColorRGB(FV_CODE_AREA_BORDER_COLOR);
-    code_area->cursor_color     = FV_NewColorRGB(FV_CODE_AREA_CURSOR_COLOR);
-    code_area->highlight_color  = FV_NewColorRGB(FV_CODE_AREA_HIGHLIGHT_COLOR);
+    code_area->highlight_color  = FV_NewColorRGB(FV_CODE_AREA_HIGHLIGHT_COLOR );
+    code_area->border_color     = FV_NewColorRGB(FV_CODE_AREA_BORDER_COLOR    );
+    code_area->cursor_color     = FV_NewColorRGB(FV_CODE_AREA_CURSOR_COLOR    );
 
-    code_area->highlight = FV_CreateCodeAreaHighlight(code_area_component);
-    code_area->cursor    = FV_CreateCodeAreaCursor(code_area_component);
+    code_area->highlight = calloc(1, sizeof(fv_code_area_highlight_t));
+    code_area->cursor    = calloc(1, sizeof(fv_code_area_cursor_t   ));
 
     return code_area_component;
 }
@@ -71,9 +71,12 @@ FV_CreateComponentCodeArea(fv_vector_t pos, fv_vecotr_t size, i32 font_size,
 i32 
 FV_ComponentCodeAreaRenderFunction(fv_component_t* component, fv_app_t* app)
 {
-    GET_CODE_AREA();
+    GET_CODE_AREA(component);
 
-    
+    FV_DrawFillRect(app, code_area->pos, code_area->size, code_area->background_color);
+
+    FV_ComponentCodeAreaRenderText(component, app);
+    FV_ComponentTextBoxRenderLineNumbers(component, app);
 }   
 
 i32 

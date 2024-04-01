@@ -194,6 +194,12 @@ FV_AppInitFunctionDefault(fv_app_t* app)
     //         DEFAULT_CODE, FV_GetDefaultFont(app->font_manager), 20, FV_NewColorRGB(26, 26, 26, 255), 7.0f, "<none>", "<none>"
     //     )
     // ));
+
+    FV_TRY(
+        FV_AppendComponent(app->component_manager,
+            FV_CreateComponentCodeArea(FV_NewVector(0, 0), FV_NewVector(1280, 720), 20, 
+                                       FV_GetDefaultFont(app->font_manager), DEFAULT_CODE, "<none>"))
+    );
     return 0;
 }   
 
