@@ -22,8 +22,8 @@
 #include <fv/fv.h>
 #include <fv/fv_app.h>
 
-// 32kB
-#define MAX_LINE_LENGTH (1024 * 32)
+// 16kB
+#define MAX_LINE_LENGTH (1024 * 64)
 
 char* FV_DuplicateString(char* str);
 
