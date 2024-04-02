@@ -20,7 +20,6 @@
 #include <config/config.h>
 
 #include <fv/fv_component_code_area.h>
-
 #include <fv/fv_component_lable.h>
 #include <fv/fv_component_manager.h>
 #include <fv/fv_component.h>
@@ -34,10 +33,33 @@ i32
 FV_ComponentCodeAreaEventFunction(fv_component_t* component, fv_app_t* app, SDL_Event event)
 {
     GET_CODE_AREA(component);
+    
+    fv_code_area_lines_values_t values = FV_ComponentCodeAreaGetValues(code_area);
+
+    bool mouse_collision = event.type == SDL_MOUSEBUTTONDOWN 
+                            ? FV_CollisionBoxVector(FV_NewVector(values.text_pos_start, code_area->pos.y + 5), code_area->size, 
+                                                    FV_NewVector(event.button.x, event.button.y), 
+                                                    FV_NewVector(1, 1))
+                            : false;
 
     if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED)
     {
         code_area->size.x = event.window.data1;
         code_area->size.y = event.window.data2;
     }
+
+    if (event.type == SDL_MOUSEBUTTONDOWN && mouse_collision && !code_area->focus)
+    {
+        FV_SUCCESS("Focus on code_area [id=%d]", component->component_id);
+        code_area->focus = true;
+        SDL_StartTextInput();
+    }
+    else if (event.type == SDL_MOUSEBUTTONDOWN && mouse_collision && code_area->focus)
+        FV_ComponentCodeAreaSetCursorByMouse(component, app, event);
+    else if (event.type == SDL_MOUSEBUTTONDOWN && !mouse_collision)
+    {
+        code_area->focus = false;
+        SDL_StopTextInput();
+    }
+
 }

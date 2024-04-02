@@ -27,6 +27,14 @@
 #include <fv/fv_font_manager.h>
 #include <fv/fv_font_draw.h>
 
+static fv_array_t* splited_code;
+
+typedef struct __fv_code_area_lines_values {
+    i32 lines_letters,
+        left_padding,
+        text_pos_start;
+} fv_code_area_lines_values_t;
+
 typedef struct __fv_code_area_highlight_t {
     i32 x;
 } fv_code_area_highlight_t;
@@ -42,6 +50,8 @@ typedef struct __fv_component_code_area_t {
 
     /* Color pallete, colors are defined in the 
      * config.h file*/
+    fv_color_t darker_foreground_color;
+    fv_color_t line_number_color;
     fv_color_t background_color;
     fv_color_t foreground_color;
     fv_color_t highlight_color;
@@ -84,5 +94,14 @@ i32 FV_ComponentCodeAreaRunFunction   (fv_component_t* component, fv_app_t* app)
 
 void FV_ComponentCodeAreaRenderText(fv_component_t* component, fv_app_t* app);
 void FV_ComponentTextBoxRenderLineNumbers(fv_component_t* component, fv_app_t* app);
+void FV_ComponentCodeAreaSetCursorByMouse(fv_component_t* component, fv_app_t* app, SDL_Event event);
+
+fv_code_area_lines_values_t FV_ComponentCodeAreaGetValues(fv_component_code_area_t* code_area);
+
+/* This specific function will calculate position in text
+ * by given mouse position. This function is widealy used in
+ * fvcode so it needs to be as optimised as it can. */
+fv_vector_t FV_CodeAreaPositionByMouse(fv_component_t* component, fv_vector_t mouse_position);
+
 
 #endif /* __FV_COMPONENT_CODE_AREA_H */

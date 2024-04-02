@@ -30,6 +30,12 @@
 #include <fv/fv_font_manager.h>
 #include <fv/fv_font_draw.h>
 
+fv_array_t* 
+FV_ComponentCodeAreaGetSplitedLines()
+{
+    return splited_code;
+}
+
 fv_component_t* 
 FV_CreateComponentCodeArea(fv_vector_t pos, fv_vector_t size, i32 font_size, 
                            fv_font_t* font, char* code_value, char* filename)
@@ -56,11 +62,13 @@ FV_CreateComponentCodeArea(fv_vector_t pos, fv_vector_t size, i32 font_size,
     code_area->focus              = false;
     code_area->mouse_button_state = false;
 
-    code_area->background_color = FV_NewColorRGB(FV_CODE_AREA_BACKGROUND_COLOR);
-    code_area->foreground_color = FV_NewColorRGB(FV_CODE_AREA_FOREGROUND_COLOR);
-    code_area->highlight_color  = FV_NewColorRGB(FV_CODE_AREA_HIGHLIGHT_COLOR );
-    code_area->border_color     = FV_NewColorRGB(FV_CODE_AREA_BORDER_COLOR    );
-    code_area->cursor_color     = FV_NewColorRGB(FV_CODE_AREA_CURSOR_COLOR    );
+    code_area->background_color         = FV_NewColorRGB(FV_CODE_AREA_BACKGROUND_COLOR        );
+    code_area->foreground_color         = FV_NewColorRGB(FV_CODE_AREA_FOREGROUND_COLOR        );
+    code_area->darker_foreground_color  = FV_NewColorRGB(FV_CODE_AREA_DARKER_FOREGROUND_COLOR );
+    code_area->highlight_color          = FV_NewColorRGB(FV_CODE_AREA_HIGHLIGHT_COLOR         );
+    code_area->border_color             = FV_NewColorRGB(FV_CODE_AREA_BORDER_COLOR            );
+    code_area->cursor_color             = FV_NewColorRGB(FV_CODE_AREA_CURSOR_COLOR            );
+    code_area->line_number_color        = FV_NewColorRGB(FV_CODE_AREA_LINE_NUMBER_COLOR       );
 
     code_area->highlight = calloc(1, sizeof(fv_code_area_highlight_t));
     code_area->cursor    = calloc(1, sizeof(fv_code_area_cursor_t   ));
@@ -77,6 +85,7 @@ FV_ComponentCodeAreaRenderFunction(fv_component_t* component, fv_app_t* app)
 
     FV_ComponentCodeAreaRenderText(component, app);
     FV_ComponentTextBoxRenderLineNumbers(component, app);
+
 }   
 
 i32 

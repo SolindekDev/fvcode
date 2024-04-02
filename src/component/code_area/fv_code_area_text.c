@@ -31,17 +31,12 @@
 #include <fv/fv_font_manager.h>
 #include <fv/fv_font_draw.h>
 
-static fv_array_t* splited_code;
-
-typedef struct __fv_code_area_lines_values {
-    i32 lines_letters,
-        left_padding,
-        text_pos_start;
-} fv_code_area_lines_values_t;
-
 fv_code_area_lines_values_t
 FV_ComponentCodeAreaGetValues(fv_component_code_area_t* code_area)
 {
+    if (splited_code == NULL)
+        splited_code = FV_StringSplitByNewline(code_area->code_value);
+
     i32 lines_letters  = floor(log10(splited_code->length)) + 1;
     i32 left_padding   = round((lines_letters * code_area->font_size) * 1.3);
     i32 text_pos_start = code_area->pos.x + 12 + left_padding;
@@ -63,10 +58,8 @@ FV_ComponentTextBoxRenderLine(fv_component_t* component, fv_app_t* app, i32 line
     for (i32 i = 0; i < (current_line_len == 0 ? 0 : (current_line_len + 1)); i++) 
     {
         if ((code_area->cursor->x == i && code_area->cursor->y == line_index) && code_area->focus)
-        {
             FV_DrawFillRect(app, FV_NewVector(line_position->x - 1, line_position->y + 2), 
                             FV_NewVector(2, code_area->font_size * 1.15), code_area->cursor_color);
-        }
         
         if (i != current_line_len + 1)
         {
@@ -74,12 +67,16 @@ FV_ComponentTextBoxRenderLine(fv_component_t* component, fv_app_t* app, i32 line
 
             if (textbox_value_char == '\n')
             {
+                /* Newline character, advance y value and move x to the 
+                 * starting point */
                 line_position->y += code_area->font_size + code_area->line_space;
                 line_position->x  = code_area->pos.x + 12 + values.left_padding;
             }
             else if (textbox_value_char == '\t')
             {
-                line_position->x += (code_area->font_size / 2) * 4;
+                /* Tab character, advance x by two times the 
+                 * font size */
+                line_position->x += code_area->font_size * 2;
             }
             else
             {
@@ -102,17 +99,15 @@ FV_ComponentTextBoxRenderLine(fv_component_t* component, fv_app_t* app, i32 line
                 SDL_RenderCopy(app->render->sdl_renderer, glyph_texture, NULL, &rect);
                 SDL_DestroyTexture(glyph_texture);
                 SDL_FreeSurface(glyph_surface);
-                line_position->x += glyph_size_x + 1;
+                line_position->x += glyph_size_x;
             }
         }
         
     }
 
     if (strlen(current_line) == 0 && ((code_area->cursor->x == 0 && code_area->cursor->y == line_index) && code_area->focus))
-    {
         FV_DrawFillRect(app, FV_NewVector(line_position->x - 1, line_position->y + 2), 
                         FV_NewVector(2, code_area->font_size * 1.15), code_area->cursor_color);
-    }
 
     line_position->x = code_area->pos.x + 12 + values.left_padding;
 }
@@ -146,7 +141,7 @@ FV_RenderLineNumberText(fv_app_t* app, fv_component_t* component, i32 size,
     GET_CODE_AREA(component);
 
     FV_SetFontSize(app->font_manager, FV_GetDefaultFont(app->font_manager), size);
-    SDL_Surface* surface = TTF_RenderText_Blended_Wrapped(code_area->default_font->font, buffer, (SDL_Color){ fg.r, fg.b, fg.b, fg.a }, 1280);
+    SDL_Surface* surface = TTF_RenderText_Blended_Wrapped(code_area->default_font->font, buffer, (SDL_Color){ fg.r, fg.g, fg.b, fg.a }, 1280);
     SDL_Texture* texture = SDL_CreateTextureFromSurface(app->render->sdl_renderer, surface);
     
     fv_vector_t font_size = FV_NewVector(0, 0);
@@ -188,10 +183,9 @@ FV_ComponentTextBoxRenderLineNumberText(fv_component_t* component, fv_app_t* app
     /* Render this buffer */
     fv_color_t line_number_fg;
     if (code_area->cursor->y == i)
-        line_number_fg = FV_NewColorRGB(code_area->cursor_color.r, code_area->cursor_color.g,
-                                        code_area->cursor_color.b, 255);
+        line_number_fg = code_area->line_number_color;
     else 
-        line_number_fg = code_area->foreground_color;
+        line_number_fg = code_area->darker_foreground_color;
 
     // FV_RenderFont(app, code_area->default_font, code_area->font_size, 1280, line_number_fg, 
                 //   FV_NewVector(values.left_padding / 2, number_position->y), line_number_text_buffer);

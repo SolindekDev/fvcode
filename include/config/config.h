@@ -41,11 +41,13 @@
 #define FV_DEFAULT_FONT_PATH "./fonts/jetbrains/JetBrainsMono-Regular.ttf"
 
 /* Code area color pallet */
-#define FV_CODE_AREA_HIGHLIGHT_COLOR  129, 125, 255, 120
-#define FV_CODE_AREA_CURSOR_COLOR     94,  161, 242, 240
-#define FV_CODE_AREA_BORDER_COLOR     26,  26,  26,  255
-#define FV_CODE_AREA_BACKGROUND_COLOR 19,  19,  19,  255
-#define FV_CODE_AREA_FOREGROUND_COLOR 211, 215, 207, 255
+#define FV_CODE_AREA_HIGHLIGHT_COLOR          129, 125, 255, 120
+#define FV_CODE_AREA_CURSOR_COLOR             94,  161, 242, 240
+#define FV_CODE_AREA_LINE_NUMBER_COLOR        129, 125, 255, 255
+#define FV_CODE_AREA_BORDER_COLOR             26,  26,  26,  255
+#define FV_CODE_AREA_BACKGROUND_COLOR         19,  19,  19,  255
+#define FV_CODE_AREA_FOREGROUND_COLOR         211, 215, 207, 255
+#define FV_CODE_AREA_DARKER_FOREGROUND_COLOR  168, 168, 168, 255
 
 /* Code area line space */
 #define FV_CODE_AREA_LINE_SPACE 7.0f
