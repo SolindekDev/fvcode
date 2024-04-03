@@ -47,6 +47,7 @@
 #define FV_CODE_AREA_BORDER_COLOR             26,  26,  26,  255
 #define FV_CODE_AREA_BACKGROUND_COLOR         19,  19,  19,  255
 #define FV_CODE_AREA_FOREGROUND_COLOR         211, 215, 207, 255
+#define FV_CODE_AREA_SCROLL_BAR_COLOR         211, 215, 207, 255
 #define FV_CODE_AREA_DARKER_FOREGROUND_COLOR  168, 168, 168, 255
 
 /* Code area line space */

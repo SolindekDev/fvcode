@@ -50,13 +50,14 @@ typedef struct __fv_component_code_area_t {
      * config.h file*/
     fv_color_t darker_foreground_color;
     fv_color_t line_number_color;
+    fv_color_t scroll_bar_color;
     fv_color_t background_color;
     fv_color_t foreground_color;
     fv_color_t highlight_color;
     fv_color_t border_color;
     fv_color_t cursor_color;
 
-    /* Highlight & cursor properties */
+    /* Highlight, cursor and scroll properties */
     fv_code_area_highlight_t* highlight;
     fv_code_area_cursor_t   * cursor;
 
@@ -113,5 +114,9 @@ void FV_ComponentCodeAreaHandleMouseWheel(fv_component_t* component, SDL_Event e
 void FV_ComponentCodeAreaRenderScrollBar(fv_component_t* component, fv_app_t* app);
 void FV_ComponentCodeAreaIncrementViewLine(fv_component_t* component);
 void FV_ComponentCodeAreaDecrementViewLine(fv_component_t* component);
+
+void FV_ComponentCodeAreaKeyDownEvent(fv_component_t* component, fv_app_t* app, SDL_Event event);
+void FV_ComponentCodeAreaTextInput(fv_component_t* component, fv_app_t* app, SDL_Event event);
+
 
 #endif /* __FV_COMPONENT_CODE_AREA_H */

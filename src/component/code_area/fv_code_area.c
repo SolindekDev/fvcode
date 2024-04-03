@@ -64,6 +64,7 @@ FV_CreateComponentCodeArea(fv_vector_t pos, fv_vector_t size, i32 font_size,
     code_area->border_color             = FV_NewColorRGB(FV_CODE_AREA_BORDER_COLOR            );
     code_area->cursor_color             = FV_NewColorRGB(FV_CODE_AREA_CURSOR_COLOR            );
     code_area->line_number_color        = FV_NewColorRGB(FV_CODE_AREA_LINE_NUMBER_COLOR       );
+    code_area->scroll_bar_color         = FV_NewColorRGB(FV_CODE_AREA_SCROLL_BAR_COLOR        );
 
     code_area->highlight = calloc(1, sizeof(fv_code_area_highlight_t));
     code_area->cursor    = calloc(1, sizeof(fv_code_area_cursor_t   ));
@@ -78,9 +79,9 @@ FV_ComponentCodeAreaRenderFunction(fv_component_t* component, fv_app_t* app)
 
     FV_DrawFillRect(app, code_area->pos, code_area->size, code_area->background_color);
 
-    FV_ComponentCodeAreaRenderText(component, app);
+    FV_ComponentCodeAreaRenderText       (component, app);
     FV_ComponentCodeAreaRenderLineNumbers(component, app);
-    FV_ComponentCodeAreaRenderScrollBar(component, app)
+    FV_ComponentCodeAreaRenderScrollBar  (component, app);
 
     return 0;
 }   

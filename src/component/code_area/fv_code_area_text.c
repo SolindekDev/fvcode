@@ -214,3 +214,68 @@ FV_ComponentCodeAreaRenderLineNumbers(fv_component_t* component, fv_app_t* app)
         number_position.y += code_area->font_size + code_area->line_space;
     }
 }
+
+/*
+if (event.key.keysym.mod & FV_CONFIG_CONTROL_MOD)
+        {
+            FV_ComponentTextBoxHandleCtrlMod(component, app, event);
+            return 0;
+        }
+
+        else if (event.key.keysym.sym == SDLK_RETURN || event.key.keysym.sym == SDLK_KP_ENTER)
+            FV_ComponentTextBoxEnterKey(component, app, event);
+        else if (event.key.keysym.sym == SDLK_BACKSPACE)
+            FV_ComponentTextBoxBackspaceKey(component, app, event);
+        else if (event.key.keysym.sym == SDLK_TAB)
+            FV_ComponentTextBoxTabKey(component, app, event);
+
+    if (event.type == SDL_TEXTINPUT)
+        FV_ComponentTextBoxTextInput(component, app, event);
+        */
+        
+void
+FV_ComponentCodeAreaEnterKey(fv_component_t* component, fv_app_t* app, SDL_Event event)
+{
+
+}
+
+void
+FV_ComponentCodeAreaBackspaceKey(fv_component_t* component, fv_app_t* app, SDL_Event event)
+{
+
+}
+
+void
+FV_ComponentCodeAreaTabKey(fv_component_t* component, fv_app_t* app, SDL_Event event)
+{
+
+}
+
+void
+FV_ComponentCodeAreaKeyDownEvent(fv_component_t* component, fv_app_t* app, SDL_Event event)
+{
+    if (event.key.keysym.sym == SDLK_UP)
+        FV_ComponentCodeAreaMoveUp(component);
+    else if (event.key.keysym.sym == SDLK_RIGHT)
+        FV_ComponentCodeAreaMoveRight(component);
+    else if (event.key.keysym.sym == SDLK_LEFT)
+        FV_ComponentCodeAreaMoveLeft(component);
+    else if (event.key.keysym.sym == SDLK_DOWN)
+        FV_ComponentCodeAreaMoveDown(component);
+    else if (event.key.keysym.sym == SDLK_RETURN || event.key.keysym.sym == SDLK_KP_ENTER)
+        FV_ComponentCodeAreaEnterKey(component, app, event);
+    else if (event.key.keysym.sym == SDLK_BACKSPACE)
+        FV_ComponentCodeAreaBackspaceKey(component, app, event);
+    else if (event.key.keysym.sym == SDLK_TAB)
+        FV_ComponentCodeAreaTabKey(component, app, event);
+}
+
+void FV_ComponentCodeAreaTextInput(fv_component_t* component, fv_app_t* app, SDL_Event event) 
+{
+    fv_component_textbox_t* textbox = component->component_additional_data;
+
+    char* current_line = FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y);
+    char append_char = event.text.text[0];
+
+    FV_ComponentTextBoxAddChar(textbox, current_line, append_char);
+}

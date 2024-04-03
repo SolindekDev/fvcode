@@ -52,10 +52,13 @@ FV_ComponentCodeAreaEventFunction(fv_component_t* component, fv_app_t* app, SDL_
     {
         FV_SUCCESS("Focus on code_area [id=%d]", component->component_id);
         code_area->focus = true;
+        FV_ComponentCodeAreaSetCursorByMouse(component, app, event);
         SDL_StartTextInput();
     }
-    else if (event.type == SDL_MOUSEBUTTONDOWN && mouse_collision && code_area->focus)
+    else if (event.type == SDL_MOUSEBUTTONDOWN && mouse_collision)
+    {
         FV_ComponentCodeAreaSetCursorByMouse(component, app, event);
+    }
     else if (event.type == SDL_MOUSEBUTTONDOWN && !mouse_collision)
     {
         code_area->focus = false;
@@ -71,8 +74,14 @@ FV_ComponentCodeAreaEventFunction(fv_component_t* component, fv_app_t* app, SDL_
         SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
     }
 
+    if (event.type == SDL_KEYDOWN && code_area->focus)
+        FV_ComponentCodeAreaKeyDownEvent(component, event);
+
     if (event.type == SDL_MOUSEWHEEL)
         FV_ComponentCodeAreaHandleMouseWheel(component, event);
+
+    if (event.type == SDL_TEXTINPUT)
+        FV_ComponentCodeAreaTextInput(component, app, event);
 
     return 0;
 }

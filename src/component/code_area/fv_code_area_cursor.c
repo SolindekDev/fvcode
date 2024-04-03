@@ -145,6 +145,28 @@ FV_ComponentCodeAreaMoveUp(fv_component_t* component)
 
     if (code_area->cursor->y != 0)
         code_area->cursor->y--;
+
+    if (code_area->cursor->y < code_area->view_line)
+        code_area->view_line--;
+}
+
+i32
+FV_ComponentCodeAreaGetLinesToSee(fv_component_t* component)
+{
+    GET_CODE_AREA(component);
+
+    i32 line_pos_y = code_area->pos.y;
+    i32 index      = 0;
+
+    for (index = 0; index < code_area->splited_code->length; index++)
+    {
+        if (line_pos_y > (code_area->size.y + code_area->pos.y))
+            break;
+
+        line_pos_y += code_area->font_size + code_area->line_space;
+    }
+
+    return index - 2;
 }
 
 void 
@@ -152,8 +174,18 @@ FV_ComponentCodeAreaMoveDown(fv_component_t* component)
 {
     GET_CODE_AREA(component);
 
-    if (code_area->cursor->y != code_area->splited_code->length)
+    printf("%d/%d\n", code_area->cursor->y, code_area->splited_code->length - 1);
+    if (code_area->cursor->y != code_area->splited_code->length - 1)
         code_area->cursor->y++;
+
+    i64 line_length = strlen(FV_GetElementFromArray(
+                                code_area->splited_code, code_area->cursor->y));
+    if (code_area->cursor->x > line_length)
+        code_area->cursor->x = line_length;
+
+    if (code_area->cursor->y == 
+                    (code_area->view_line + FV_ComponentCodeAreaGetLinesToSee(component)))
+        code_area->view_line++;
 }
 
 void 
@@ -163,6 +195,13 @@ FV_ComponentCodeAreaMoveLeft(fv_component_t* component)
 
     if (code_area->cursor->x != 0)
         code_area->cursor->x--;
+    else
+        if (code_area->cursor->y != 0)
+        {
+            FV_ComponentCodeAreaMoveUp(component);
+            code_area->cursor->x = strlen(FV_GetElementFromArray(
+                                        code_area->splited_code, code_area->cursor->y));
+        }
 }
 
 void 
@@ -173,4 +212,12 @@ FV_ComponentCodeAreaMoveRight(fv_component_t* component)
     if (code_area->cursor->x 
             != strlen(FV_GetElementFromArray(code_area->splited_code, code_area->cursor->y)))
         code_area->cursor->x++;
+    else
+    {
+        if (code_area->cursor->y != code_area->splited_code->length)
+        {
+            code_area->cursor->x = 0;
+            FV_ComponentCodeAreaMoveDown(component);
+        }
+    }
 }

@@ -30,111 +30,10 @@
 #include <fv/fv_drawing.h>
 #include <fv/fv_render.h>
 #include <fv/fv_color.h>
+#include <fv/fv_io.h>
 
 #include <fv/fv_main.h>
 #include <fv/fv_app.h>
-
-// #define DEFAULT_CODE "okoko\n"
-#define DEFAULT_CODE "/*\n\
- * FVCode - Fast and easy code editor\n\
- * Copyright (C) 2023-2024 FVCode Developers\n\
- *   \n\
- * This program is free software: you can redistribute it and/or modify\n\
- * it under the terms of the GNU General Public License as published by\n\
- * the Free Software Foundation, either version 3 of the License, or\n\
- * (at your option) any later version.\n\
- *   \n\
- * This program is distributed in the hope that it will be useful,\n\
- * but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
- * GNU General Public License for more details.\n\
- *   \n\
- * You should have received a copy of the GNU General Public License\n\
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.\n\
- */\n\
-\n\
-#include <fv/fv.h>\n\
-\n\
-#include <fv/fv_string.h>\n\
-#include <fv/fv_array.h>\n\
-\n\
-#include <fv/fv_app.h>\n\
-\n\
-fv_array_t* \n\
-FV_StringSplitByNewline(char* s)\n\
-{\n\
-    return split_arr;\n\
-}"
-// #define DEFAULT_CODE "a\n\
-// b\n\
-// a\n\
-// b\n\
-// a\n\
-// a\n\
-// 3\n\
-// a\n\
-// dfa\n\
-// a\n\
-// a\n\
-// a\n\
-// ca\n\
-// a\n\
-// a\n\
-// ad\n\
-// a\n\
-// da\n\
-// a\n\
-// fa\n\
-// ad\n\
-// a\n\
-// 3\n\
-// a\n\
-// dfa\n\
-// a\n\
-// a\n\
-// a\n\
-// ca\n\
-// a\n\
-// a\n\
-// ad\n\
-// a\n\
-// da\n\
-// a\n\
-// fa\n\
-// ad\n\
-// a\n\
-// 3\n\
-// a\n\
-// dfa\n\
-// a\n\
-// a\n\
-// a\n\
-// ca\n\
-// a\n\
-// a\n\
-// ad\n\
-// a\n\
-// da\n\
-// a\n\
-// fa\n\
-// ad\n\
-// a\n\
-// 3\n\
-// a\n\
-// dfa\n\
-// a\n\
-// a\n\
-// a\n\
-// ca\n\
-// a\n\
-// a\n\
-// ad\n\
-// a\n\
-// da\n\
-// a\n\
-// fa\n\
-// ad\n\
-// a\n"
 
 /* This function will initalize app structure 
  * that is used in main function for managing
@@ -195,10 +94,13 @@ FV_AppInitFunctionDefault(fv_app_t* app)
     //     )
     // ));
 
+    const char* def_code = FV_ReadWholeFileContent("./word_counter.ba");
+    printf("%p\n", def_code);
+
     FV_TRY(
         FV_AppendComponent(app->component_manager,
             FV_CreateComponentCodeArea(FV_NewVector(0, 0), FV_NewVector(1280, 720), 20, 
-                                       FV_GetDefaultFont(app->font_manager), DEFAULT_CODE, "<none>"))
+                                       FV_GetDefaultFont(app->font_manager), (char*)def_code, "<none>"))
     );
     return 0;
 }   

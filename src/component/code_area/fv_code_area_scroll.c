@@ -73,8 +73,22 @@ FV_ComponentCodeAreaRenderScrollBar(fv_component_t* component, fv_app_t* app)
 {
     GET_CODE_AREA(component);
 
-    const i32 max_scroll_value = code_area->splited_code->length;
+    i32 max_scroll_value = code_area->splited_code->length;
 
-    const i32 scroll_bar_height = code_area->size.y;
-    const i32 track_height      = scroll_bar_height / max_scroll_value
+    i32 scroll_bar_height = code_area->size.y;
+    i32 track_height      = (scroll_bar_height / max_scroll_value) * 3;
+    f32 track_position    = ((f32)code_area->view_line / (f32)max_scroll_value) * (f32)scroll_bar_height;
+
+    if (track_height < 4)
+        track_height = 4;
+
+    FV_DrawFillRect(app, FV_NewVector(code_area->pos.x + code_area->size.x - 5,
+                                      code_area->pos.y),
+                         FV_NewVector(5, code_area->size.y),
+                         code_area->border_color);
+
+    FV_DrawFillRect(app, FV_NewVector(code_area->pos.x + code_area->size.x - 5,
+                                      code_area->pos.y + (i32)track_position),
+                         FV_NewVector(5, track_height),
+                         code_area->scroll_bar_color);
 }
