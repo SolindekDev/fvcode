@@ -27,8 +27,6 @@
 #include <fv/fv_font_manager.h>
 #include <fv/fv_font_draw.h>
 
-static fv_array_t* splited_code;
-
 typedef struct __fv_code_area_lines_values {
     i32 lines_letters,
         left_padding,
@@ -81,6 +79,8 @@ typedef struct __fv_component_code_area_t {
      * mouse_button_state - Current state of mouse */
     bool focus;
     bool mouse_button_state;
+
+    fv_array_t* splited_code;
 } fv_component_code_area_t;
 
 #define GET_CODE_AREA(component)                                                        \
@@ -93,7 +93,7 @@ i32 FV_ComponentCodeAreaEventFunction (fv_component_t* component, fv_app_t* app,
 i32 FV_ComponentCodeAreaRunFunction   (fv_component_t* component, fv_app_t* app);
 
 void FV_ComponentCodeAreaRenderText(fv_component_t* component, fv_app_t* app);
-void FV_ComponentTextBoxRenderLineNumbers(fv_component_t* component, fv_app_t* app);
+void FV_ComponentCodeAreaRenderLineNumbers(fv_component_t* component, fv_app_t* app);
 void FV_ComponentCodeAreaSetCursorByMouse(fv_component_t* component, fv_app_t* app, SDL_Event event);
 
 fv_code_area_lines_values_t FV_ComponentCodeAreaGetValues(fv_component_code_area_t* code_area);
@@ -103,5 +103,15 @@ fv_code_area_lines_values_t FV_ComponentCodeAreaGetValues(fv_component_code_area
  * fvcode so it needs to be as optimised as it can. */
 fv_vector_t FV_CodeAreaPositionByMouse(fv_component_t* component, fv_vector_t mouse_position);
 
+void FV_ComponentCodeAreaSetCursor(fv_component_t* component, fv_vector_t pos);
+void FV_ComponentCodeAreaMoveUp   (fv_component_t* component);
+void FV_ComponentCodeAreaMoveDown (fv_component_t* component);
+void FV_ComponentCodeAreaMoveLeft (fv_component_t* component);
+void FV_ComponentCodeAreaMoveRight(fv_component_t* component);
+
+void FV_ComponentCodeAreaHandleMouseWheel(fv_component_t* component, SDL_Event event);
+void FV_ComponentCodeAreaRenderScrollBar(fv_component_t* component, fv_app_t* app);
+void FV_ComponentCodeAreaIncrementViewLine(fv_component_t* component);
+void FV_ComponentCodeAreaDecrementViewLine(fv_component_t* component);
 
 #endif /* __FV_COMPONENT_CODE_AREA_H */

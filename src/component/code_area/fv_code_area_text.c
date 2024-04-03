@@ -34,10 +34,10 @@
 fv_code_area_lines_values_t
 FV_ComponentCodeAreaGetValues(fv_component_code_area_t* code_area)
 {
-    if (splited_code == NULL)
-        splited_code = FV_StringSplitByNewline(code_area->code_value);
+    if (code_area->splited_code == NULL)
+        code_area->splited_code = FV_StringSplitByNewline(code_area->code_value);
 
-    i32 lines_letters  = floor(log10(splited_code->length)) + 1;
+    i32 lines_letters  = floor(log10(code_area->splited_code->length)) + 1;
     i32 left_padding   = round((lines_letters * code_area->font_size) * 1.3);
     i32 text_pos_start = code_area->pos.x + 12 + left_padding;
 
@@ -47,12 +47,12 @@ FV_ComponentCodeAreaGetValues(fv_component_code_area_t* code_area)
 }
 
 void
-FV_ComponentTextBoxRenderLine(fv_component_t* component, fv_app_t* app, i32 line_index, 
+FV_ComponentCodeAreaRenderLine(fv_component_t* component, fv_app_t* app, i32 line_index, 
                               fv_vector_t* line_position, fv_code_area_lines_values_t values)
 {
     GET_CODE_AREA(component);
 
-    char* current_line = FV_GetElementFromArray(splited_code, line_index);
+    char* current_line = FV_GetElementFromArray(code_area->splited_code, line_index);
     size_t current_line_len = strlen(current_line);
 
     for (i32 i = 0; i < (current_line_len == 0 ? 0 : (current_line_len + 1)); i++) 
@@ -63,16 +63,16 @@ FV_ComponentTextBoxRenderLine(fv_component_t* component, fv_app_t* app, i32 line
         
         if (i != current_line_len + 1)
         {
-            char textbox_value_char = current_line[i];
+            char CodeArea_value_char = current_line[i];
 
-            if (textbox_value_char == '\n')
+            if (CodeArea_value_char == '\n')
             {
                 /* Newline character, advance y value and move x to the 
                  * starting point */
                 line_position->y += code_area->font_size + code_area->line_space;
                 line_position->x  = code_area->pos.x + 12 + values.left_padding;
             }
-            else if (textbox_value_char == '\t')
+            else if (CodeArea_value_char == '\t')
             {
                 /* Tab character, advance x by two times the 
                  * font size */
@@ -80,7 +80,7 @@ FV_ComponentTextBoxRenderLine(fv_component_t* component, fv_app_t* app, i32 line
             }
             else
             {
-                SDL_Surface* glyph_surface = TTF_RenderGlyph_Blended(code_area->default_font->font, textbox_value_char,
+                SDL_Surface* glyph_surface = TTF_RenderGlyph_Blended(code_area->default_font->font, CodeArea_value_char,
                                         (SDL_Color){ code_area->foreground_color.r, code_area->foreground_color.g, 
                                                      code_area->foreground_color.b, code_area->foreground_color.a });
                 SDL_Texture* glyph_texture = SDL_CreateTextureFromSurface(app->render->sdl_renderer, glyph_surface);
@@ -117,17 +117,17 @@ FV_ComponentCodeAreaRenderText(fv_component_t* component, fv_app_t* app)
 {
     GET_CODE_AREA(component);
 
-    splited_code = FV_StringSplitByNewline(code_area->code_value);
+    code_area->splited_code = FV_StringSplitByNewline(code_area->code_value);
 
     fv_code_area_lines_values_t values = FV_ComponentCodeAreaGetValues(code_area);
     fv_vector_t line_position          = FV_NewVector(values.text_pos_start, code_area->pos.y + 5);
 
-    for (i32 i = code_area->view_line; i < splited_code->length; i++)
+    for (i32 i = code_area->view_line; i < code_area->splited_code->length; i++)
     {
         if (line_position.y > (code_area->size.y + code_area->pos.y))
             break;
 
-        FV_ComponentTextBoxRenderLine(component, app, i, &line_position, values);
+        FV_ComponentCodeAreaRenderLine(component, app, i, &line_position, values);
         line_position.y += code_area->font_size + code_area->line_space;
     }
 
@@ -171,7 +171,7 @@ FV_RenderLineNumberText(fv_app_t* app, fv_component_t* component, i32 size,
 }
 
 void
-FV_ComponentTextBoxRenderLineNumberText(fv_component_t* component, fv_app_t* app, i32 i, 
+FV_ComponentCodeAreaRenderLineNumberText(fv_component_t* component, fv_app_t* app, i32 i, 
                                         fv_vector_t* number_position, fv_code_area_lines_values_t values)
 {
     GET_CODE_AREA(component);
@@ -194,7 +194,7 @@ FV_ComponentTextBoxRenderLineNumberText(fv_component_t* component, fv_app_t* app
 }
 
 void
-FV_ComponentTextBoxRenderLineNumbers(fv_component_t* component, fv_app_t* app)
+FV_ComponentCodeAreaRenderLineNumbers(fv_component_t* component, fv_app_t* app)
 {
     GET_CODE_AREA(component);
 
@@ -205,12 +205,12 @@ FV_ComponentTextBoxRenderLineNumbers(fv_component_t* component, fv_app_t* app)
                     FV_NewVector(code_area->pos.x + values.left_padding, code_area->pos.y + code_area->size.y),
                     code_area->border_color);
 
-    for (i32 i = code_area->view_line; i < splited_code->length; i++)
+    for (i32 i = code_area->view_line; i < code_area->splited_code->length; i++)
     {
         if (number_position.y > (code_area->size.y + code_area->pos.y))
             break;
 
-        FV_ComponentTextBoxRenderLineNumberText(component, app, i, &number_position, values);
+        FV_ComponentCodeAreaRenderLineNumberText(component, app, i, &number_position, values);
         number_position.y += code_area->font_size + code_area->line_space;
     }
 }

@@ -26,15 +26,10 @@
 #include <fv/fv_component.h>
 #include <fv/fv_collisions.h>
 #include <fv/fv_drawing.h>
+#include <fv/fv_string.h>
 
 #include <fv/fv_font_manager.h>
 #include <fv/fv_font_draw.h>
-
-fv_array_t* 
-FV_ComponentCodeAreaGetSplitedLines()
-{
-    return splited_code;
-}
 
 fv_component_t* 
 FV_CreateComponentCodeArea(fv_vector_t pos, fv_vector_t size, i32 font_size, 
@@ -84,12 +79,17 @@ FV_ComponentCodeAreaRenderFunction(fv_component_t* component, fv_app_t* app)
     FV_DrawFillRect(app, code_area->pos, code_area->size, code_area->background_color);
 
     FV_ComponentCodeAreaRenderText(component, app);
-    FV_ComponentTextBoxRenderLineNumbers(component, app);
+    FV_ComponentCodeAreaRenderLineNumbers(component, app);
+    FV_ComponentCodeAreaRenderScrollBar(component, app)
 
+    return 0;
 }   
 
 i32 
 FV_ComponentCodeAreaRunFunction(fv_component_t* component, fv_app_t* app)
 {
-    /* Nothing here for now */
+    GET_CODE_AREA(component);
+    code_area->splited_code = FV_StringSplitByNewline(code_area->code_value);
+
+    return 0;
 }

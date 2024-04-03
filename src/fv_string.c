@@ -69,7 +69,7 @@ FV_StringSplitByNewline(char* s)
                 char_index++;
             } 
             else
-                FV_ERROR_NO_EXIT("%d line is too long (1024 * 32 limit), skipping excess characters",
+                FV_ERROR_NO_EXIT("%d line is too long (1024 * 16 limit), skipping excess characters",
                                     MAX_LINE_LENGTH);
         }
     }

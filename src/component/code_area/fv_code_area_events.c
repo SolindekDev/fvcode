@@ -62,4 +62,17 @@ FV_ComponentCodeAreaEventFunction(fv_component_t* component, fv_app_t* app, SDL_
         SDL_StopTextInput();
     }
 
+    if (event.type == SDL_MOUSEMOTION)
+    {
+        bool motion_collision = FV_CollisionBoxVector(FV_NewVector(values.text_pos_start, code_area->pos.y + 5), code_area->size, 
+                                                      FV_NewVector(event.motion.x, event.motion.y), 
+                                                      FV_NewVector(1, 1));
+
+        SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
+    }
+
+    if (event.type == SDL_MOUSEWHEEL)
+        FV_ComponentCodeAreaHandleMouseWheel(component, event);
+
+    return 0;
 }

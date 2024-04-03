@@ -58,10 +58,12 @@ fv_vector_t FV_CodeAreaPositionByMouse(fv_component_t* component, fv_vector_t mo
 
     text_position.y = (whole_y / line_height) + code_area->view_line;
 
+    if (text_position.y > code_area->splited_code->length)
+        text_position.y = code_area->splited_code->length - 1;
+
     /* Determite the X cordinate in text */
 
-    fv_array_t* _splited_code = FV_StringSplitByNewline(code_area->code_value);
-    char*  current_line     = FV_GetElementFromArray(_splited_code, text_position.y);
+    char*  current_line     = FV_GetElementFromArray(code_area->splited_code, text_position.y);
     size_t current_line_len = strlen(current_line);
 
     i32    x_cord = start_x;
@@ -102,6 +104,73 @@ FV_ComponentCodeAreaSetCursorByMouse(fv_component_t* component, fv_app_t* app, S
     if (in_text_place.x == -1 && in_text_place.y == -1)
         return;
 
-    code_area->cursor->x = in_text_place.x;
-    code_area->cursor->y = in_text_place.y;
+    FV_ComponentCodeAreaSetCursor(component, in_text_place);
+}
+
+void
+FV_ComponentCodeAreaAssignToCursor(fv_component_t* component, fv_vector_t pos)
+{
+    GET_CODE_AREA(component);
+
+    code_area->cursor->x = pos.x;
+    code_area->cursor->y = pos.y;
+}
+
+void 
+FV_ComponentCodeAreaSetCursor(fv_component_t* component, fv_vector_t pos)
+{
+    GET_CODE_AREA(component);
+
+    FV_ComponentCodeAreaAssignToCursor(component, pos);
+
+    if (code_area->cursor->y < 0)
+        code_area->cursor->y = 0;
+
+    if (code_area->cursor->x < 0)
+        code_area->cursor->x = 0;
+
+    if (code_area->cursor->y > code_area->splited_code->length)
+        code_area->cursor->y = code_area->splited_code->length;
+
+    i64 line_length = strlen(FV_GetElementFromArray(
+                                code_area->splited_code, code_area->cursor->y));
+    if (code_area->cursor->x > line_length)
+        code_area->cursor->x = line_length;
+}
+
+void 
+FV_ComponentCodeAreaMoveUp(fv_component_t* component)
+{
+    GET_CODE_AREA(component);
+
+    if (code_area->cursor->y != 0)
+        code_area->cursor->y--;
+}
+
+void 
+FV_ComponentCodeAreaMoveDown(fv_component_t* component)
+{
+    GET_CODE_AREA(component);
+
+    if (code_area->cursor->y != code_area->splited_code->length)
+        code_area->cursor->y++;
+}
+
+void 
+FV_ComponentCodeAreaMoveLeft(fv_component_t* component)
+{
+    GET_CODE_AREA(component);
+
+    if (code_area->cursor->x != 0)
+        code_area->cursor->x--;
+}
+
+void 
+FV_ComponentCodeAreaMoveRight(fv_component_t* component)
+{
+    GET_CODE_AREA(component);
+
+    if (code_area->cursor->x 
+            != strlen(FV_GetElementFromArray(code_area->splited_code, code_area->cursor->y)))
+        code_area->cursor->x++;
 }
