@@ -30,3 +30,49 @@
 #include <fv/fv_font_manager.h>
 #include <fv/fv_font_draw.h>
 
+void
+FV_ComponentCodeAreaHighlight(fv_component_t* component, fv_app_t* app, SDL_Event event)
+{
+    GET_CODE_AREA(component);
+
+    fv_vector_t mouse_pos = { .x = event.motion.x, 
+                              .y = event.motion.y };
+
+    fv_vector_t highlight_cursor = FV_CodeAreaPositionByMouse(component, mouse_pos);
+    printf("highlight_start: %d, highlight_end: %d\n", 
+        code_area->highlight->highlight_start, 
+        code_area->highlight->highlight_end);
+
+    if (code_area->highlight->highlight_start == 0)
+    {
+        code_area->highlight->highlight_start = FV_ComponentCodeAreaGetAbsolutePositionOfPosition(component, highlight_cursor);
+        return;
+    }
+
+    code_area->highlight->highlight_end = FV_ComponentCodeAreaGetAbsolutePositionOfPosition(component, highlight_cursor);
+
+    printf("highlight_start: %d, highlight_end: %d\n", 
+        code_area->highlight->highlight_start, 
+        code_area->highlight->highlight_end);
+}
+
+void
+FV_ComponentCodeAreaButtonMotion(fv_component_t* component, fv_app_t* app, SDL_Event event)
+{
+    GET_CODE_AREA(component);
+
+    /* Set IBeam cursor when mouse is on the code area */
+    SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM));
+
+    if (code_area->mouse_button_state == true)
+        FV_ComponentCodeAreaHighlight(component, app, event);
+}
+
+void 
+FV_ComponentCodeAreaClearHighlight(fv_component_t* component)
+{
+    GET_CODE_AREA(component);
+
+    code_area->highlight->highlight_start = 0; 
+    code_area->highlight->highlight_end   = 0;
+}

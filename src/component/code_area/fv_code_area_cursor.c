@@ -105,6 +105,7 @@ FV_ComponentCodeAreaSetCursorByMouse(fv_component_t* component, fv_app_t* app, S
         return;
 
     FV_ComponentCodeAreaSetCursor(component, in_text_place);
+    FV_ComponentCodeAreaClearHighlight(component);
 }
 
 void
@@ -174,7 +175,6 @@ FV_ComponentCodeAreaMoveDown(fv_component_t* component)
 {
     GET_CODE_AREA(component);
 
-    printf("%d/%d\n", code_area->cursor->y, code_area->splited_code->length - 1);
     if (code_area->cursor->y != code_area->splited_code->length - 1)
         code_area->cursor->y++;
 

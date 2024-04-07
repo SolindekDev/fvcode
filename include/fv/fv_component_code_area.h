@@ -34,7 +34,8 @@ typedef struct __fv_code_area_lines_values {
 } fv_code_area_lines_values_t;
 
 typedef struct __fv_code_area_highlight_t {
-    i32 x;
+    i32 highlight_start;
+    i32 highlight_end;
 } fv_code_area_highlight_t;
 
 typedef struct {
@@ -119,5 +120,10 @@ void FV_ComponentCodeAreaKeyDownEvent(fv_component_t* component, fv_app_t* app, 
 void FV_ComponentCodeAreaTextInput(fv_component_t* component, fv_app_t* app, SDL_Event event);
 
 void FV_ComponentCodeAreaInsertCharAtCursor(fv_component_t* component, char append_char);
+void FV_ComponentCodeAreaButtonMotion(fv_component_t* component, fv_app_t* app, SDL_Event event);
+void FV_ComponentCodeAreaClearHighlight(fv_component_t* component);
+
+i32 FV_ComponentCodeAreaGetAbsolutePositionOfPosition(fv_component_t* component, fv_vector_t position);
+i32 FV_ComponentCodeAreaGetAbsolutePositionCursor(fv_component_t* component);
 
 #endif /* __FV_COMPONENT_CODE_AREA_H */

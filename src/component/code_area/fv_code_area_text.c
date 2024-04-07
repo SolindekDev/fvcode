@@ -63,16 +63,16 @@ FV_ComponentCodeAreaRenderLine(fv_component_t* component, fv_app_t* app, i32 lin
         
         if (i != current_line_len + 1)
         {
-            char CodeArea_value_char = current_line[i];
+            char code_area_value_char = current_line[i];
 
-            if (CodeArea_value_char == '\n')
+            if (code_area_value_char == '\n')
             {
                 /* Newline character, advance y value and move x to the 
                  * starting point */
                 line_position->y += code_area->font_size + code_area->line_space;
                 line_position->x  = code_area->pos.x + 12 + values.left_padding;
             }
-            else if (CodeArea_value_char == '\t')
+            else if (code_area_value_char == '\t')
             {
                 /* Tab character, advance x by two times the 
                  * font size */
@@ -215,28 +215,17 @@ FV_ComponentCodeAreaRenderLineNumbers(fv_component_t* component, fv_app_t* app)
     }
 }
 
-/*
-if (event.key.keysym.mod & FV_CONFIG_CONTROL_MOD)
-        {
-            FV_ComponentTextBoxHandleCtrlMod(component, app, event);
-            return 0;
-        }
-
-        else if (event.key.keysym.sym == SDLK_RETURN || event.key.keysym.sym == SDLK_KP_ENTER)
-            FV_ComponentTextBoxEnterKey(component, app, event);
-        else if (event.key.keysym.sym == SDLK_BACKSPACE)
-            FV_ComponentTextBoxBackspaceKey(component, app, event);
-        else if (event.key.keysym.sym == SDLK_TAB)
-            FV_ComponentTextBoxTabKey(component, app, event);
-
-    if (event.type == SDL_TEXTINPUT)
-        FV_ComponentTextBoxTextInput(component, app, event);
-        */
-        
 void
 FV_ComponentCodeAreaEnterKey(fv_component_t* component, fv_app_t* app, SDL_Event event)
 {
+    GET_CODE_AREA(component);
 
+    /* Insert new line character at cursor position, move the 
+     * cursor down by one and set cursor x to 0 */
+    FV_ComponentCodeAreaInsertCharAtCursor(component, '\n');
+    FV_ComponentCodeAreaMoveDown(component);
+    code_area->cursor->x = 0;
+    return;
 }
 
 void
@@ -246,8 +235,15 @@ FV_ComponentCodeAreaBackspaceKey(fv_component_t* component, fv_app_t* app, SDL_E
 
     i32 absolute_position = FV_ComponentCodeAreaGetAbsolutePositionCursor(component);
     char* cursor_position = &code_area->code_value[(i32)absolute_position];
-    memmove(cursor_position - 1, cursor_position, strlen(code_area->code_value) + 1);
+    i32 code_value_len    = strlen(code_area->code_value);
+    
+    if (absolute_position < 0) 
+        return;
 
+    /* Shift text so we effetively delete one character  */
+    memmove(cursor_position - 1, cursor_position, code_value_len - absolute_position + 1);
+    
+    /* Update the cursor position */
     if (code_area->cursor->x == 0)
     {
         if (code_area->cursor->y == 0)
@@ -259,13 +255,17 @@ FV_ComponentCodeAreaBackspaceKey(fv_component_t* component, fv_app_t* app, SDL_E
     else
         code_area->cursor->x--;
 
-    code_area->code_value = realloc(code_area->code_value, strlen(code_area->code_value) - 1);
+    code_area->code_value = realloc(code_area->code_value, code_value_len);
+    FV_NO_NULL(code_area->code_value);
 }
 
 void
 FV_ComponentCodeAreaTabKey(fv_component_t* component, fv_app_t* app, SDL_Event event)
 {
+    GET_CODE_AREA(component);
 
+    FV_ComponentCodeAreaInsertCharAtCursor(component, '\t');
+    return;
 }
 
 void
@@ -285,6 +285,39 @@ FV_ComponentCodeAreaKeyDownEvent(fv_component_t* component, fv_app_t* app, SDL_E
         FV_ComponentCodeAreaBackspaceKey(component, app, event);
     else if (event.key.keysym.sym == SDLK_TAB)
         FV_ComponentCodeAreaTabKey(component, app, event);
+}
+
+i32
+FV_ComponentCodeAreaGetAbsolutePositionOfPosition(fv_component_t* component, fv_vector_t position)
+{
+    GET_CODE_AREA(component);
+
+    i32 absolute_position = 0;
+    i32 code_length       = strlen(code_area->code_value);
+
+    i32 current_pos_x = 0;
+    i32 current_pos_y = 0;
+
+    for (absolute_position = 0; absolute_position < code_length; absolute_position++)
+    {
+        char current_char = code_area->code_value[absolute_position];
+
+        if (current_pos_x == position.x &&
+            current_pos_y == position.y)
+            break;
+
+        if (current_char == '\n')
+        {
+            current_pos_x =  0;
+            current_pos_y += 1;
+        }
+        else
+        {
+            current_pos_x += 1;
+        }
+    }
+
+    return absolute_position;
 }
 
 i32

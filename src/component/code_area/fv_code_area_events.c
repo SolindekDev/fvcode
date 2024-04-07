@@ -58,6 +58,7 @@ FV_ComponentCodeAreaEventFunction(fv_component_t* component, fv_app_t* app, SDL_
     else if (event.type == SDL_MOUSEBUTTONDOWN && mouse_collision)
     {
         FV_ComponentCodeAreaSetCursorByMouse(component, app, event);
+        code_area->mouse_button_state = true;
     }
     else if (event.type == SDL_MOUSEBUTTONDOWN && !mouse_collision)
     {
@@ -71,7 +72,10 @@ FV_ComponentCodeAreaEventFunction(fv_component_t* component, fv_app_t* app, SDL_
                                                       FV_NewVector(event.motion.x, event.motion.y), 
                                                       FV_NewVector(1, 1));
 
-        SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
+        if (event.type == SDL_MOUSEMOTION && motion_collision)
+            FV_ComponentCodeAreaButtonMotion(component, app, event);
+        else if (event.type == SDL_MOUSEMOTION && !motion_collision)
+            SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW));
     }
 
     if (event.type == SDL_KEYDOWN && code_area->focus)
@@ -82,6 +86,9 @@ FV_ComponentCodeAreaEventFunction(fv_component_t* component, fv_app_t* app, SDL_
 
     if (event.type == SDL_TEXTINPUT)
         FV_ComponentCodeAreaTextInput(component, app, event);
+
+    if (event.type == SDL_MOUSEBUTTONUP)
+        code_area->mouse_button_state = false;
 
     return 0;
 }

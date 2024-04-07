@@ -88,7 +88,7 @@ FV_AppInitFunctionDefault(fv_app_t* app)
     
     app->component_manager = FV_CreateComponentManager(app);
 
-    const char* def_code = FV_ReadWholeFileContent("./SDL_iostream.h");
+    const char* def_code = FV_ReadWholeFileContent("/usr/include/stdio.h");
 
     FV_TRY(
         FV_AppendComponent(app->component_manager,
