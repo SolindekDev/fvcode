@@ -87,15 +87,8 @@ FV_AppInitFunctionDefault(fv_app_t* app)
     FV_SetFontSize(app->font_manager, FV_CreateNewFontAsDefault(app->font_manager, FV_DEFAULT_FONT_PATH), 24);
     
     app->component_manager = FV_CreateComponentManager(app);
-    // FV_TRY(
-    //     FV_AppendComponent(app->component_manager, 
-    //         FV_CreateComponentCodeArea(FV_NewVector(0, 0), FV_NewVector(1280, 720), FV_NewColorRGB(19, 19, 19, 255), FV_NewColorRGB(211, 215, 207, 255), 
-    //         DEFAULT_CODE, FV_GetDefaultFont(app->font_manager), 20, FV_NewColorRGB(26, 26, 26, 255), 7.0f, "<none>", "<none>"
-    //     )
-    // ));
 
-    const char* def_code = FV_ReadWholeFileContent("./word_counter.ba");
-    printf("%p\n", def_code);
+    const char* def_code = FV_ReadWholeFileContent("./SDL_iostream.h");
 
     FV_TRY(
         FV_AppendComponent(app->component_manager,

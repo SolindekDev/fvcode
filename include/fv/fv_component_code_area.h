@@ -118,5 +118,6 @@ void FV_ComponentCodeAreaDecrementViewLine(fv_component_t* component);
 void FV_ComponentCodeAreaKeyDownEvent(fv_component_t* component, fv_app_t* app, SDL_Event event);
 void FV_ComponentCodeAreaTextInput(fv_component_t* component, fv_app_t* app, SDL_Event event);
 
+void FV_ComponentCodeAreaInsertCharAtCursor(fv_component_t* component, char append_char);
 
 #endif /* __FV_COMPONENT_CODE_AREA_H */

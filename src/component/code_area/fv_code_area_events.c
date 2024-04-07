@@ -75,7 +75,7 @@ FV_ComponentCodeAreaEventFunction(fv_component_t* component, fv_app_t* app, SDL_
     }
 
     if (event.type == SDL_KEYDOWN && code_area->focus)
-        FV_ComponentCodeAreaKeyDownEvent(component, event);
+        FV_ComponentCodeAreaKeyDownEvent(component, app, event);
 
     if (event.type == SDL_MOUSEWHEEL)
         FV_ComponentCodeAreaHandleMouseWheel(component, event);

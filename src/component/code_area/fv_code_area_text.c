@@ -242,7 +242,24 @@ FV_ComponentCodeAreaEnterKey(fv_component_t* component, fv_app_t* app, SDL_Event
 void
 FV_ComponentCodeAreaBackspaceKey(fv_component_t* component, fv_app_t* app, SDL_Event event)
 {
+    GET_CODE_AREA(component);
 
+    i32 absolute_position = FV_ComponentCodeAreaGetAbsolutePositionCursor(component);
+    char* cursor_position = &code_area->code_value[(i32)absolute_position];
+    memmove(cursor_position - 1, cursor_position, strlen(code_area->code_value) + 1);
+
+    if (code_area->cursor->x == 0)
+    {
+        if (code_area->cursor->y == 0)
+            return;
+
+        code_area->cursor->y--;
+        code_area->cursor->x = strlen(FV_GetElementFromArray(code_area->splited_code, code_area->cursor->y));
+    }
+    else
+        code_area->cursor->x--;
+
+    code_area->code_value = realloc(code_area->code_value, strlen(code_area->code_value) - 1);
 }
 
 void
@@ -270,12 +287,62 @@ FV_ComponentCodeAreaKeyDownEvent(fv_component_t* component, fv_app_t* app, SDL_E
         FV_ComponentCodeAreaTabKey(component, app, event);
 }
 
-void FV_ComponentCodeAreaTextInput(fv_component_t* component, fv_app_t* app, SDL_Event event) 
+i32
+FV_ComponentCodeAreaGetAbsolutePositionCursor(fv_component_t* component)
 {
-    fv_component_textbox_t* textbox = component->component_additional_data;
+    GET_CODE_AREA(component);
 
-    char* current_line = FV_GetElementFromArray(textbox->textbox_lines, textbox->cursor.y);
+    i32 absolute_position = 0;
+    i32 code_length       = strlen(code_area->code_value);
+
+    i32 current_pos_x = 0;
+    i32 current_pos_y = 0;
+
+    for (absolute_position = 0; absolute_position < code_length; absolute_position++)
+    {
+        char current_char = code_area->code_value[absolute_position];
+
+        if (current_pos_x == code_area->cursor->x &&
+            current_pos_y == code_area->cursor->y)
+            break;
+
+        if (current_char == '\n')
+        {
+            current_pos_x =  0;
+            current_pos_y += 1;
+        }
+        else
+        {
+            current_pos_x += 1;
+        }
+    }
+
+    return absolute_position;
+}
+
+void
+FV_ComponentCodeAreaInsertCharAtCursor(fv_component_t* component, char append_char)
+{
+    GET_CODE_AREA(component);
+
+    i32 absolute_position = FV_ComponentCodeAreaGetAbsolutePositionCursor(component);
+
+    int len = strlen(code_area->code_value);
+    code_area->code_value = (char *)realloc(code_area->code_value, (len + 2) * sizeof(char)); 
+    
+    for (int i = len; i >= absolute_position; i--) {
+        code_area->code_value[i + 1] = code_area->code_value[i];
+    }
+    
+    code_area->code_value[absolute_position] = append_char;
+    code_area->cursor->x++;
+}
+
+void 
+FV_ComponentCodeAreaTextInput(fv_component_t* component, fv_app_t* app, SDL_Event event) 
+{
+    GET_CODE_AREA(component);
     char append_char = event.text.text[0];
 
-    FV_ComponentTextBoxAddChar(textbox, current_line, append_char);
+    FV_ComponentCodeAreaInsertCharAtCursor(component, append_char);
 }
