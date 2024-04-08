@@ -78,9 +78,17 @@ fv_vector_t FV_CodeAreaPositionByMouse(fv_component_t* component, fv_vector_t mo
             char current_line_char = current_line[i];
             i32  adv = 0;
             TTF_GlyphMetrics32(code_area->default_font->font, current_line_char, NULL, NULL, NULL, NULL, &adv);
+           
+            if (current_line_char != '\t')
+                x_cord += adv;
+            else
+                x_cord += code_area->font_size * 2;
+
             standard_glyph_size = adv;
-            x_cord += adv;
-            if (x_cord < mouse_position.x && (x_cord + adv) > mouse_position.x)
+            if ((x_cord < mouse_position.x && (x_cord + adv) > mouse_position.x))
+                break;
+            else if ((current_line_char == '\t') && (x_cord - code_area->font_size * 2 < mouse_position.x &&
+                                                     x_cord > mouse_position.x))
                 break;
             else
                 continue;

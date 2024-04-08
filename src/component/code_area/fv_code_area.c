@@ -72,6 +72,15 @@ FV_CreateComponentCodeArea(fv_vector_t pos, fv_vector_t size, i32 font_size,
     return code_area_component;
 }
 
+void
+FV_ComponentCodeAreaRenderInfoBar(fv_component_t* component, fv_app_t* app)
+{
+    GET_CODE_AREA(component);
+
+    FV_DrawFillRect(app, FV_NewVector(code_area->pos.x, code_area->pos.y - (code_area->font_size * 1.6)),
+                    FV_NewVector(code_area->size.x, (code_area->font_size * 1.6)), code_area->background_color);
+}
+
 i32 
 FV_ComponentCodeAreaRenderFunction(fv_component_t* component, fv_app_t* app)
 {
@@ -82,6 +91,7 @@ FV_ComponentCodeAreaRenderFunction(fv_component_t* component, fv_app_t* app)
     FV_ComponentCodeAreaRenderText       (component, app);
     FV_ComponentCodeAreaRenderLineNumbers(component, app);
     FV_ComponentCodeAreaRenderScrollBar  (component, app);
+    FV_ComponentCodeAreaRenderInfoBar    (component, app);
 
     return 0;
 }   

@@ -64,10 +64,12 @@ typedef struct __fv_component_code_area_t {
 
     /* line_space - Space in px between every line 
      * font_size  - Font size in px 
-     * view_line  - First line number we see in our code_area  */
+     * view_line  - First line number we see in our code_area
+     * absolute_position_count - Used at rendering to keep track of absolute position */
     f32 line_space;
     i32 font_size;
     i32 view_line;
+    i32 absolute_position_count;
 
     /* code_value - File context in code area
      * filename   - Name of edited right now file */

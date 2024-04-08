@@ -57,6 +57,9 @@ FV_ComponentCodeAreaRenderLine(fv_component_t* component, fv_app_t* app, i32 lin
 
     for (i32 i = 0; i < (current_line_len == 0 ? 0 : (current_line_len + 1)); i++) 
     {
+        code_area->absolute_position_count++;
+        // printf("%d\n", code_area->absolute_position_count);
+
         if ((code_area->cursor->x == i && code_area->cursor->y == line_index) && code_area->focus)
             FV_DrawFillRect(app, FV_NewVector(line_position->x - 1, line_position->y + 2), 
                             FV_NewVector(2, code_area->font_size * 1.15), code_area->cursor_color);
@@ -80,7 +83,7 @@ FV_ComponentCodeAreaRenderLine(fv_component_t* component, fv_app_t* app, i32 lin
             }
             else
             {
-                SDL_Surface* glyph_surface = TTF_RenderGlyph_Blended(code_area->default_font->font, CodeArea_value_char,
+                SDL_Surface* glyph_surface = TTF_RenderGlyph_Blended(code_area->default_font->font, code_area_value_char,
                                         (SDL_Color){ code_area->foreground_color.r, code_area->foreground_color.g, 
                                                      code_area->foreground_color.b, code_area->foreground_color.a });
                 SDL_Texture* glyph_texture = SDL_CreateTextureFromSurface(app->render->sdl_renderer, glyph_surface);
@@ -100,6 +103,11 @@ FV_ComponentCodeAreaRenderLine(fv_component_t* component, fv_app_t* app, i32 lin
                 SDL_DestroyTexture(glyph_texture);
                 SDL_FreeSurface(glyph_surface);
                 line_position->x += glyph_size_x;
+
+                if (code_area->absolute_position_count >= code_area->highlight->highlight_start && 
+                    code_area->absolute_position_count <= code_area->highlight->highlight_end)
+                    FV_DrawFillRect(app, FV_NewVector(line_position->x, line_position->y),
+                                    FV_NewVector(glyph_size.x, glyph_size.y), code_area->highlight_color);
             }
         }
         
@@ -122,6 +130,14 @@ FV_ComponentCodeAreaRenderText(fv_component_t* component, fv_app_t* app)
     fv_code_area_lines_values_t values = FV_ComponentCodeAreaGetValues(code_area);
     fv_vector_t line_position          = FV_NewVector(values.text_pos_start, code_area->pos.y + 5);
 
+    if (code_area->view_line != 0)
+    {
+        i32 view_line_length = strlen(FV_GetElementFromArray(code_area->splited_code, code_area->view_line - 1));
+        code_area->absolute_position_count 
+            = FV_ComponentCodeAreaGetAbsolutePositionOfPosition(component, FV_NewVector(view_line_length, code_area->view_line - 1));
+        printf("%d\n", code_area->absolute_position_count );
+    }
+
     for (i32 i = code_area->view_line; i < code_area->splited_code->length; i++)
     {
         if (line_position.y > (code_area->size.y + code_area->pos.y))
@@ -131,6 +147,7 @@ FV_ComponentCodeAreaRenderText(fv_component_t* component, fv_app_t* app)
         line_position.y += code_area->font_size + code_area->line_space;
     }
 
+    code_area->absolute_position_count = 0;
 }
 
 void 

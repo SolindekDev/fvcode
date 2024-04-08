@@ -88,7 +88,8 @@ FV_AppInitFunctionDefault(fv_app_t* app)
     
     app->component_manager = FV_CreateComponentManager(app);
 
-    const char* def_code = FV_ReadWholeFileContent("/usr/include/stdio.h");
+    // const char* def_code = FV_ReadWholeFileContent("/usr/include/stdio.h");
+    const char* def_code = FV_ReadWholeFileContent("/Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk/usr/include/stdio.h");
 
     FV_TRY(
         FV_AppendComponent(app->component_manager,
