@@ -54,8 +54,9 @@ FV_ComponentCodeAreaRenderLine(fv_component_t* component, fv_app_t* app, i32 lin
 
     char* current_line = FV_GetElementFromArray(code_area->splited_code, line_index);
     size_t current_line_len = strlen(current_line);
-
-    // bool character_rendered = false;
+    
+    if (current_line_len == 0)
+        code_area->absolute_position_count++;
 
     for (i32 i = 0; i < (current_line_len == 0 ? 0 : (current_line_len + 1)); i++) 
     {
@@ -145,9 +146,12 @@ FV_ComponentCodeAreaRenderText(fv_component_t* component, fv_app_t* app)
 
     if (code_area->view_line != 0)
     {
-        i32 view_line_length = strlen(FV_GetElementFromArray(code_area->splited_code, code_area->view_line - 1));
+        // i32 view_line_length = strlen(FV_GetElementFromArray(code_area->splited_code, code_area->view_line - 1));
+        // code_area->absolute_position_count 
+        //     = FV_ComponentCodeAreaGetAbsolutePositionOfPosition(component, FV_NewVector(view_line_length, code_area->view_line - 1));
         code_area->absolute_position_count 
-            = FV_ComponentCodeAreaGetAbsolutePositionOfPosition(component, FV_NewVector(view_line_length, code_area->view_line - 1));
+            = FV_ComponentCodeAreaGetAbsolutePositionOfPosition(component, FV_NewVector(0, code_area->view_line));
+        printf("%d\n", code_area->absolute_position_count);
     }
 
     for (i32 i = code_area->view_line; i < code_area->splited_code->length; i++)

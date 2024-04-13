@@ -96,7 +96,6 @@ fv_vector_t FV_CodeAreaPositionByMouse(fv_component_t* component, fv_vector_t mo
     }
         
     text_position.x = (i + 1);
-    printf("%f\n", text_position.x);
 
     return text_position;
 }

@@ -39,10 +39,12 @@ FV_ComponentCodeAreaHighlight(fv_component_t* component, fv_app_t* app, SDL_Even
                               .y = event.motion.y };
 
     fv_vector_t highlight_cursor = FV_CodeAreaPositionByMouse(component, mouse_pos);
+    printf("Vector2{x:%f,y:%f}\n", highlight_cursor.x, highlight_cursor.y);
 
     if (code_area->highlight->highlight_start == 0)
     {
         code_area->highlight->highlight_start = FV_ComponentCodeAreaGetAbsolutePositionOfPosition(component, highlight_cursor) + 1;
+        printf("highlight_start:%d\n", code_area->highlight->highlight_start);
         return;
     }
 
