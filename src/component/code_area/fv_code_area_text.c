@@ -27,6 +27,7 @@
 #include <fv/fv_collisions.h>
 #include <fv/fv_string.h>
 #include <fv/fv_drawing.h>
+#include <fv/fv_math.h>
 
 #include <fv/fv_font_manager.h>
 #include <fv/fv_font_draw.h>
@@ -264,10 +265,33 @@ FV_ComponentCodeAreaEnterKey(fv_component_t* component, fv_app_t* app, SDL_Event
 }
 
 void
+FV_ComponentCodeAreaBackspaceHighlight(fv_component_t* component, fv_app_t* app, SDL_Event event)
+{
+    GET_CODE_AREA(component);
+
+    i32 highlight_start = code_area->highlight->highlight_start;
+    i32 highlight_end   = code_area->highlight->highlight_end;
+
+    i32 code_value_len = strlen(code_area->code_value);
+    i32 delete_count = highlight_end - highlight_start + 1;
+    memmove(&code_area->code_value[highlight_start - 1], &code_area->code_value[highlight_end], code_value_len - (i32)highlight_end);
+    
+    FV_ComponentCodeAreaClearHighlight(component);
+    code_area->code_value = realloc(code_area->code_value, code_value_len - delete_count);
+    FV_NO_NULL(code_area->code_value);
+}
+
+void
 FV_ComponentCodeAreaBackspaceKey(fv_component_t* component, fv_app_t* app, SDL_Event event)
 {
     GET_CODE_AREA(component);
 
+    if (code_area->highlight->highlight_start != 0 && code_area->highlight->highlight_end != 0)
+    {
+        FV_ComponentCodeAreaBackspaceHighlight(component, app, event);
+        return;
+    }
+ 
     i32 absolute_position = FV_ComponentCodeAreaGetAbsolutePositionCursor(component);
     char* cursor_position = &code_area->code_value[(i32)absolute_position];
     i32 code_value_len    = strlen(code_area->code_value);

@@ -56,7 +56,7 @@ FV_ComponentCodeAreaHighlight(fv_component_t* component, fv_app_t* app, SDL_Even
             = FV_ComponentCodeAreaGetAbsolutePositionOfPosition(component, 
                 FV_NewVector(strlen(FV_GetElementFromArray(code_area->splited_code, highlight_cursor.y)), highlight_cursor.y));
     
-        FV_ComponentCodeAreaSetCursor(component, highlight_cursor);
+        // FV_ComponentCodeAreaSetCursor(component, highlight_cursor);
     }
 }
 
