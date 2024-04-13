@@ -55,10 +55,11 @@ FV_ComponentCodeAreaRenderLine(fv_component_t* component, fv_app_t* app, i32 lin
     char* current_line = FV_GetElementFromArray(code_area->splited_code, line_index);
     size_t current_line_len = strlen(current_line);
 
+    // bool character_rendered = false;
+
     for (i32 i = 0; i < (current_line_len == 0 ? 0 : (current_line_len + 1)); i++) 
     {
         code_area->absolute_position_count++;
-        // printf("%d\n", code_area->absolute_position_count);
 
         if ((code_area->cursor->x == i && code_area->cursor->y == line_index) && code_area->focus)
             FV_DrawFillRect(app, FV_NewVector(line_position->x - 1, line_position->y + 2), 
@@ -79,6 +80,16 @@ FV_ComponentCodeAreaRenderLine(fv_component_t* component, fv_app_t* app, i32 lin
             {
                 /* Tab character, advance x by two times the 
                  * font size */
+                if (code_area->absolute_position_count >= code_area->highlight->highlight_start &&
+                    code_area->absolute_position_count <= code_area->highlight->highlight_end)
+                    FV_DrawFillRect(app, FV_NewVector(line_position->x, line_position->y),
+                                    FV_NewVector(code_area->font_size * 2, code_area->font_size), code_area->highlight_color);
+                
+                // if (character_rendered == false)
+                //     FV_DrawLine(app, FV_NewVector(line_position->x, line_position->y),
+                //                     FV_NewVector(line_position->x, line_position->y + (code_area->font_size + code_area->line_space)),
+                //                     FV_NewColorRGB(255, 255, 255, 40));
+
                 line_position->x += code_area->font_size * 2;
             }
             else
@@ -99,15 +110,17 @@ FV_ComponentCodeAreaRenderLine(fv_component_t* component, fv_app_t* app, i32 lin
                     .x = line_position->x, .y = line_position->y, 
                     .w = glyph_size.x,     .h = glyph_size.y
                 };
+
+                if (code_area->absolute_position_count >= code_area->highlight->highlight_start &&
+                    code_area->absolute_position_count <= code_area->highlight->highlight_end)
+                    FV_DrawFillRect(app, FV_NewVector(line_position->x, line_position->y),
+                                    FV_NewVector(glyph_size.x, glyph_size.y), code_area->highlight_color);
+                
                 SDL_RenderCopy(app->render->sdl_renderer, glyph_texture, NULL, &rect);
                 SDL_DestroyTexture(glyph_texture);
                 SDL_FreeSurface(glyph_surface);
                 line_position->x += glyph_size_x;
-
-                if (code_area->absolute_position_count >= code_area->highlight->highlight_start && 
-                    code_area->absolute_position_count <= code_area->highlight->highlight_end)
-                    FV_DrawFillRect(app, FV_NewVector(line_position->x, line_position->y),
-                                    FV_NewVector(glyph_size.x, glyph_size.y), code_area->highlight_color);
+                // character_rendered = true;
             }
         }
         
@@ -135,7 +148,6 @@ FV_ComponentCodeAreaRenderText(fv_component_t* component, fv_app_t* app)
         i32 view_line_length = strlen(FV_GetElementFromArray(code_area->splited_code, code_area->view_line - 1));
         code_area->absolute_position_count 
             = FV_ComponentCodeAreaGetAbsolutePositionOfPosition(component, FV_NewVector(view_line_length, code_area->view_line - 1));
-        printf("%d\n", code_area->absolute_position_count );
     }
 
     for (i32 i = code_area->view_line; i < code_area->splited_code->length; i++)
@@ -240,6 +252,8 @@ FV_ComponentCodeAreaEnterKey(fv_component_t* component, fv_app_t* app, SDL_Event
     /* Insert new line character at cursor position, move the 
      * cursor down by one and set cursor x to 0 */
     FV_ComponentCodeAreaInsertCharAtCursor(component, '\n');
+    FV_DestroyArray(code_area->splited_code);
+    code_area->splited_code = FV_StringSplitByNewline(code_area->code_value);
     FV_ComponentCodeAreaMoveDown(component);
     code_area->cursor->x = 0;
     return;
@@ -266,7 +280,7 @@ FV_ComponentCodeAreaBackspaceKey(fv_component_t* component, fv_app_t* app, SDL_E
         if (code_area->cursor->y == 0)
             return;
 
-        code_area->cursor->y--;
+        FV_ComponentCodeAreaMoveUp(component);
         code_area->cursor->x = strlen(FV_GetElementFromArray(code_area->splited_code, code_area->cursor->y));
     }
     else

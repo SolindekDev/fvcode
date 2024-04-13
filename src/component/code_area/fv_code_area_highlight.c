@@ -39,21 +39,23 @@ FV_ComponentCodeAreaHighlight(fv_component_t* component, fv_app_t* app, SDL_Even
                               .y = event.motion.y };
 
     fv_vector_t highlight_cursor = FV_CodeAreaPositionByMouse(component, mouse_pos);
-    printf("highlight_start: %d, highlight_end: %d\n", 
-        code_area->highlight->highlight_start, 
-        code_area->highlight->highlight_end);
 
     if (code_area->highlight->highlight_start == 0)
     {
-        code_area->highlight->highlight_start = FV_ComponentCodeAreaGetAbsolutePositionOfPosition(component, highlight_cursor);
+        code_area->highlight->highlight_start = FV_ComponentCodeAreaGetAbsolutePositionOfPosition(component, highlight_cursor) + 1;
         return;
     }
 
     code_area->highlight->highlight_end = FV_ComponentCodeAreaGetAbsolutePositionOfPosition(component, highlight_cursor);
-
-    printf("highlight_start: %d, highlight_end: %d\n", 
-        code_area->highlight->highlight_start, 
-        code_area->highlight->highlight_end);
+    if (code_area->highlight->highlight_end == strlen(code_area->code_value) &&
+        highlight_cursor.y                  != code_area->splited_code->length)
+    {
+        code_area->highlight->highlight_end 
+            = FV_ComponentCodeAreaGetAbsolutePositionOfPosition(component, 
+                FV_NewVector(strlen(FV_GetElementFromArray(code_area->splited_code, highlight_cursor.y)), highlight_cursor.y));
+    
+        FV_ComponentCodeAreaSetCursor(component, highlight_cursor);
+    }
 }
 
 void

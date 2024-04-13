@@ -79,6 +79,12 @@ FV_AppInitFunctionDefault(fv_app_t* app)
 {
     FV_SUCCESS("Executing \'FV_AppInitFunctionDefault\'. App is being initalized.", 0);
 
+    if (app->argc < 2)
+    {
+        FV_ERROR_NO_EXIT("Expected more arguments.", 0);
+        exit(EXIT_FAILURE);
+    }
+
     app->render = FV_RenderInit(app);
     FV_RenderCreateDefaultWindow(app->render);
     app->background   = FV_NewColorRGB(FV_BACKGROUND_COLOR);
@@ -89,7 +95,8 @@ FV_AppInitFunctionDefault(fv_app_t* app)
     app->component_manager = FV_CreateComponentManager(app);
 
     // const char* def_code = FV_ReadWholeFileContent("/usr/include/stdio.h");
-    const char* def_code = FV_ReadWholeFileContent("/Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk/usr/include/stdio.h");
+
+    const char* def_code = FV_ReadWholeFileContent(app->argv[1]);
 
     FV_TRY(
         FV_AppendComponent(app->component_manager,

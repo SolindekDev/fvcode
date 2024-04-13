@@ -58,7 +58,7 @@ fv_vector_t FV_CodeAreaPositionByMouse(fv_component_t* component, fv_vector_t mo
 
     text_position.y = (whole_y / line_height) + code_area->view_line;
 
-    if (text_position.y > code_area->splited_code->length)
+    if (text_position.y >= code_area->splited_code->length)
         text_position.y = code_area->splited_code->length - 1;
 
     /* Determite the X cordinate in text */
@@ -85,10 +85,10 @@ fv_vector_t FV_CodeAreaPositionByMouse(fv_component_t* component, fv_vector_t mo
                 x_cord += code_area->font_size * 2;
 
             standard_glyph_size = adv;
-            if ((x_cord < mouse_position.x && (x_cord + adv) > mouse_position.x))
+            if ((x_cord <= mouse_position.x && (x_cord + adv) >= mouse_position.x))
                 break;
-            else if ((current_line_char == '\t') && (x_cord - code_area->font_size * 2 < mouse_position.x &&
-                                                     x_cord > mouse_position.x))
+            else if ((current_line_char == '\t') && (x_cord - code_area->font_size * 2 <= mouse_position.x &&
+                                                     x_cord >= mouse_position.x))
                 break;
             else
                 continue;
@@ -96,6 +96,7 @@ fv_vector_t FV_CodeAreaPositionByMouse(fv_component_t* component, fv_vector_t mo
     }
         
     text_position.x = (i + 1);
+    printf("%f\n", text_position.x);
 
     return text_position;
 }
