@@ -264,22 +264,27 @@ FV_ComponentCodeAreaEnterKey(fv_component_t* component, fv_app_t* app, SDL_Event
     return;
 }
 
-void
-FV_ComponentCodeAreaBackspaceHighlight(fv_component_t* component, fv_app_t* app, SDL_Event event)
+void FV_ComponentCodeAreaBackspaceHighlight(fv_component_t* component, fv_app_t* app, SDL_Event event)
 {
     GET_CODE_AREA(component);
 
     i32 highlight_start = code_area->highlight->highlight_start;
-    i32 highlight_end   = code_area->highlight->highlight_end;
+    i32 highlight_end = code_area->highlight->highlight_end;
 
     i32 code_value_len = strlen(code_area->code_value);
-    i32 delete_count = highlight_end - highlight_start + 1;
-    memmove(&code_area->code_value[highlight_start - 1], &code_area->code_value[highlight_end], code_value_len - (i32)highlight_end);
+    i32 delete_count = highlight_end - highlight_start; // Removing +1 to avoid deleting one extra character
     
+    // Shift the remaining characters to overwrite the deleted portion
+    memmove(&code_area->code_value[highlight_start], &code_area->code_value[highlight_end], code_value_len - highlight_end + 1);
+    
+    // Clear the highlight
     FV_ComponentCodeAreaClearHighlight(component);
-    code_area->code_value = realloc(code_area->code_value, code_value_len - delete_count);
+    
+    // Reallocate memory for the code_value to remove the deleted portion
+    code_area->code_value = realloc(code_area->code_value, code_value_len - delete_count + 1);
     FV_NO_NULL(code_area->code_value);
 }
+
 
 void
 FV_ComponentCodeAreaBackspaceKey(fv_component_t* component, fv_app_t* app, SDL_Event event)
