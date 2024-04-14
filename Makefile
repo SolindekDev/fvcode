@@ -21,7 +21,7 @@ CFLAGS = -O3 -std=c2x -I./include $(shell pkg-config --cflags sdl2) -Wno-depreca
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
-LIBFLAGS = $(shell pkg-config --libs sdl2) -lSDL2_ttf -lm
+LIBFLAGS = $(shell pkg-config --libs sdl2) -lSDL2_ttf -lm -rdynamic
 endif
 ifeq ($(UNAME_S),Darwin)
 LIBFLAGS = $(shell pkg-config --libs sdl2 sdl2_ttf) -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo

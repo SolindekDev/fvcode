@@ -97,6 +97,7 @@ FV_AppInitFunctionDefault(fv_app_t* app)
     // const char* def_code = FV_ReadWholeFileContent("/usr/include/stdio.h");
 
     const char* def_code = FV_ReadWholeFileContent(app->argv[1]);
+    FV_NO_NULL(def_code);
 
     FV_TRY(
         FV_AppendComponent(app->component_manager,

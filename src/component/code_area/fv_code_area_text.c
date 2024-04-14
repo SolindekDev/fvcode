@@ -152,7 +152,6 @@ FV_ComponentCodeAreaRenderText(fv_component_t* component, fv_app_t* app)
         //     = FV_ComponentCodeAreaGetAbsolutePositionOfPosition(component, FV_NewVector(view_line_length, code_area->view_line - 1));
         code_area->absolute_position_count 
             = FV_ComponentCodeAreaGetAbsolutePositionOfPosition(component, FV_NewVector(0, code_area->view_line));
-        printf("%d\n", code_area->absolute_position_count);
     }
 
     for (i32 i = code_area->view_line; i < code_area->splited_code->length; i++)
@@ -283,6 +282,8 @@ void FV_ComponentCodeAreaBackspaceHighlight(fv_component_t* component, fv_app_t*
     // Reallocate memory for the code_value to remove the deleted portion
     code_area->code_value = realloc(code_area->code_value, code_value_len - delete_count + 1);
     FV_NO_NULL(code_area->code_value);
+
+    code_area->code_value[code_value_len - delete_count] = '\0';
 }
 
 

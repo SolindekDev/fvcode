@@ -40,6 +40,7 @@ FV_DrawFillRect(fv_app_t* app, fv_vector_t pos, fv_vector_t size, fv_color_t col
         .w = size.x, .h = size.y
     };
     SDL_RenderFillRect(app->render->sdl_renderer, &rect);
+    FV_NO_NULL(NULL);
     return;
 }
 

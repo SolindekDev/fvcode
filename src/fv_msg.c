@@ -22,8 +22,8 @@
 
 #include <fv/fv_app.h>
 
-#define FV_ERROR_MESSAGE                                             \
-     "\e[0;31mFVCode\e[0m: %s:%d in %s: %s\nExiting with 1 code.\n"  \
+#define FV_ERROR_MESSAGE                        \
+     "\e[0;31mFVCode\e[0m: %s:%d in %s: %s\n"   \
 
 #define FV_ERROR_NO_EXIT_MESSAGE                \
      "\e[0;31mFVCode\e[0m: %s:%d in %s: %s\n"   \
@@ -59,6 +59,12 @@ FV_Error(const char* file, i32 line,
 
     printf(FV_ERROR_MESSAGE, file, line, func, buffer);
     SDL_Quit();
+
+    /* Backtrace is avaliable only for linux machines */
+#ifdef __unix__
+    #include <fv/fv_backtrace.h>
+    FV_PrintBacktraceOfProgram();
+#endif /* __unix__ */
 
     va_end(ap);
     exit(1);
